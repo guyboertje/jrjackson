@@ -10,3 +10,9 @@ JrJackson::Json.parse(str) -> hash like object
 JrJackson::Smile.generate obj -> smile string
 JrJackson::Smile.parse smile_str -> hash like object
 
+
+credit to Chuck Remes for the benchmark and initial
+investigation when the jruby, json gem and the jackson
+libraries were young.
+
+I compared json-jruby 1.5.1 and jackson 1.7.3
