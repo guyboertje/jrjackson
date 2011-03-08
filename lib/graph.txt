@@ -1,0 +1,57 @@
+
+Thread 1 / 1
+
+ %total    %self      total      self    children    calls   Name
+----------------------------------------------------------------------------------------------------
+                         17         0          17        1  #toplevel
+  98.99%  81.82%         98        81          17        1  <Class::JrJackson::Json>#parse
+                          0         0           0        1  Module#initialize_copy
+                         17         4          13        1  JrJackson::RubyObjectDeserializer#mapObject
+----------------------------------------------------------------------------------------------------
+  98.99%   0.00%         98         0          98        1  #toplevel
+                         98        81          17        1  <Class::JrJackson::Json>#parse
+----------------------------------------------------------------------------------------------------
+                         17         4          13        1  <Class::JrJackson::Json>#parse
+  17.17%   4.04%         17         4          13        1  JrJackson::RubyObjectDeserializer#mapObject
+                          0         0           0        5  Comparable#==
+                          0         0           0        6  Array#push
+                         12         9           3        1  JrJackson::RubyObjectDeserializer#mapArray
+                          1         1           0        1  <Class::Hash>#[]
+----------------------------------------------------------------------------------------------------
+                         12         9           3        1  JrJackson::RubyObjectDeserializer#mapObject
+  12.12%   9.09%         12         9           3        1  JrJackson::RubyObjectDeserializer#mapArray
+                          1         1           0        2  Module#initialize_copy
+                          2         0           2        1  Enumerable#entries
+----------------------------------------------------------------------------------------------------
+                          2         2           0        1  Enumerable#entries
+   2.02%   2.02%          2         2           0        1  Java::JavaUtil::Collection#each
+                          0         0           0        2  Proc#call
+----------------------------------------------------------------------------------------------------
+                          2         0           2        1  JrJackson::RubyObjectDeserializer#mapArray
+   2.02%   0.00%          2         0           2        1  Enumerable#entries
+                          2         2           0        1  Java::JavaUtil::Collection#each
+----------------------------------------------------------------------------------------------------
+                          1         1           0        1  JrJackson::RubyObjectDeserializer#mapObject
+   1.01%   1.01%          1         1           0        1  <Class::Hash>#[]
+----------------------------------------------------------------------------------------------------
+                          0         0           0        1  <Class::JrJackson::Json>#parse
+                          1         1           0        2  JrJackson::RubyObjectDeserializer#mapArray
+   1.01%   1.01%          1         1           0        3  Module#initialize_copy
+----------------------------------------------------------------------------------------------------
+                          0         0           0        2  Java::JavaUtil::Collection#each
+   0.00%   0.00%          0         0           0        2  Proc#call
+----------------------------------------------------------------------------------------------------
+                          0         0           0        6  JrJackson::RubyObjectDeserializer#mapObject
+   0.00%   0.00%          0         0           0        6  Array#push
+----------------------------------------------------------------------------------------------------
+                          0         0           0        2  Java::JavaLang::Comparable#<=>
+   0.00%   0.00%          0         0           0        2  Kernel#nil?
+----------------------------------------------------------------------------------------------------
+                          0         0           0        2  Comparable#==
+   0.00%   0.00%          0         0           0        2  Java::JavaLang::Comparable#<=>
+                          0         0           0        2  Kernel#nil?
+----------------------------------------------------------------------------------------------------
+                          0         0           0        5  JrJackson::RubyObjectDeserializer#mapObject
+   0.00%   0.00%          0         0           0        5  Comparable#==
+                          0         0           0        2  Java::JavaLang::Comparable#<=>
+----------------------------------------------------------------------------------------------------

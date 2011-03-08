@@ -1,0 +1,17 @@
+
+*** Thread 1 / 1
+
+#:0
+  <Class::JrJackson::Json>#parse:98
+    Module#initialize_copy:0
+    JrJackson::RubyObjectDeserializer#mapObject:17
+      Comparable#==:0
+        Java::JavaLang::Comparable#<=>:0
+          Kernel#nil?:0
+      Array#push:0
+      JrJackson::RubyObjectDeserializer#mapArray:12
+        Module#initialize_copy:1
+        Enumerable#entries:2
+          Java::JavaUtil::Collection#each:2
+            Proc#call:0
+      <Class::Hash>#[]:1
