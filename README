@@ -1,0 +1,12 @@
+jrjackson
+
+a jruby library wrapping the JAVA jackson jars
+
+provides:
+
+JrJackson::Json.generate(obj) -> json string
+JrJackson::Json.parse(str) -> hash like object
+
+JrJackson::Smile.generate obj -> smile string
+JrJackson::Smile.parse smile_str -> hash like object
+
