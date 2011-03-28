@@ -15,4 +15,19 @@ credit to Chuck Remes for the benchmark and initial
 investigation when the jruby, json gem and the jackson
 libraries were young.
 
-I compared json-jruby 1.5.1 and jackson 1.7.3
+I compared json-jruby 1.5.1 and jackson 1.7.3 on jruby 1.6.0
+
+
+Variants:
+
+jrjackson.rb
+  this variant is the fastest but the parse function will
+  return Java ArrayList instead of Ruby Array and
+  Java LinkedHashMap instead of Ruby Hash.
+  In Jruby 1.6.0, these java classes have most if not all
+  of the behaviour of the corresponding Ruby classes
+
+jrjackson_r.rb
+  If you absolutely need Ruby Objects then use this variant
+  It parses a little bit slower than the json-jruby gem but
+  returns Ruby Array and Hash objects
