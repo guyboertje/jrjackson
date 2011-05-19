@@ -2,7 +2,7 @@
 
 spec = Gem::Specification.new do |s|
   s.name = 'jrjackson'
-  s.version = '0.0.3'
+  s.version = '0.0.4'
   s.authors = ['Guy Boertje']
   s.email = 'gboertje@gowebtop.com'
   s.date = '2011-04-25'

@@ -28,3 +28,4 @@ module JrJackson
   end
 end
 
+JSON = JrJackson::Json
