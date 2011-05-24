@@ -15,7 +15,13 @@ module JrJackson
       Mapper.read_value json_string, Jclass
     end
     def self.generate(object)
-       Mapper.writeValueAsString(object)
+      Mapper.writeValueAsString(object)
+    end
+    def self.load(json_string)
+      Mapper.read_value json_string, Jclass
+    end
+    def self.dump(object)
+      Mapper.writeValueAsString(object)
     end
   end
   module Smile
@@ -23,6 +29,12 @@ module JrJackson
       SmileMapper.read_value smile_bytes,0,smile_bytes.size, Jclass
     end
     def self.generate(object)
+      SmileMapper.writeValueAsBytes(object)
+    end
+    def self.load(smile_bytes)
+      SmileMapper.read_value smile_bytes,0,smile_bytes.size, Jclass
+    end
+    def self.dump(object)
       SmileMapper.writeValueAsBytes(object)
     end
   end
