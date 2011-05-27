@@ -16,5 +16,4 @@ spec = Gem::Specification.new do |s|
                 lib/jrjackson/jrjackson.rb lib/jrjackson/rubify.rb lib/jrjackson_r.rb
             )
   s.test_files = []
-  s.has_rdoc = false
 end
