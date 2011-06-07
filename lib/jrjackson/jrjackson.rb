@@ -40,4 +40,4 @@ module JrJackson
   end
 end
 
-JSON = JrJackson::Json
+JSON = JrJackson::Json unless defined?(JSON)

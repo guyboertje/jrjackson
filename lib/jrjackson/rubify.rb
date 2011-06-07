@@ -17,9 +17,13 @@ module JrJackson
       return {} if t != JsonToken::FIELD_NAME
       tmp = []
       begin
-        tmp.push(jp.getText)
+        k = jp.getText
         jp.nextToken
-        tmp.push(deserialize(jp, ctxt))
+        v = deserialize(jp, ctxt)
+        tmp.push(k)
+        tmp.push(v)
+        tmp.push(k.to_sym)
+        tmp.push(v)
       end while jp.nextToken != JsonToken::END_OBJECT
       Hash[*tmp]
     end
