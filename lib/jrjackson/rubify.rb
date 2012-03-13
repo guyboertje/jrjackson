@@ -22,8 +22,6 @@ module JrJackson
         v = deserialize(jp, ctxt)
         tmp.push(k)
         tmp.push(v)
-        tmp.push(k.to_sym)
-        tmp.push(v)
       end while jp.nextToken != JsonToken::END_OBJECT
       Hash[*tmp]
     end
