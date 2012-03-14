@@ -2,8 +2,8 @@
 
 Gem::Specification.new do |s|
   s.name        = 'jrjackson'
-  s.version     = '0.0.6'
-  s.date        = '2011-11-03'
+  s.version     = '0.0.7'
+  s.date        = '2012-03-14'
   s.platform    = Gem::Platform::RUBY
   s.authors     = ['Guy Boertje']
   s.email       = ['guyboertje@gmail.com']
@@ -12,6 +12,24 @@ Gem::Specification.new do |s|
   s.description = %q{}
 
   # = MANIFEST =
+  s.files = %w[
+    Gemfile
+    README
+    Rakefile
+    benchmarking/benchmark.rb
+    jrjackson.gemspec
+    lib/jrjackson.rb
+    lib/jrjackson/jackson-core-asl-1.9.5.jar
+    lib/jrjackson/jackson-mapper-asl-1.9.5.jar
+    lib/jrjackson/jackson-smile-1.9.5.jar
+    lib/jrjackson/jrjackson.rb
+    lib/jrjackson/rubify.rb
+    lib/jrjackson/rubify_with_symbol_keys.rb
+    lib/jrjackson/version.rb
+    lib/jrjackson_r.rb
+    lib/jrjackson_r_sym.rb
+    profiling/profiled.rb
+  ]
   # = MANIFEST =
 
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
