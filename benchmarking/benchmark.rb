@@ -1,8 +1,8 @@
 require 'rubygems'
 require 'benchmark'
-require 'md5'
+require 'digest'
 require 'json'
-require 'jrjackson'
+require 'lib/jrjackson'
 
 HASH = {:one => nil, :two => nil, :three => nil, :four => {:a => nil, :b => nil, :c =>nil},
 :five => {:d => nil, :e => nil},
@@ -40,7 +40,7 @@ METHODS = [:random_string, :random_number, :random_float]
 org_array = []
 one = []
 #
-0.upto(5000) do |i|
+0.upto(50000) do |i|
   hsh = HASH.dup
   org_array << randomize_entries(hsh)
 end
