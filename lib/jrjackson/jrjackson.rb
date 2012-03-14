@@ -1,5 +1,5 @@
-%W(jackson-core-lgpl-1.7.3.jar jackson-mapper-lgpl-1.7.3.jar jackson-smile-1.7.3.jar).each {|f| require File.join("jrjackson",f)}
-#jackson-smile-1.8.0.jar
+%W(jackson-core-asl-1.9.5.jar jackson-mapper-asl-1.9.5.jar jackson-smile-1.9.5.jar).each {|f| require File.join("jrjackson",f)}
+
 module JrJackson
   include_package "org.codehaus.jackson"
   include_package "org.codehaus.jackson.map"
