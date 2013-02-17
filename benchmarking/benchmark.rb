@@ -41,15 +41,14 @@ METHODS = [:random_string, :random_number, :random_float]
 
 org_array = []
 one = []
-#
-0.upto(20000) do |i|
+
+0.upto(10000) do |i|
   hsh = HASH.dup
   org_array << randomize_entries(hsh)
 end
 
 generated_array = []
 generated_smile = []
-
 
 org_array.each do |hsh|
   generated_array << JrJackson::Json.generate(hsh)
@@ -58,27 +57,27 @@ end
 
 Benchmark.bmbm("jackson generate: plus some margin".size) do |x|
 
+  x.report("ruby generate:") do
+    25.times {org_array.each {|hsh|  JSON.fast_generate(hsh) }}
+  end
+
   x.report("jackson generate:") do
-    10.times {org_array.each {|hsh| JrJackson::Json.generate(hsh)  }}
+    25.times {org_array.each {|hsh| JrJackson::Json.generate(hsh)  }}
   end
 
   # x.report("smile generate:") do
-  #   10.times {org_array.each {|hsh| JrJackson::Smile.generate(hsh)  }
-  # end
-
-  x.report("ruby generate:") do
-    10.times {org_array.each {|hsh|  JSON.fast_generate(hsh) }}
-  end
-
-  x.report("jackson parse:") do
-    10.times {generated_array.each {|string| JrJackson::Json.parse(string) }}
-  end
-
-  # x.report("smile parse:") do
-  #   10.times {generated_smile.each {|string| JrJackson::Smile.parse(string)  }
+  #   25.times {org_array.each {|hsh| JrJackson::Smile.generate(hsh)  }
   # end
 
   x.report("ruby parse:") do
-    10.times {generated_array.each {|string| JSON.parse(string) }}
+    25.times {generated_array.each {|string| JSON.parse(string) }}
   end
+
+  x.report("jackson parse:") do
+    25.times {generated_array.each {|string| JrJackson::Json.parse(string) }}
+  end
+
+  # x.report("smile parse:") do
+  #   25.times {generated_smile.each {|string| JrJackson::Smile.parse(string)  }
+  # end
 end
