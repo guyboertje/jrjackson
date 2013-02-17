@@ -7,4 +7,4 @@ require 'java'
 
 $CLASSPATH << 'jrjackson'
 
-require File.join("jrjackson","jrjackson")
+require File.expand_path File.join("lib", "jrjackson","jrjackson")

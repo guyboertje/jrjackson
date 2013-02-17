@@ -1,4 +1,4 @@
-%W(jackson-core-asl-1.9.5.jar jackson-mapper-asl-1.9.5.jar jackson-smile-1.9.5.jar).each {|f| require File.join("jrjackson",f)}
+%W(jackson-core-asl-1.9.5.jar jackson-mapper-asl-1.9.5.jar jackson-smile-1.9.5.jar).each {|f| require File.expand_path File.join("lib", "jrjackson",f)}
 
 module JrJackson
   include_package "org.codehaus.jackson"
