@@ -1,9 +1,42 @@
-%W(jackson-core-asl-1.9.5.jar jackson-mapper-asl-1.9.5.jar jackson-smile-1.9.5.jar).each {|f| require File.join("jrjackson",f)}
+%W(jackson-core-2.1.3.jar jackson-annotations-2.1.2.jar jackson-databind-2.1.3.jar jackson-dataformat-smile-2.1.3.jar).each {|f| require File.expand_path File.join("lib", "jrjackson",f)}
+# %W(jackson-core-asl-1.9.5.jar jackson-mapper-asl-1.9.5.jar jackson-smile-1.9.5.jar).each {|f| require File.join("jrjackson",f)}
 
 module JrJackson
-  include_package "org.codehaus.jackson"
-  include_package "org.codehaus.jackson.map"
-  include_package "org.codehaus.jackson.smile"
+  include_package "com.fasterxml.jackson.core"
+  include_package "com.fasterxml.jackson.databind"
+  include_package "com.fasterxml.jackson.dataformat.smile"
+
+  # include_package 'com.fasterxml.jackson.core'
+  # include_package 'com.fasterxml.jackson.core.io'
+  # include_package 'com.fasterxml.jackson.core.json'
+  # include_package 'com.fasterxml.jackson.core.util'
+  # include_package 'com.fasterxml.jackson.core.base'
+  # include_package 'com.fasterxml.jackson.core.sym'
+  # include_package 'com.fasterxml.jackson.core.type'
+  # include_package 'com.fasterxml.jackson.core.format'
+
+
+  # include_package 'com.fasterxml.jackson.databind'
+  # include_package 'com.fasterxml.jackson.databind.annotation'
+  # include_package 'com.fasterxml.jackson.databind.cfg'
+  # include_package 'com.fasterxml.jackson.databind.deser'
+  # include_package 'com.fasterxml.jackson.databind.deser.impl'
+  # include_package 'com.fasterxml.jackson.databind.deser.std'
+  # include_package 'com.fasterxml.jackson.databind.exc'
+  # include_package 'com.fasterxml.jackson.databind.ext'
+  # include_package 'com.fasterxml.jackson.databind.introspect'
+  # include_package 'com.fasterxml.jackson.databind.jsonschema'
+  # include_package 'com.fasterxml.jackson.databind.jsonFormatVisitors'
+  # include_package 'com.fasterxml.jackson.databind.jsontype'
+  # include_package 'com.fasterxml.jackson.databind.jsontype.impl'
+  # include_package 'com.fasterxml.jackson.databind.module'
+  # include_package 'com.fasterxml.jackson.databind.node'
+  # include_package 'com.fasterxml.jackson.databind.ser'
+  # include_package 'com.fasterxml.jackson.databind.ser.impl'
+  # include_package 'com.fasterxml.jackson.databind.ser.std'
+  # include_package 'com.fasterxml.jackson.databind.type'
+  # include_package 'com.fasterxml.jackson.databind.util'
+
 
   Jclass = java.lang.Object.java_class
 

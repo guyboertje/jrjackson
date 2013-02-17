@@ -5,6 +5,6 @@ end
 
 require 'java'
 
-$CLASSPATH << 'jrjackson'
+# $CLASSPATH << 'jrjackson'
 
-require File.join("jrjackson","jrjackson")
+require_relative File.join("jrjackson","jrjackson")
