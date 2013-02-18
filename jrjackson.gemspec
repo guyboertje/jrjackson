@@ -36,5 +36,6 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
 
   s.add_development_dependency  'awesome_print',      '~> 0.4.0'
+  s.add_development_dependency  'multi_json',         '~> 1.6.1'
 
 end
