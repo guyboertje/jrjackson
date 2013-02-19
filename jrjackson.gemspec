@@ -19,9 +19,9 @@ Gem::Specification.new do |s|
     benchmarking/benchmark.rb
     jrjackson.gemspec
     lib/jrjackson.rb
-    lib/jrjackson/jackson-core-asl-1.9.5.jar
-    lib/jrjackson/jackson-mapper-asl-1.9.5.jar
-    lib/jrjackson/jackson-smile-1.9.5.jar
+    lib/jrjackson/jackson-core-2.1.3.jar
+    lib/jrjackson/jackson-annotations-2.1.3.jar
+    lib/jrjackson/jackson-databind-2.1.3.jar
     lib/jrjackson/jrjackson.rb
     lib/jrjackson/rubify.rb
     lib/jrjackson/rubify_with_symbol_keys.rb

@@ -21,18 +21,14 @@ Credit to Chuck Remes for the benchmark and initial
 investigation when the jruby, json gem and the jackson
 libraries were young.
 
-I compared json-jruby 1.5.1 and jackson/smile 1.9.5 on jruby 1.6.7 and Java 7
-
-                                        user     system      total        real
-jackson generate:                   0.756000   0.000000   0.756000 (  0.756000)
-smile generate:                     0.530000   0.000000   0.530000 (  0.530000)
-ruby generate:                      2.754000   0.000000   2.754000 (  2.754000)
-jackson parse:                      0.630000   0.000000   0.630000 (  0.630000)
-smile parse:                        0.368000   0.000000   0.368000 (  0.368000)
-ruby parse:                         2.102000   0.000000   2.102000 (  2.102000)
-
-
-
+I compared json-jruby 1.6.1 and jackson/smile 2.1.3 on jruby 1.7.2 and Java 7
+```
+                        user     system      total        real
+ruby generate:     12.310000   0.030000  12.340000 ( 11.946000)
+jackson generate:   4.260000   0.010000   4.270000 (  4.037000)
+ruby parse:         8.450000   0.000000   8.450000 (  8.297000)
+jackson parse:      3.770000   0.000000   3.770000 (  3.241000)
+```
 
 Variants:
 
