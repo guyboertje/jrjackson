@@ -2,8 +2,8 @@
 
 Gem::Specification.new do |s|
   s.name        = 'jrjackson'
-  s.version     = '0.0.7'
-  s.date        = '2012-03-14'
+  s.version     = '0.0.9'
+  s.date        = '2013-03-26'
   s.platform    = Gem::Platform::RUBY
   s.authors     = ['Guy Boertje']
   s.email       = ['guyboertje@gmail.com']
@@ -14,21 +14,26 @@ Gem::Specification.new do |s|
   # = MANIFEST =
   s.files = %w[
     Gemfile
-    README
+    README.md
     Rakefile
+    benchmarking/.jrubyrc
     benchmarking/benchmark.rb
     jrjackson.gemspec
     lib/jrjackson.rb
-    lib/jrjackson/jackson-core-2.1.3.jar
-    lib/jrjackson/jackson-annotations-2.1.3.jar
-    lib/jrjackson/jackson-databind-2.1.3.jar
+    lib/jrjackson/jars/jrjackson-1.0.jar
     lib/jrjackson/jrjackson.rb
-    lib/jrjackson/rubify.rb
-    lib/jrjackson/rubify_with_symbol_keys.rb
     lib/jrjackson/version.rb
-    lib/jrjackson_r.rb
-    lib/jrjackson_r_sym.rb
+    lib/require_relative_patch.rb
+    pom.xml
     profiling/profiled.rb
+    src/main/java/com/jrjackson/JrJacksonRaw.java
+    src/main/java/com/jrjackson/JrJacksonService.java
+    src/main/java/com/jrjackson/JrJacksonStr.java
+    src/main/java/com/jrjackson/JrJacksonSym.java
+    src/main/java/com/jrjackson/ParseError.java
+    src/main/java/com/jrjackson/RubyObjectDeserializer.java
+    src/main/java/com/jrjackson/RubyObjectSymDeserializer.java
+    src/test/java/com/jrjackson/jruby/AppTest.java
   ]
   # = MANIFEST =
 
