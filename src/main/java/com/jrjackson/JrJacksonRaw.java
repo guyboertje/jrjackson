@@ -15,12 +15,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.util.*;
+import java.text.SimpleDateFormat;
 import java.io.IOException;
 
 @JRubyModule(name = "JrJacksonRaw")
 public class JrJacksonRaw extends RubyObject {
   private static final ObjectMapper mapper = new ObjectMapper();
 
+  static {
+    final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+    mapper.setDateFormat(sdf);
+  }
+  
   public JrJacksonRaw(Ruby ruby, RubyClass metaclass) {
     super(ruby, metaclass);
   }

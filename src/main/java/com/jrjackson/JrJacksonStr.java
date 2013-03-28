@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.util.*;
+import java.text.SimpleDateFormat;
 import java.io.IOException;
 
 @JRubyModule(name = "JrJacksonStr")
@@ -31,6 +32,8 @@ public class JrJacksonStr extends RubyObject {
     SimpleModule _module = new SimpleModule("JrJacksonStrModule", new Version(1, 0, 0, null));
     _module.addDeserializer(RubyObject.class, RubyObjectDeserializer.instance);
     mapper.registerModule(_module);
+    final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+    mapper.setDateFormat(sdf);
   }
 
   public JrJacksonStr(Ruby ruby, RubyClass metaclass) {
