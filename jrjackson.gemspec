@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.email       = ['guyboertje@gmail.com']
   s.homepage    = "http://github.com/guyboertje/jrjackson"
   s.summary     = %q{A JRuby wrapper for the java jackson json processor jar}
-  s.description = %q{}
+  s.description = %q{A mostly native JRuby wrapper for the java jackson json processor jar}
 
   # = MANIFEST =
   s.files = %w[
@@ -38,4 +38,9 @@ Gem::Specification.new do |s|
   # = MANIFEST =
 
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
+
+  s.add_development_dependency  'awesome_print',      '~> 1.0'
+  s.add_development_dependency  'gson'
+  s.add_development_dependency  'json'
+
 end
