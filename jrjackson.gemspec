@@ -3,7 +3,7 @@
 Gem::Specification.new do |s|
   s.name        = 'jrjackson'
   s.version     = '0.0.9'
-  s.date        = '2013-03-26'
+  s.date        = '2013-03-30'
   s.platform    = Gem::Platform::RUBY
   s.authors     = ['Guy Boertje']
   s.email       = ['guyboertje@gmail.com']
@@ -38,9 +38,4 @@ Gem::Specification.new do |s|
   # = MANIFEST =
 
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
-
-  s.add_development_dependency  'awesome_print',      '~> 0.4.0'
-  s.add_development_dependency  'multi_json',         '~> 1.6.1'
-
 end

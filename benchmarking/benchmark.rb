@@ -4,8 +4,7 @@ require 'rubygems'
 require 'benchmark'
 require 'thread'
 require 'digest'
-require 'json'
-# require File.expand_path('lib/jrjackson_r')
+require 'multi-json'
 require File.expand_path('lib/jrjackson')
 
 HASH = {:one => nil, :two => nil, :three => nil, :four => {:a => nil, :b => nil, :c =>nil},
