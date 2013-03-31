@@ -1,2 +1,4 @@
 Gemfile.lock
-pkg/
+pkg
+target
+Rakefile.old

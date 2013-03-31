@@ -1,10 +1,2 @@
-unless RUBY_PLATFORM =~ /java/
-  error "This library is only compatible with a java-based ruby environment like JRuby."
-  exit 255
-end
-
-require 'java'
-
-$CLASSPATH << 'jrjackson'
-
-require File.expand_path File.join("lib", "jrjackson","jrjackson")
+require "require_relative_patch" unless Kernel.respond_to?(:require_relative)
+require_relative "jrjackson/jrjackson"

@@ -2,14 +2,17 @@
 
 require 'rubygems'
 require 'benchmark'
+require 'thread'
 require 'digest'
 require 'json'
-require 'lib/jrjackson'
+require 'gson'
+
+require File.expand_path('lib/jrjackson')
 
 HASH = {:one => nil, :two => nil, :three => nil, :four => {:a => nil, :b => nil, :c =>nil},
 :five => {:d => nil, :e => nil},
 :six => {:f => nil, :g => nil, :h =>nil, :i => nil, :j => nil, :k => nil, :l => nil},
-:seven => nil, :eight => nil,
+:seven => nil, :eight => [],
 :nine => {:m => {:A => nil, :B => nil}}}
 
 def random_string
@@ -24,6 +27,14 @@ def random_float
   random_number + rand
 end
 
+def fill_array
+  value = []
+  5.times do
+    value.push send(METHODS[rand(3)])
+  end
+  value
+end
+
 def randomize_entries hsh
   new_hsh = {}
   hsh.each_pair do |key, value|
@@ -32,6 +43,8 @@ def randomize_entries hsh
       new_hsh[key] = send METHODS[rand(3)]
     when Hash
       new_hsh[key] = randomize_entries value
+    when Array
+      new_hsh[key] = fill_array
     end
   end
   new_hsh
@@ -42,42 +55,100 @@ METHODS = [:random_string, :random_number, :random_float]
 org_array = []
 one = []
 
-0.upto(10000) do |i|
+0.upto(5000) do |i|
   hsh = HASH.dup
   org_array << randomize_entries(hsh)
 end
 
 generated_array = []
 generated_smile = []
+q = Queue.new
 
 org_array.each do |hsh|
-  generated_array << JrJackson::Json.generate(hsh)
-  generated_smile << JrJackson::Smile.generate(hsh)
+  generated_array << JrJackson::Raw.generate(hsh)
 end
 
-Benchmark.bmbm("jackson generate: plus some margin".size) do |x|
+Benchmark.bmbm("jackson parse symbol keys:  ".size) do |x|
 
-  x.report("ruby generate:") do
-    25.times {org_array.each {|hsh|  JSON.fast_generate(hsh) }}
+  x.report("json java parse:") do
+    th1 = Thread.new(generated_array) do |arry|
+      50.times {arry.each {|string| ::JSON.parse("[#{string}]").first }}
+      q << true
+    end
+    th2 = Thread.new(generated_array) do |arry|
+      50.times {arry.each {|string| ::JSON.parse("[#{string}]").first }}
+      q << true
+    end
+    q.pop
+    q.pop
+    # 50.times {generated_array.each {|string| ::JSON.parse("[#{string}]").first }}
+  end
+
+  x.report("gson parse:") do
+    th1 = Thread.new(generated_array) do |arry|
+      50.times {arry.each {|string| ::Gson::Decoder.new({}).decode(string) }}
+      q << true
+    end
+    th2 = Thread.new(generated_array) do |arry|
+      50.times {arry.each {|string| ::Gson::Decoder.new({}).decode(string) }}
+      q << true
+    end
+    q.pop
+    q.pop
+    # 50.times {generated_array.each {|string| ::Gson::Decoder.new({}).decode(string) }}
+  end
+
+  x.report("jackson parse raw:") do
+    th1 = Thread.new(generated_array) do |arry|
+      50.times {arry.each {|string| JrJackson::Raw.parse(string) }}
+      q << true
+    end
+    th2 = Thread.new(generated_array) do |arry|
+      50.times {arry.each {|string| JrJackson::Raw.parse(string) }}
+      q << true
+    end
+    q.pop
+    q.pop
+    # 50.times {generated_array.each {|string| JrJackson::Raw.parse(string) }}
+  end
+
+  x.report("jackson parse symbol keys:") do
+    th1 = Thread.new(generated_array) do |arry|
+      50.times {arry.each {|string| JrJackson::Sym.parse(string) }}
+      q << true
+    end
+    th2 = Thread.new(generated_array) do |arry|
+      50.times {arry.each {|string| JrJackson::Sym.parse(string) }}
+      q << true
+    end
+    q.pop
+    q.pop
+    # 50.times {generated_array.each {|string| JrJackson::Sym.parse(string) }}
+  end
+
+  x.report("jackson parse string keys:") do
+    th1 = Thread.new(generated_array) do |arry|
+      50.times {arry.each {|string| JrJackson::Str.parse(string) }}
+      q << true
+    end
+    th2 = Thread.new(generated_array) do |arry|
+      50.times {arry.each {|string| JrJackson::Str.parse(string) }}
+      q << true
+    end
+    q.pop
+    q.pop
+    # 50.times {generated_array.each {|string| JrJackson::Str.parse(string) }}
+  end
+
+  x.report("json java generate:") do
+    50.times {org_array.each {|hsh|  hsh.to_json }}
+  end
+
+  x.report("gson generate:") do
+    50.times {org_array.each {|hsh|  ::Gson::Encoder.new({}).encode(hsh) }}
   end
 
   x.report("jackson generate:") do
-    25.times {org_array.each {|hsh| JrJackson::Json.generate(hsh)  }}
+    50.times {org_array.each {|hsh| JrJackson::Raw.generate(hsh)  }}
   end
-
-  # x.report("smile generate:") do
-  #   25.times {org_array.each {|hsh| JrJackson::Smile.generate(hsh)  }
-  # end
-
-  x.report("ruby parse:") do
-    25.times {generated_array.each {|string| JSON.parse(string) }}
-  end
-
-  x.report("jackson parse:") do
-    25.times {generated_array.each {|string| JrJackson::Json.parse(string) }}
-  end
-
-  # x.report("smile parse:") do
-  #   25.times {generated_smile.each {|string| JrJackson::Smile.parse(string)  }
-  # end
 end
