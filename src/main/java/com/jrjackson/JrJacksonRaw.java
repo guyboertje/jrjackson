@@ -13,10 +13,11 @@ import org.jruby.java.addons.IOJavaAddons;
 import org.jruby.javasupport.JavaUtil;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
+import org.jruby.util.RubyDateFormat;
 
 import java.io.InputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.util.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,8 +28,7 @@ public class JrJacksonRaw extends RubyObject {
   protected static final ObjectMapper mapper = new ObjectMapper();
 
   static {
-    final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-    mapper.setDateFormat(sdf);
+    mapper.setDateFormat(new RubyDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.US, true));
   }
 
   public JrJacksonRaw(Ruby ruby, RubyClass metaclass) {
