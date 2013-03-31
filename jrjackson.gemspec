@@ -11,6 +11,8 @@ Gem::Specification.new do |s|
   s.summary     = %q{A JRuby wrapper for the java jackson json processor jar}
   s.description = %q{A mostly native JRuby wrapper for the java jackson json processor jar}
 
+  s.add_development_dependency 'bundler', '~> 1.0'
+
   # = MANIFEST =
   s.files = %w[
     Gemfile
@@ -33,14 +35,7 @@ Gem::Specification.new do |s|
     src/main/java/com/jrjackson/ParseError.java
     src/main/java/com/jrjackson/RubyObjectDeserializer.java
     src/main/java/com/jrjackson/RubyObjectSymDeserializer.java
-    src/test/java/com/jrjackson/jruby/AppTest.java
   ]
   # = MANIFEST =
-
-  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
-
-  s.add_development_dependency  'awesome_print',      '~> 1.0'
-  s.add_development_dependency  'gson'
-  s.add_development_dependency  'json'
 
 end

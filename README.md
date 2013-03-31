@@ -17,13 +17,13 @@ There is shortly to be a MultiJson adapter added for JrJackson
 provides:
 
 ```
-JrJackson::Json.parse(str, options) -> hash like object
-  aliased as load
-JrJackson::Json.generate(obj) -> json string
-  aliased as dump
+JrJackson::Json.load(str, options) -> hash like object
+  aliased as parse
+JrJackson::Json.dump(obj) -> json string
+  aliased as generate
 ```
 
-By default the parse method will return a full Ruby object with stringed keys.
+By default the load method will return Ruby objects (Hashes have string keys).
 The options hash respects two symbol keys
   :symbolize_keys
     Will return symbol keys in hashes
@@ -45,14 +45,15 @@ Credit to Chuck Remes for the benchmark and initial
 investigation when the jruby, json gem and the jackson
 libraries were young.
 
-I compared json-jruby 1.6.1 and jackson/smile 2.1.4 on jruby 1.7.3 and Java 7
+I compared Json (java) 1.7.7, Gson 0.6.1 and jackson 2.1.4 on jruby 1.7.3 and Java 7
 ```
                                          user     system      total        real
-ruby parse:                         10.320000   0.010000  10.330000 ( 10.038000)
-jackson parse raw:                   4.590000   0.040000   4.630000 (  3.762000)
-jackson parse symbol keys:           5.140000   0.010000   5.150000 (  4.969000)
-jackson parse string keys:           7.520000   0.000000   7.520000 (  7.351000)
-ruby generate:                      13.700000   0.030000  13.730000 ( 12.893000)
-jackson generate:                    4.550000   0.010000   4.560000 (  4.462000)
-
+ruby parse:                         10.300000   0.020000  10.320000 ( 10.014000)
+gson parse:                         11.270000   0.010000  11.280000 ( 10.958000)
+jrjackson parse raw:                 4.840000   0.080000   4.920000 (  3.767000)
+jrjackson parse symbol keys:         5.130000   0.010000   5.140000 (  4.975000)
+jrjackson parse string keys:         7.370000   0.010000   7.380000 (  7.223000)
+ruby generate:                      13.590000   0.050000  13.640000 ( 12.815000)
+gson generate:                       5.080000   0.010000   5.090000 (  4.949000)
+jackson generate:                    4.640000   0.010000   4.650000 (  4.560000)
 ```
