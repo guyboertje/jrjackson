@@ -9,7 +9,7 @@ require 'com/jrjackson/jr_jackson'
 module JrJackson
   module Json
       class << self
-      TIME_REGEX = %r(\A\d{4}-\d\d-\d\d\s\d\d:\d\d:\d\d)
+      TIME_REGEX = %r(\A(\d{4}-\d\d-\d\d|(\w{3}\s){2}\d\d)\s\d\d:\d\d:\d\d)
       def load(json_string, options = {})
         mod = if options[:raw]
           JrJackson::Raw

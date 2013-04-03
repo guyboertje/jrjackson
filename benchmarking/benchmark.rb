@@ -4,7 +4,7 @@ require 'rubygems'
 require 'benchmark'
 require 'thread'
 require 'digest'
-require 'json'
+require 'json/ext'
 require 'gson'
 
 require File.expand_path('lib/jrjackson')
