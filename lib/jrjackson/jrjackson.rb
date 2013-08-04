@@ -8,8 +8,9 @@ require 'com/jrjackson/jr_jackson'
 
 module JrJackson
   module Json
-      class << self
+    module ClassMethods
       TIME_REGEX = %r(\A(\d{4}-\d\d-\d\d|(\w{3}\s){2}\d\d)\s\d\d:\d\d:\d\d)
+
       def load(json_string, options = {})
         mod = if options[:raw]
           JrJackson::Raw
@@ -47,7 +48,16 @@ module JrJackson
       alias :parse :load
       alias :generate :dump
     end
+
+    extend ClassMethods
+
+    def self.included(mod)
+      mod.extend(ClassMethods)
+    end
+
   end
 end
 
-JSON = JrJackson::Json unless defined?(JSON)
+module JSON
+  include JrJackson::Json
+end
