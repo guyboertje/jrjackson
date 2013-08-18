@@ -27,12 +27,8 @@ module JrJackson
 
       def dump(object)
         case object
-        when Array, Hash
+        when Array, Hash, String, nil, true, false
           JrJackson::Raw.generate(object)
-        when String
-          "\"#{object}\""
-        when nil, true, false
-          object
         else
           if object.respond_to?(:to_json)
             object.to_json
