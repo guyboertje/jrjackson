@@ -45,5 +45,3 @@ module JrJackson
     end
   end
 end
-
-JSON = JrJackson::Json unless defined?(JSON)
