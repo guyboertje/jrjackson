@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 
 @JRubyModule(name = "JrJacksonStr")
 public class JrJacksonStr extends RubyObject {
@@ -37,6 +38,11 @@ public class JrJacksonStr extends RubyObject {
   
   public JrJacksonStr(Ruby ruby, RubyClass metaclass) {
     super(ruby, metaclass);
+  }
+
+  @JRubyMethod(module = true, name = {"use_big_decimal_for_floats"})
+  public static void useBigDecimalForFloats(ThreadContext context, IRubyObject self) {
+    mapper.enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
   }
 
   @JRubyMethod(module = true, name = {"parse", "load"}, required = 1)

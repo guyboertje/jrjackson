@@ -18,6 +18,9 @@ module JrJackson
         else
           JrJackson::Str
         end
+
+        mod.use_big_decimal_for_floats if options[:use_big_decimal_for_floats]
+
         if json_string.is_a?(String) && json_string =~ TIME_REGEX
           mod.parse("\"#{json_string}\"")
         else
