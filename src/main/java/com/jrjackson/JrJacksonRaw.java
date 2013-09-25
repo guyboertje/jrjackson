@@ -4,6 +4,8 @@ import org.jruby.Ruby;
 import org.jruby.RubyClass;
 import org.jruby.RubyObject;
 import org.jruby.RubyString;
+import org.jruby.RubySymbol;
+import org.jruby.RubyHash;
 import org.jruby.RubyIO;
 import org.jruby.anno.JRubyMethod;
 import org.jruby.anno.JRubyModule;
@@ -21,34 +23,94 @@ import java.text.DateFormat;
 import java.util.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.core.JsonProcessingException;
+
+import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
 
 @JRubyModule(name = "JrJacksonRaw")
 public class JrJacksonRaw extends RubyObject {
-  protected static final ObjectMapper mapper = new ObjectMapper();
+  protected static ObjectMapper mapper_raw = new ObjectMapper();
+  protected static ObjectMapper mapper_sym = new ObjectMapper();
+  protected static ObjectMapper mapper_str = new ObjectMapper();
+  private static Ruby __ruby__;
 
-  static {
-    mapper.setDateFormat(new RubyDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.US, true));
+  {
+    mapper_raw.registerModule(
+      RubyJacksonModule.asRaw()
+    ).registerModule(
+      new AfterburnerModule()
+    ).setDateFormat(new RubyDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.US, true));
+    
+    mapper_sym.registerModule(
+      RubyJacksonModule.asSym()
+    ).registerModule(
+      new AfterburnerModule()
+    ).setDateFormat(new RubyDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.US, true));
+    
+    mapper_str.registerModule(
+      RubyJacksonModule.asStr()
+    ).registerModule(
+      new AfterburnerModule()
+    ).setDateFormat(new RubyDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.US, true));
   }
 
   public JrJacksonRaw(Ruby ruby, RubyClass metaclass) {
     super(ruby, metaclass);
+    this.__ruby__ = ruby;
   }
 
-  @JRubyMethod(module = true, name = {"parse", "load"}, required = 1)
-  public static IRubyObject parse(ThreadContext context, IRubyObject self, IRubyObject arg) {
+  private static boolean flagged(RubyHash opts, RubySymbol key) {
+    // if (opts == null) {
+    //   return false;
+    // }
+    Object val = opts.get(key);
+    if (val == null) {
+      return false;
+    }
+    return (Boolean) val;
+  }
+
+  // deserialize
+  @JRubyMethod(module = true, name = {"parse", "load"}, required = 2)
+  public static IRubyObject parse(ThreadContext context, IRubyObject self, IRubyObject arg, IRubyObject opts) 
+    throws IOException
+  {
+    RubyHash options = null;
     Ruby ruby = context.getRuntime();
+    ObjectMapper mapper = mapper_raw;
+
+    if (opts != context.nil) {
+      options = opts.convertToHash();
+      if (flagged(options, RubyUtils.rubySymbol(ruby, "symbolize_keys"))) {
+        mapper = mapper_sym;
+      }
+      if (flagged(options, RubyUtils.rubySymbol(ruby, "str"))) {
+        mapper = mapper_str;
+      }
+      if (flagged(options, RubyUtils.rubySymbol(ruby, "use_bigdecimal"))) {
+        mapper.enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
+      }
+      else {
+        mapper.disable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
+      }
+    }
+
     try {
       Object o;
       if (arg instanceof RubyString) {
-        o = mapper.readValue(arg.toString(), Object.class);
+        o = mapper.readValue(
+          arg.toString(), Object.class
+        );
       } else if ((arg instanceof RubyIO) || (arg instanceof RubyStringIO)) {
         IRubyObject stream = IOJavaAddons.AnyIO.any_to_inputstream(context, arg);
-        o =  mapper.readValue((InputStream)stream.toJava(InputStream.class), Object.class);
+        o = mapper.readValue((InputStream)stream.toJava(InputStream.class), Object.class);
       } else {
         throw ruby.newArgumentError("Unsupported source. This method accepts String or IO");
       }
-      return (RubyObject)JavaUtil.convertJavaToRuby(ruby, o);
+      return RubyUtils.rubyObject(ruby, o);
     }
     catch (JsonProcessingException e) {
       throw ParseError.newParseError(ruby, e.getLocalizedMessage());
@@ -58,13 +120,14 @@ public class JrJacksonRaw extends RubyObject {
     }
   }
 
+  // serialize
   @JRubyMethod(module = true, name = {"generate", "dump"}, required = 1)
   public static IRubyObject generate(ThreadContext context, IRubyObject self, IRubyObject arg) {
     Ruby ruby = context.getRuntime();
     Object obj = arg.toJava(Object.class);
     try {
-      String s = mapper.writeValueAsString(obj);
-      return ruby.newString(s);
+      String s = mapper_raw.writeValueAsString(obj);
+      return RubyUtils.rubyString(ruby, s);
     }
     catch (JsonProcessingException e) {
       throw ParseError.newParseError(ruby, e.getLocalizedMessage());

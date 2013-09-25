@@ -22,7 +22,7 @@ import org.jruby.javasupport.JavaUtil;
 import org.jruby.javasupport.util.RuntimeHelpers;
 
 
-public class RubyObjectDeserializer
+public abstract class RubyObjectDeserializer
     extends StdDeserializer<RubyObject>
 {
     private static final long serialVersionUID = 1L;
@@ -34,9 +34,11 @@ public class RubyObjectDeserializer
     /**
      * @since 2.2
      */
-    public final static RubyObjectDeserializer instance = new RubyObjectDeserializer();
     
     public RubyObjectDeserializer() { super(RubyObject.class); }
+
+    protected abstract RubyObject convertKey(JsonParser jp)
+      throws IOException;
 
     /*
     /**********************************************************
@@ -208,13 +210,13 @@ public class RubyObjectDeserializer
             // empty map might work; but caller may want to modify... so better just give small modifiable
             return RubyHash.newHash(__ruby__);
         }
-        RubyString field1 = rubyString(jp);
+        RubyObject field1 = convertKey(jp);
         jp.nextToken();
         RubyObject value1 = deserialize(jp, ctxt);
         if (jp.nextToken() != JsonToken.FIELD_NAME) { // single entry; but we want modifiable
             return RuntimeHelpers.constructHash(__ruby__, field1, value1);
         }
-        RubyString field2 = rubyString(jp);
+        RubyObject field2 = convertKey(jp);
         jp.nextToken();
         RubyObject value2 = deserialize(jp, ctxt);
         if (jp.nextToken() != JsonToken.FIELD_NAME) {
@@ -223,7 +225,7 @@ public class RubyObjectDeserializer
         // And then the general case; default map size is 16
         RubyHash result = RuntimeHelpers.constructHash(__ruby__, field1, value1, field2, value2);
         do {
-            RubyString fieldName = rubyString(jp);
+            RubyObject fieldName = convertKey(jp);
             jp.nextToken();
             result.fastASet(fieldName, deserialize(jp, ctxt));
         } while (jp.nextToken() != JsonToken.END_OBJECT);

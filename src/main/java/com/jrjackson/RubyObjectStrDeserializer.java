@@ -9,13 +9,13 @@ import org.jruby.Ruby;
 
 import org.jruby.RubyObject;
 
-public class RubyObjectSymDeserializer
+public class RubyObjectStrDeserializer
     extends RubyObjectDeserializer
 {
   
-  public final static RubyObjectSymDeserializer instance = new RubyObjectSymDeserializer();
+  public final static RubyObjectStrDeserializer instance = new RubyObjectStrDeserializer();
   
-  public RubyObjectSymDeserializer() { super(); }
+  public RubyObjectStrDeserializer() { super(); }
 
   /*
   /**********************************************************
@@ -24,7 +24,7 @@ public class RubyObjectSymDeserializer
    */
   
   protected RubyObject convertKey(JsonParser jp) throws IOException {
-    return RubyUtils.rubySymbol(Ruby.getGlobalRuntime(), jp.getText());
+    return RubyUtils.rubyString(Ruby.getGlobalRuntime(), jp.getText());
   }
 
 }
