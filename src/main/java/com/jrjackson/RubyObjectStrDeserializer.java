@@ -17,15 +17,7 @@ public class RubyObjectStrDeserializer
   
   public RubyObjectStrDeserializer() { super(); }
 
-  /*
-  /**********************************************************
-  /* Internal methods
-  /**********************************************************
-   */
-  
   protected RubyObject convertKey(JsonParser jp) throws IOException {
     return RubyUtils.rubyString(Ruby.getGlobalRuntime(), jp.getText());
   }
-
 }
-

@@ -1,25 +1,16 @@
 package com.jrjackson;
 
-import java.io.IOException;
 import java.util.*;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
 import org.jruby.*;
-import org.jruby.javasupport.JavaUtil;
-import org.jruby.runtime.builtin.IRubyObject;
-import org.jruby.ext.bigdecimal.RubyBigDecimal;
+import org.jruby.util.RubyDateFormat;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.util.StdConverter;
 import com.fasterxml.jackson.core.util.VersionUtil;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.fasterxml.jackson.databind.deser.std.StdDelegatingDeserializer;
 
-import com.fasterxml.jackson.databind.node.*;
+import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
 
 public class RubyJacksonModule extends SimpleModule
 {
@@ -29,14 +20,41 @@ public class RubyJacksonModule extends SimpleModule
     super("JrJacksonStrModule", VersionUtil.versionFor(RubyJacksonModule.class));
   }
 
-  public static Module asRaw()
+  public static ObjectMapper mappedAs(String key)
+  {
+    ObjectMapper mapper = new ObjectMapper();
+    
+    mapper.registerModule(
+      new AfterburnerModule()
+    );
+
+    if (key == "sym") {
+      mapper.registerModule(
+        asSym()
+      );
+    }
+    else if (key == "raw") {
+      mapper.registerModule(
+        asRaw()
+      );
+    }
+    else {
+      mapper.registerModule(
+        asStr()
+      );
+    }
+    mapper.setDateFormat(new RubyDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.US, true));
+    return mapper;
+  }
+
+  public static SimpleModule asRaw()
   { 
     return new RubyJacksonModule().addSerializer(
       RubySymbol.class, ToStringSerializer.instance
     );
   }
 
-  public static Module asSym()
+  public static SimpleModule asSym()
   { 
     return new RubyJacksonModule().addSerializer(
       RubySymbol.class, ToStringSerializer.instance
@@ -45,9 +63,8 @@ public class RubyJacksonModule extends SimpleModule
     );
   }
 
-  public static Module asStr()
+  public static SimpleModule asStr()
   { 
-    // .addKeyDeserializer(RubySymbol.class, RubySymbolKeyDeserializer.instance);
     return new RubyJacksonModule().addSerializer(
       RubySymbol.class, ToStringSerializer.instance
     ).addDeserializer(

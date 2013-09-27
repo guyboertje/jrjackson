@@ -12,61 +12,48 @@ import org.jruby.anno.JRubyModule;
 import org.jruby.exceptions.RaiseException;
 import org.jruby.ext.stringio.RubyStringIO;
 import org.jruby.java.addons.IOJavaAddons;
-import org.jruby.javasupport.JavaUtil;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
-import org.jruby.util.RubyDateFormat;
 
 import java.io.InputStream;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.util.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.core.JsonProcessingException;
-
-import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
 
 @JRubyModule(name = "JrJacksonRaw")
 public class JrJacksonRaw extends RubyObject {
-  protected static ObjectMapper mapper_raw = new ObjectMapper();
-  protected static ObjectMapper mapper_sym = new ObjectMapper();
-  protected static ObjectMapper mapper_str = new ObjectMapper();
-  private static Ruby __ruby__;
+  private static final HashMap<String, ObjectMapper> mappers = new HashMap<String, ObjectMapper>(3);
+  private static final HashMap<String, RubySymbol> symbols = new HashMap<String, RubySymbol>(2);
 
-  {
-    mapper_raw.registerModule(
-      RubyJacksonModule.asRaw()
-    ).registerModule(
-      new AfterburnerModule()
-    ).setDateFormat(new RubyDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.US, true));
-    
-    mapper_sym.registerModule(
-      RubyJacksonModule.asSym()
-    ).registerModule(
-      new AfterburnerModule()
-    ).setDateFormat(new RubyDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.US, true));
-    
-    mapper_str.registerModule(
-      RubyJacksonModule.asStr()
-    ).registerModule(
-      new AfterburnerModule()
-    ).setDateFormat(new RubyDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.US, true));
+  private static final Ruby _ruby = Ruby.getGlobalRuntime();
+
+  static {
+    mappers.put("str",
+      RubyJacksonModule.mappedAs("str")
+    );
+    mappers.put("sym",
+      RubyJacksonModule.mappedAs("sym")
+    );
+    mappers.put("raw",
+      RubyJacksonModule.mappedAs("raw")
+    );
+    symbols.put("sym",
+      RubyUtils.rubySymbol(_ruby, "symbolize_keys")
+    );
+    symbols.put("bigdecimal",
+      RubyUtils.rubySymbol(_ruby, "use_bigdecimal")
+    );
   }
 
   public JrJacksonRaw(Ruby ruby, RubyClass metaclass) {
     super(ruby, metaclass);
-    this.__ruby__ = ruby;
   }
 
-  private static boolean flagged(RubyHash opts, RubySymbol key) {
-    // if (opts == null) {
-    //   return false;
-    // }
-    Object val = opts.get(key);
+  private static boolean flagged(RubyHash opts, String key) {
+    Object val = opts.get(symbols.get(key));
     if (val == null) {
       return false;
     }
@@ -75,28 +62,52 @@ public class JrJacksonRaw extends RubyObject {
 
   // deserialize
   @JRubyMethod(module = true, name = {"parse", "load"}, required = 2)
-  public static IRubyObject parse(ThreadContext context, IRubyObject self, IRubyObject arg, IRubyObject opts) 
+  public static IRubyObject parse(ThreadContext context, IRubyObject self, IRubyObject arg, IRubyObject opts)
     throws IOException
   {
     RubyHash options = null;
-    Ruby ruby = context.getRuntime();
-    ObjectMapper mapper = mapper_raw;
+    String key = "str";
 
     if (opts != context.nil) {
       options = opts.convertToHash();
-      if (flagged(options, RubyUtils.rubySymbol(ruby, "symbolize_keys"))) {
-        mapper = mapper_sym;
+      if (flagged(options, "sym")) {
+        key = "sym";
       }
-      if (flagged(options, RubyUtils.rubySymbol(ruby, "str"))) {
-        mapper = mapper_str;
-      }
-      if (flagged(options, RubyUtils.rubySymbol(ruby, "use_bigdecimal"))) {
-        mapper.enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
+      if (flagged(options, "bigdecimal")) {
+        mappers.get(key).enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
       }
       else {
-        mapper.disable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
+        mappers.get(key).disable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
       }
     }
+    return _parse(context, arg, mappers.get(key));
+  }
+
+  @JRubyMethod(module = true, name = {"parse_raw", "load_raw"}, required = 1)
+  public static IRubyObject parse_raw(ThreadContext context, IRubyObject self, IRubyObject arg)
+    throws IOException
+  {
+    return _parse(context, arg, mappers.get("raw"));
+  }
+
+  @JRubyMethod(module = true, name = {"parse_sym", "load_sym"}, required = 1)
+  public static IRubyObject parse_sym(ThreadContext context, IRubyObject self, IRubyObject arg)
+    throws IOException
+  {
+    return _parse(context, arg, mappers.get("sym"));
+  }
+
+  @JRubyMethod(module = true, name = {"parse_str", "load_str"}, required = 1)
+  public static IRubyObject parse_str(ThreadContext context, IRubyObject self, IRubyObject arg)
+    throws IOException
+  {
+    return _parse(context, arg, mappers.get("str"));
+  }
+
+  public static IRubyObject _parse(ThreadContext context, IRubyObject arg, ObjectMapper mapper) 
+    throws IOException
+  {
+    Ruby ruby = context.getRuntime();
 
     try {
       Object o;
@@ -126,7 +137,7 @@ public class JrJacksonRaw extends RubyObject {
     Ruby ruby = context.getRuntime();
     Object obj = arg.toJava(Object.class);
     try {
-      String s = mapper_raw.writeValueAsString(obj);
+      String s = mappers.get("raw").writeValueAsString(obj);
       return RubyUtils.rubyString(ruby, s);
     }
     catch (JsonProcessingException e) {

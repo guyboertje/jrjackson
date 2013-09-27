@@ -13,14 +13,8 @@ public class JrJacksonService implements BasicLibraryService {
   public boolean basicLoad(final Ruby ruby) throws IOException {
     RubyModule jr_jackson = ruby.defineModule("JrJackson");
 
-    RubyModule jr_jackson_str = ruby.defineModuleUnder("Str", jr_jackson);
-    jr_jackson_str.defineAnnotatedMethods(JrJacksonStr.class);
-
     RubyModule jr_jackson_raw = ruby.defineModuleUnder("Raw", jr_jackson);
     jr_jackson_raw.defineAnnotatedMethods(JrJacksonRaw.class);
-
-    RubyModule jr_jackson_sym = ruby.defineModuleUnder("Sym", jr_jackson);
-    jr_jackson_sym.defineAnnotatedMethods(JrJacksonSym.class);
 
     RubyClass runtimeError = ruby.getRuntimeError();
     RubyClass parseError = jr_jackson.defineClassUnder("ParseError", runtimeError, runtimeError.getAllocator());

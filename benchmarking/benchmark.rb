@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'rubygems'
+require 'bigdecimal'
 require 'benchmark'
 require 'thread'
 require 'digest'
@@ -100,44 +101,44 @@ Benchmark.bmbm("jackson parse symbol keys:  ".size) do |x|
 
   x.report("jackson parse raw:") do
     th1 = Thread.new(generated_array) do |arry|
-      50.times {arry.each {|string| JrJackson::Raw.parse(string) }}
+      50.times {arry.each {|string| JrJackson::Raw.parse_raw(string) }}
       q << true
     end
     th2 = Thread.new(generated_array) do |arry|
-      50.times {arry.each {|string| JrJackson::Raw.parse(string) }}
+      50.times {arry.each {|string| JrJackson::Raw.parse_raw(string) }}
       q << true
     end
     q.pop
     q.pop
-    # 50.times {generated_array.each {|string| JrJackson::Raw.parse(string) }}
+    # 50.times {generated_array.each {|string| JrJackson::Raw.parse(string, opts) }}
   end
 
   x.report("jackson parse symbol keys:") do
     th1 = Thread.new(generated_array) do |arry|
-      50.times {arry.each {|string| JrJackson::Sym.parse(string) }}
+      50.times {arry.each {|string| JrJackson::Raw.parse_sym(string) }}
       q << true
     end
     th2 = Thread.new(generated_array) do |arry|
-      50.times {arry.each {|string| JrJackson::Sym.parse(string) }}
+      50.times {arry.each {|string| JrJackson::Raw.parse_sym(string) }}
       q << true
     end
     q.pop
     q.pop
-    # 50.times {generated_array.each {|string| JrJackson::Sym.parse(string) }}
+    # 50.times {generated_array.each {|string| JrJackson::Raw.parse_sym(string) }}
   end
 
   x.report("jackson parse string keys:") do
     th1 = Thread.new(generated_array) do |arry|
-      50.times {arry.each {|string| JrJackson::Str.parse(string) }}
+      50.times {arry.each {|string| JrJackson::Raw.parse_str(string) }}
       q << true
     end
     th2 = Thread.new(generated_array) do |arry|
-      50.times {arry.each {|string| JrJackson::Str.parse(string) }}
+      50.times {arry.each {|string| JrJackson::Raw.parse_str(string) }}
       q << true
     end
     q.pop
     q.pop
-    # 50.times {generated_array.each {|string| JrJackson::Str.parse(string) }}
+    # 50.times {generated_array.each {|string| JrJackson::Raw.parse_str(string) }}
   end
 
   x.report("json java generate:") do

@@ -10,6 +10,7 @@ import org.jruby.*;
 import org.jruby.javasupport.JavaUtil;
 import org.jruby.runtime.builtin.IRubyObject;
 import org.jruby.ext.bigdecimal.RubyBigDecimal;
+import org.jruby.runtime.Block;
 
 public class RubyUtils
 {
@@ -44,12 +45,12 @@ public class RubyUtils
     return (RubyHash)JavaUtil.convertJavaToRuby(ruby, arg);
   }
 
-  public static RubyFixnum rubyFixnum(Ruby ruby, Integer arg)
+  public static RubyFixnum rubyFixnum(Ruby ruby, int arg)
   {
     return ruby.newFixnum(arg);
   }
 
-  public static RubyFixnum rubyFixnum(Ruby ruby, Long arg)
+  public static RubyFixnum rubyFixnum(Ruby ruby, long arg)
   {
     return ruby.newFixnum(arg);
   }
@@ -59,7 +60,7 @@ public class RubyUtils
     return RubyBignum.newBignum(ruby, arg);
   }
 
-  public static RubyFloat rubyFloat(Ruby ruby, Double arg)
+  public static RubyFloat rubyFloat(Ruby ruby, double arg)
   {
     return ruby.newFloat(arg);
   }

@@ -17,15 +17,7 @@ public class RubyObjectSymDeserializer
   
   public RubyObjectSymDeserializer() { super(); }
 
-  /*
-  /**********************************************************
-  /* Internal methods
-  /**********************************************************
-   */
-  
   protected RubyObject convertKey(JsonParser jp) throws IOException {
     return RubyUtils.rubySymbol(Ruby.getGlobalRuntime(), jp.getText());
   }
-
 }
-
