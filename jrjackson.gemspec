@@ -22,7 +22,7 @@ Gem::Specification.new do |s|
     benchmarking/benchmark.rb
     jrjackson.gemspec
     lib/jrjackson.rb
-    lib/jrjackson/jars/jrjackson-1.0.jar
+    lib/jrjackson/jars/jrjackson-1.2.1.jar
     lib/jrjackson/jrjackson.rb
     lib/jrjackson/version.rb
     lib/require_relative_patch.rb
@@ -30,11 +30,12 @@ Gem::Specification.new do |s|
     profiling/profiled.rb
     src/main/java/com/jrjackson/JrJacksonRaw.java
     src/main/java/com/jrjackson/JrJacksonService.java
-    src/main/java/com/jrjackson/JrJacksonStr.java
-    src/main/java/com/jrjackson/JrJacksonSym.java
     src/main/java/com/jrjackson/ParseError.java
+    src/main/java/com/jrjackson/RubyJacksonModule.java
+    src/main/java/com/jrjackson/RubyUtils.java
     src/main/java/com/jrjackson/RubyObjectDeserializer.java
     src/main/java/com/jrjackson/RubyObjectSymDeserializer.java
+    src/main/java/com/jrjackson/RubyObjectStrDeserializer.java
   ]
   # = MANIFEST =
 

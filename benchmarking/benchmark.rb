@@ -73,11 +73,13 @@ Benchmark.bmbm("jackson parse symbol keys:  ".size) do |x|
 
   x.report("json java parse:") do
     th1 = Thread.new(generated_array) do |arry|
-      50.times {arry.each {|string| ::JSON.parse("[#{string}]").first }}
+      # 50.times {arry.each {|string| ::JSON.parse("[#{string}]").first }}
+      50.times {arry.each {|string| ::JSON.parse(string).first }}
       q << true
     end
     th2 = Thread.new(generated_array) do |arry|
-      50.times {arry.each {|string| ::JSON.parse("[#{string}]").first }}
+      # 50.times {arry.each {|string| ::JSON.parse("[#{string}]").first }}
+      50.times {arry.each {|string| ::JSON.parse(string).first }}
       q << true
     end
     q.pop
@@ -87,11 +89,11 @@ Benchmark.bmbm("jackson parse symbol keys:  ".size) do |x|
 
   x.report("gson parse:") do
     th1 = Thread.new(generated_array) do |arry|
-      50.times {arry.each {|string| ::Gson::Decoder.new({}).decode(string) }}
+      50.times {arry.each {|string| ::Gson::Decoder.new.decode(string) }}
       q << true
     end
     th2 = Thread.new(generated_array) do |arry|
-      50.times {arry.each {|string| ::Gson::Decoder.new({}).decode(string) }}
+      50.times {arry.each {|string| ::Gson::Decoder.new.decode(string) }}
       q << true
     end
     q.pop

@@ -26,7 +26,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 @JRubyModule(name = "JrJacksonRaw")
 public class JrJacksonRaw extends RubyObject {
   private static final HashMap<String, ObjectMapper> mappers = new HashMap<String, ObjectMapper>(3);
-  private static final HashMap<String, RubySymbol> symbols = new HashMap<String, RubySymbol>(2);
+  private static final HashMap<String, RubySymbol> symbols = new HashMap<String, RubySymbol>(3);
 
   private static final Ruby _ruby = Ruby.getGlobalRuntime();
 
@@ -42,6 +42,9 @@ public class JrJacksonRaw extends RubyObject {
     );
     symbols.put("sym",
       RubyUtils.rubySymbol(_ruby, "symbolize_keys")
+    );
+    symbols.put("raw",
+      RubyUtils.rubySymbol(_ruby, "raw")
     );
     symbols.put("bigdecimal",
       RubyUtils.rubySymbol(_ruby, "use_bigdecimal")
@@ -72,6 +75,9 @@ public class JrJacksonRaw extends RubyObject {
       options = opts.convertToHash();
       if (flagged(options, "sym")) {
         key = "sym";
+      }
+      if (flagged(options, "raw")) {
+        key = "raw";
       }
       if (flagged(options, "bigdecimal")) {
         mappers.get(key).enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
