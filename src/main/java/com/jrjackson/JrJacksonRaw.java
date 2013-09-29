@@ -70,6 +70,7 @@ public class JrJacksonRaw extends RubyObject {
   {
     RubyHash options = null;
     String key = "str";
+    ObjectMapper local;
 
     if (opts != context.nil) {
       options = opts.convertToHash();
@@ -79,14 +80,18 @@ public class JrJacksonRaw extends RubyObject {
       if (flagged(options, "raw")) {
         key = "raw";
       }
+      local = mappers.get(key).copy();
       if (flagged(options, "bigdecimal")) {
-        mappers.get(key).enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
+        local.enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
       }
       else {
-        mappers.get(key).disable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
+        local.disable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
       }
     }
-    return _parse(context, arg, mappers.get(key));
+    else {
+      local = mappers.get(key).copy();
+    }
+    return _parse(context, arg, local);
   }
 
   @JRubyMethod(module = true, name = {"parse_raw", "load_raw"}, required = 1)
