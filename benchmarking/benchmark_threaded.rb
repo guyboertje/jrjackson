@@ -73,23 +73,70 @@ q = Queue.new
 Benchmark.bmbm("jackson parse symbol keys:  ".size) do |x|
 
   x.report("json java parse:") do
-    50.times {generated_array.each {|string| ::JSON.parse(string) }}
+    th1 = Thread.new(generated_array) do |arry|
+      # 50.times {arry.each {|string| ::JSON.parse("[#{string}]").first }}
+      50.times {arry.each {|string| ::JSON.parse(string).first }}
+      q << true
+    end
+    th2 = Thread.new(generated_array) do |arry|
+      # 50.times {arry.each {|string| ::JSON.parse("[#{string}]").first }}
+      50.times {arry.each {|string| ::JSON.parse(string).first }}
+      q << true
+    end
+    q.pop
+    q.pop
   end
 
   x.report("gson parse:") do
-    50.times {generated_array.each {|string| ::Gson::Decoder.new({}).decode(string) }}
-  end
-
-  x.report("jackson parse string keys:") do
-    50.times {generated_array.each {|string| JrJackson::Raw.parse_str(string) }}
-  end
-
-  x.report("jackson parse symbol keys:") do
-    50.times {generated_array.each {|string| JrJackson::Raw.parse_sym(string) }}
+    th1 = Thread.new(generated_array) do |arry|
+      50.times {arry.each {|string| ::Gson::Decoder.new.decode(string) }}
+      q << true
+    end
+    th2 = Thread.new(generated_array) do |arry|
+      50.times {arry.each {|string| ::Gson::Decoder.new.decode(string) }}
+      q << true
+    end
+    q.pop
+    q.pop
   end
 
   x.report("jackson parse raw:") do
-    50.times {generated_array.each {|string| JrJackson::Raw.parse_raw(string) }}
+    th1 = Thread.new(generated_array) do |arry|
+      50.times {arry.each {|string| JrJackson::Raw.parse_raw(string) }}
+      q << true
+    end
+    th2 = Thread.new(generated_array) do |arry|
+      50.times {arry.each {|string| JrJackson::Raw.parse_raw(string) }}
+      q << true
+    end
+    q.pop
+    q.pop
+  end
+
+  x.report("jackson parse symbol keys:") do
+    th1 = Thread.new(generated_array) do |arry|
+      50.times {arry.each {|string| JrJackson::Raw.parse_sym(string) }}
+      q << true
+    end
+    th2 = Thread.new(generated_array) do |arry|
+      50.times {arry.each {|string| JrJackson::Raw.parse_sym(string) }}
+      q << true
+    end
+    q.pop
+    q.pop
+  end
+
+  x.report("jackson parse string keys:") do
+    th1 = Thread.new(generated_array) do |arry|
+      50.times {arry.each {|string| JrJackson::Raw.parse_str(string) }}
+      q << true
+    end
+    th2 = Thread.new(generated_array) do |arry|
+      50.times {arry.each {|string| JrJackson::Raw.parse_str(string) }}
+      q << true
+    end
+    q.pop
+    q.pop
   end
 
   x.report("json java generate:") do

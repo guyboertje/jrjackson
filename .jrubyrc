@@ -125,18 +125,17 @@ invokedynamic.cache.ivars=true
 # Options: [true, false], Default: false.
 invokedynamic.class.values=false
 
-
 # ################################################################################
 # # jit settings
 # ################################################################################
 
 # # Set the JIT threshold to the specified method invocation count.
 # # Options: [Integer], Default: 50.
-# jit.threshold=50
+jit.threshold=1
 
 # # Set the max count of active methods eligible for JIT-compilation.
 # # Options: [Integer], Default: 4096.
-# jit.max=4096
+jit.max=16384
 
 # # Set the maximum full-class byte size allowed for jitted methods.
 # # Options: [Integer], Default: 30000.
