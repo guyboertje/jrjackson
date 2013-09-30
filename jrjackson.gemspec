@@ -15,14 +15,17 @@ Gem::Specification.new do |s|
 
   # = MANIFEST =
   s.files = %w[
+    .jrubyrc
     Gemfile
     README.md
     Rakefile
     benchmarking/.jrubyrc
     benchmarking/benchmark.rb
+    benchmarking/benchmark_threaded.rb
+    dependency-reduced-pom.xml
     jrjackson.gemspec
     lib/jrjackson.rb
-    lib/jrjackson/jars/jrjackson-1.2.1.jar
+    lib/jrjackson/jars/jrjackson-1.2.2.jar
     lib/jrjackson/jrjackson.rb
     lib/jrjackson/version.rb
     lib/require_relative_patch.rb
@@ -32,10 +35,12 @@ Gem::Specification.new do |s|
     src/main/java/com/jrjackson/JrJacksonService.java
     src/main/java/com/jrjackson/ParseError.java
     src/main/java/com/jrjackson/RubyJacksonModule.java
-    src/main/java/com/jrjackson/RubyUtils.java
     src/main/java/com/jrjackson/RubyObjectDeserializer.java
-    src/main/java/com/jrjackson/RubyObjectSymDeserializer.java
     src/main/java/com/jrjackson/RubyObjectStrDeserializer.java
+    src/main/java/com/jrjackson/RubyObjectSymDeserializer.java
+    src/main/java/com/jrjackson/RubyUtils.java
+    src/test/java/com/jrjackson/jruby/AppTest.java
+    test/jrjackson_test.rb
   ]
   # = MANIFEST =
 
