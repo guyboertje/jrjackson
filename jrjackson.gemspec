@@ -2,8 +2,8 @@
 
 Gem::Specification.new do |s|
   s.name        = 'jrjackson'
-  s.version     = '0.1.1'
-  s.date        = '2013-04-03'
+  s.version     = '0.2.0'
+  s.date        = '2013-09-30'
   s.platform    = Gem::Platform::RUBY
   s.authors     = ['Guy Boertje']
   s.email       = ['guyboertje@gmail.com']
