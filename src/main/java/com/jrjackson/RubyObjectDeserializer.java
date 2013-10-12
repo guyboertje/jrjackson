@@ -17,7 +17,7 @@ import org.jruby.RubyHash;
 import org.jruby.javasupport.util.RuntimeHelpers;
 
 
-public abstract class RubyObjectDeserializer
+public class RubyObjectDeserializer
   extends StdDeserializer<RubyObject>
 {
   private static final long serialVersionUID = 1L;
@@ -26,14 +26,29 @@ public abstract class RubyObjectDeserializer
 
   protected final static Ruby __ruby__ = Ruby.getGlobalRuntime();
 
+  private static final HashMap<String, RubyKeyConverter> converters = new HashMap<String, RubyKeyConverter>(3);
+
+  private RubyKeyConverter converter;
+  
+  public RubyObjectDeserializer() { 
+    super(RubyObject.class);
+  }
+
+  public RubyObjectDeserializer setStringStrategy()
+  {
+    converter = new RubyStringConverter();
+    return this;
+  }
+
+  public RubyObjectDeserializer setSymbolStrategy()
+  {
+    converter = new RubySymbolConverter();
+    return this;
+  }
+
   /**
    * @since 2.2
   */
-  
-  public RubyObjectDeserializer() { super(RubyObject.class); }
-
-  protected abstract RubyObject convertKey(JsonParser jp)
-  throws IOException;
 
   /**
   /**********************************************************
@@ -53,13 +68,13 @@ public abstract class RubyObjectDeserializer
         return mapArray(jp, ctxt);
 
       case FIELD_NAME:
-        return convertKey(jp);
+        return converter.convert(jp);
 
       case VALUE_EMBEDDED_OBJECT:
         return RubyUtils.rubyObject(__ruby__, jp.getEmbeddedObject());
 
       case VALUE_STRING:
-        return RubyUtils.rubyString(__ruby__, jp.getText());
+        return RubyUtils.rubyString(__ruby__, jp.getText().getBytes());
 
       case VALUE_NUMBER_INT:
         /* [JACKSON-100]: caller may want to get all integral values
@@ -75,6 +90,7 @@ public abstract class RubyObjectDeserializer
           return RubyUtils.rubyBigDecimal(__ruby__, jp.getDecimalValue());
         }
         return RubyUtils.rubyFloat(__ruby__, jp.getDoubleValue());
+        // return RubyUtils.rubyFloat(__ruby__, jp.getText());
 
       case VALUE_TRUE:
         return __ruby__.newBoolean(Boolean.TRUE);
@@ -146,14 +162,14 @@ public abstract class RubyObjectDeserializer
       return RubyHash.newHash(__ruby__);
     }
 
-    RubyObject field1 = convertKey(jp);
+    RubyObject field1 = converter.convert(jp);
     jp.nextToken();
     RubyObject value1 = deserialize(jp, ctxt);
     if (jp.nextToken() != JsonToken.FIELD_NAME) { // single entry; but we want modifiable
       return RuntimeHelpers.constructHash(__ruby__, field1, value1);
     }
 
-    RubyObject field2 = convertKey(jp);
+    RubyObject field2 = converter.convert(jp);
     jp.nextToken();
     RubyObject value2 = deserialize(jp, ctxt);
     if (jp.nextToken() != JsonToken.FIELD_NAME) {
@@ -163,11 +179,10 @@ public abstract class RubyObjectDeserializer
     // And then the general case; default map size is 16
     RubyHash result = RuntimeHelpers.constructHash(__ruby__, field1, value1, field2, value2);
     do {
-      RubyObject fieldName = convertKey(jp);
+      RubyObject fieldName = converter.convert(jp);
       jp.nextToken();
-      result.fastASet(fieldName, deserialize(jp, ctxt));
+      result.fastASetCheckString(__ruby__, fieldName, deserialize(jp, ctxt));
     } while (jp.nextToken() != JsonToken.END_OBJECT);
     return result;
   }
 }
-

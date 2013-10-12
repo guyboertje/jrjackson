@@ -1,9 +1,13 @@
 #! /usr/bin/env jruby
+lib = File.expand_path('../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+
+require 'jrjackson/version'
 
 Gem::Specification.new do |s|
   s.name        = 'jrjackson'
-  s.version     = '0.2.0'
-  s.date        = '2013-09-30'
+  s.version     = JrJackson::VERSION
+  s.date        = '2013-10-12'
   s.platform    = Gem::Platform::RUBY
   s.authors     = ['Guy Boertje']
   s.email       = ['guyboertje@gmail.com']

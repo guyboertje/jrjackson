@@ -11,6 +11,7 @@ import org.jruby.javasupport.JavaUtil;
 import org.jruby.runtime.builtin.IRubyObject;
 import org.jruby.ext.bigdecimal.RubyBigDecimal;
 import org.jruby.runtime.Block;
+import org.jruby.util.SafeDoubleParser;
 
 public class RubyUtils
 {
@@ -22,7 +23,12 @@ public class RubyUtils
 
   public static RubyString rubyString(Ruby ruby, String node)
   {
-    return ruby.newString(node);
+    return RubyString.newUnicodeString(ruby, node);
+  }
+
+  public static RubyString rubyString(Ruby ruby, byte[] node)
+  {
+    return RubyString.newString(ruby, node);
   }
 
   public static RubySymbol rubySymbol(Ruby ruby, String node)
@@ -63,6 +69,12 @@ public class RubyUtils
   public static RubyFloat rubyFloat(Ruby ruby, double arg)
   {
     return ruby.newFloat(arg);
+  }
+
+  public static RubyFloat rubyFloat(Ruby ruby, String arg)
+  {
+    double d = SafeDoubleParser.parseDouble(arg);
+    return ruby.newFloat(d);
   }
 
   public static RubyBigDecimal rubyBigDecimal(Ruby ruby, BigDecimal arg)

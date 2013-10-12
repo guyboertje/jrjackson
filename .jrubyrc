@@ -37,7 +37,7 @@ compile.noguards=false
 
 # Compile with all "mostly harmless" compiler optimizations.
 # Options: [true, false], Default: false.
-compile.fastest=false
+compile.fastest=true
 
 # Compile obj.__send__(<literal>, ...) as obj.<literal>(...).
 # Options: [true, false], Default: false.

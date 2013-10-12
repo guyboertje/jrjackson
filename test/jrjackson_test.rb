@@ -10,7 +10,7 @@ class JrJacksonTest < Test::Unit::TestCase
   def test_threading
     q1, q2, q3 = Queue.new, Queue.new, Queue.new
 
-    s1 = %Q|{"a":2.5, "b":0.214, "c":3.4567}|
+    s1 = %Q|{"a":2.5, "b":0.214, "c":3.4567, "d":-3.4567}|
     th1 = Thread.new(s1) do |string|
       q1 << JrJackson::Json.load(string, {use_bigdecimal: true, raw: true})
     end
@@ -21,9 +21,9 @@ class JrJacksonTest < Test::Unit::TestCase
       q3 << JrJackson::Json.load(string, {use_bigdecimal: false, symbolize_keys: true})
     end
     a1, a2, a3 = q1.pop, q2.pop, q3.pop
-    assert_equal ["a", "b", "c"], a1.keys
+    assert_equal ["a", "b", "c", "d"], a1.keys
     assert a1.values.all? {|v| v.is_a?(Java::JavaMath::BigDecimal)}, "Expected all values to be Java::JavaMath::BigDecimal"
-    assert_equal [:a, :b, :c], a2.keys
+    assert_equal [:a, :b, :c, :d], a2.keys
     assert a2.values.all? {|v| v.is_a?(BigDecimal)}, "Expected all values to be BigDecimal"
     assert a3.values.all? {|v| v.is_a?(Float)}, "Expected all values to be Float"
   end

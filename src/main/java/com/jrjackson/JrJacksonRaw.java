@@ -124,7 +124,7 @@ public class JrJacksonRaw extends RubyObject {
       Object o;
       if (arg instanceof RubyString) {
         o = mapper.readValue(
-          arg.toString(), Object.class
+          ((RubyString)arg).getBytes(), Object.class
         );
       } else if ((arg instanceof RubyIO) || (arg instanceof RubyStringIO)) {
         IRubyObject stream = IOJavaAddons.AnyIO.any_to_inputstream(context, arg);

@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.core.util.VersionUtil;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-
+import com.fasterxml.jackson.databind.deser.std.UntypedObjectDeserializer;
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
 
 public class RubyJacksonModule extends SimpleModule
@@ -59,7 +59,7 @@ public class RubyJacksonModule extends SimpleModule
     return new RubyJacksonModule().addSerializer(
       RubySymbol.class, ToStringSerializer.instance
     ).addDeserializer(
-      Object.class, RubyObjectSymDeserializer.instance
+      Object.class, new RubyObjectDeserializer().setSymbolStrategy()
     );
   }
 
@@ -68,7 +68,7 @@ public class RubyJacksonModule extends SimpleModule
     return new RubyJacksonModule().addSerializer(
       RubySymbol.class, ToStringSerializer.instance
     ).addDeserializer(
-      Object.class, RubyObjectStrDeserializer.instance
+      Object.class, new RubyObjectDeserializer().setStringStrategy()
     );
   }
 }
