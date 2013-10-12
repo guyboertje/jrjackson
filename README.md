@@ -24,13 +24,16 @@ By default the load method will return Ruby objects (Hashes have string keys).
 The options hash respects three symbol keys
 
 + :symbolize_keys
+
   Will return symbol keys in hashes
 
 + :raw
+
   Will return JRuby wrapped java objects that quack like ruby objects
   This is the fastest option
 
 + :use_bigdecimal
+
   Will return BigDecimal objects instead of Float
   If used with the :raw option you will get Java::JavaMath::BigDecimal objects
   otherwise they are Ruby BigDecimal
