@@ -42,10 +42,9 @@ The options hash respects three symbol keys
 JrJackson::Json.dump(obj) -> json string
       aliased as generate
 ```
-
-__NOTE:__ the dump method expects that the values of hashes or arrays are JSON data types,
+The dump method expects that the values of hashes or arrays are JSON data types,
 the only exception to this is Ruby Symbol as values, they are converted to java strings
-during serialization. All other objects should be converted to JSON data types before
+during serialization. __NOTE:__ All other objects should be converted to JSON data types before
 serialization. See the wiki for more on this.
 
 ***
