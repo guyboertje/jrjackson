@@ -2,7 +2,7 @@ LICENSE applicable to this library:
 
 Apache License 2.0 see http://www.apache.org/licenses/LICENSE-2.0
 
-Jrjackson:
+## Jrjackson:
 
 a jruby library wrapping the JAVA Jackson jars
 
@@ -44,7 +44,7 @@ otherwise they are Ruby BigDecimal
 Note: the dump method expects that the values of hashes or arrays are JSON data types,
 the only exception to this is Ruby Symbol as values, they are converted to java strings
 during serialization. All other objects should be converted to JSON data types before
-serialization.
+serialization. See the wiki for more on this.
 
 There are two Ruby sub modules of the JrJackson module
 
