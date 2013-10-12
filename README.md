@@ -2,13 +2,13 @@ LICENSE applicable to this library:
 
 Apache License 2.0 see http://www.apache.org/licenses/LICENSE-2.0
 
-## JrJackson:
+### JrJackson:
 
-a jruby library wrapping the JAVA Jackson jars
+a jruby library wrapping the JAVA Jackson jars`
 
 Version: 0.2.1
 
-NOTE: Smile support has been temporarily dropped
+__NOTE:__ Smile support has been temporarily dropped
 
 The code has been refactored to use almost all Java.
 
@@ -18,33 +18,34 @@ JrJackson provides:
 
 ```
 JrJackson::Json.load(string, options) -> hash like object
-  aliased as parse
-JrJackson::Json.dump(obj) -> json string
-  aliased as generate
+      aliased as parse
 ```
-
 By default the load method will return Ruby objects (Hashes have string keys).
 The options hash respects three symbol keys
-```
-  :symbolize_keys
-```
-Will return symbol keys in hashes
-```
-  :raw
-```
-Will return JRuby wrapped java objects that quack like ruby objects
-This is the fastest option
-```
-  :use_bigdecimal
-```
-Will return BigDecimal objects instead of Float
-If used with the :raw option you will get Java::JavaMath::BigDecimal objects
-otherwise they are Ruby BigDecimal
 
-Note: the dump method expects that the values of hashes or arrays are JSON data types,
++ :symbolize_keys
+  Will return symbol keys in hashes
+
++ :raw
+  Will return JRuby wrapped java objects that quack like ruby objects
+  This is the fastest option
+
++ :use_bigdecimal
+  Will return BigDecimal objects instead of Float
+  If used with the :raw option you will get Java::JavaMath::BigDecimal objects
+  otherwise they are Ruby BigDecimal
+
+```
+JrJackson::Json.dump(obj) -> json string
+      aliased as generate
+```
+
+__NOTE:__ the dump method expects that the values of hashes or arrays are JSON data types,
 the only exception to this is Ruby Symbol as values, they are converted to java strings
 during serialization. All other objects should be converted to JSON data types before
 serialization. See the wiki for more on this.
+
+***
 
 There are two Ruby sub modules of the JrJackson module
 
@@ -55,6 +56,8 @@ exposing it as a Ruby module with module methods.
 Credit to Chuck Remes for the benchmark and initial
 investigation when the jruby, json gem and the jackson
 libraries were young.
+
+***
 
 I compared Json (java) 1.8, Gson 0.6.1 and jackson 2.2.3 on jruby 1.7.4 and OpenJDK 64-Bit Server VM 1.7.0_21-b02
 All the benchmarks were run separately. A 727.9KB string of random json data is read from a file and handled 250 times, thereby attempting to balance invocation and parsing benchmarking.
