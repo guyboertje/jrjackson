@@ -51,8 +51,9 @@ serialization. See the wiki for more on this.
 
 There are two Ruby sub modules of the JrJackson module
 
-JrJackson::Json, this is the general external facade used by MultiJson, and is pure Ruby.
-JrJackson::Raw, this is used by the Json module, it is defined in Java with annotations
+```JrJackson::Json```, this is the general external facade used by MultiJson, and is pure Ruby.
+
+```JrJackson::Raw```, this is used by the Json module, it is defined in Java with annotations
 exposing it as a Ruby module with module methods.
 
 Credit to Chuck Remes for the benchmark and initial
