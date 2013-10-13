@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.homepage    = "http://github.com/guyboertje/jrjackson"
   s.summary     = %q{A JRuby wrapper for the java jackson json processor jar}
   s.description = %q{A mostly native JRuby wrapper for the java jackson json processor jar}
-  s.license     = 'Apache License 2.0 see http://www.apache.org/licenses/LICENSE-2.0'
+  s.license     = 'Apache License 2.0'
 
   s.add_development_dependency 'bundler', '~> 1.0'
 
