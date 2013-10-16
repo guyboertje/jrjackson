@@ -62,7 +62,7 @@ exposing it as a Ruby module with module methods.
 
 ***
 
-#### Bencharks
+#### Benchmarks
 
 Credit to Chuck Remes for the benchmark and initial
 investigation when the jruby, json gem and the jackson
