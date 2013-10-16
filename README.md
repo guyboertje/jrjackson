@@ -2,7 +2,7 @@ LICENSE applicable to this library:
 
 Apache License 2.0 see http://www.apache.org/licenses/LICENSE-2.0
 
-### JrJackson:
+ ## JrJackson:
 
 a jruby library wrapping the JAVA Jackson jars`
 
@@ -14,7 +14,9 @@ The code has been refactored to use almost all Java.
 
 There is now a MultiJson adapter added for JrJackson
 
-JrJackson provides:
+***
+
+#### API
 
 ```
 JrJackson::Json.load(string, options) -> hash like object
@@ -49,6 +51,8 @@ serialization. See the wiki for more on this.
 
 ***
 
+#### Internals
+
 There are two Ruby sub modules of the JrJackson module
 
 ```JrJackson::Json```, this is the general external facade used by MultiJson, and is pure Ruby.
@@ -56,11 +60,13 @@ There are two Ruby sub modules of the JrJackson module
 ```JrJackson::Raw```, this is used by the Json module, it is defined in Java with annotations
 exposing it as a Ruby module with module methods.
 
+***
+
+#### Bencharks
+
 Credit to Chuck Remes for the benchmark and initial
 investigation when the jruby, json gem and the jackson
 libraries were young.
-
-***
 
 I compared Json (java) 1.8, Gson 0.6.1 and jackson 2.2.3 on jruby 1.7.4 and OpenJDK 64-Bit Server VM 1.7.0_21-b02
 All the benchmarks were run separately. A 727.9KB string of random json data is read from a file and handled 250 times, thereby attempting to balance invocation and parsing benchmarking.
