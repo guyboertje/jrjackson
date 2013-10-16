@@ -2,7 +2,7 @@ LICENSE applicable to this library:
 
 Apache License 2.0 see http://www.apache.org/licenses/LICENSE-2.0
 
- ## JrJackson:
+### JrJackson:
 
 a jruby library wrapping the JAVA Jackson jars`
 
