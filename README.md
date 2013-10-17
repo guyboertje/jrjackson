@@ -6,8 +6,6 @@ Apache License 2.0 see http://www.apache.org/licenses/LICENSE-2.0
 
 a jruby library wrapping the JAVA Jackson jars`
 
-Version: 0.2.1
-
 __NOTE:__ Smile support has been temporarily dropped
 
 The code has been refactored to use almost all Java.
