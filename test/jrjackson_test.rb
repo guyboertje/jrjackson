@@ -1,11 +1,23 @@
 $LOAD_PATH << File.expand_path('../../lib', __FILE__)
 
+require "java"
+
 require 'test/unit'
 require 'thread'
 require 'bigdecimal'
 require 'jrjackson'
 
 class JrJacksonTest < Test::Unit::TestCase
+
+  class CustomObject
+    attr_accessor :one, :two, :six
+    def initialize(a,b,c)
+      @one, @two, @six = a,b,c
+    end
+    def to_h
+      {'one' => one, 'two' => two, 'six' => six}
+    end
+  end
 
   def test_threading
     q1, q2, q3 = Queue.new, Queue.new, Queue.new
@@ -28,10 +40,24 @@ class JrJacksonTest < Test::Unit::TestCase
     assert a3.values.all? {|v| v.is_a?(Float)}, "Expected all values to be Float"
   end
 
-  def test_serialize_symbols_as_values
-    source = {"first" => :first_symbol, "second" => {"inner" => :inner_symbol}}
-    expected = {:first => "first_symbol", :second => {:inner => "inner_symbol"}}
-    actual = JrJackson::Json.load(JrJackson::Json.dump(source), :symbolize_keys => true)
+  # def test_serialize_non_json_datatypes_as_values
+  #   dt = Time.now
+  #   source = {"k1" => :first_symbol, "k2" => {"inner" => :inner_symbol}, "k3" => dt}
+  #   json_string = JrJackson::Json.dump(source)
+  #   puts "---------------------------", json_string
+  #   actual = ""
+  #   expected = {:k1 => "first_symbol", :k2 => {:inner => "inner_symbol"}, :k3 => dt.strftime("%F %R")}
+  #   # actual = JrJackson::Json.load(json_string, :symbolize_keys => true)
+  #   assert_equal expected, actual
+  # end
+
+  def test_serialize_non_json_datatypes_as_values
+    dt = Time.now
+    co = CustomObject.new("uno", :two, 6.0)
+    source = {"k1" => :first_symbol, "k2" => {"inner" => co}, "k3" => dt}
+    json_string = JrJackson::Json.dump(source)
+    expected = {:k1 => "first_symbol", :k2 => {:inner => {:one => "uno", :two => "two", :six => 6.0 }}, :k3 => dt.strftime("%F %T %Z")}
+    actual = JrJackson::Json.load(json_string, :symbolize_keys => true)
     assert_equal expected, actual
   end
 

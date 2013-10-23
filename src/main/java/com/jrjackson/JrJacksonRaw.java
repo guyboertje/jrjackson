@@ -144,18 +144,23 @@ public class JrJacksonRaw extends RubyObject {
 
   // serialize
   @JRubyMethod(module = true, name = {"generate", "dump"}, required = 1)
-  public static IRubyObject generate(ThreadContext context, IRubyObject self, IRubyObject arg) {
+  public static IRubyObject generate(ThreadContext context, IRubyObject self, IRubyObject arg)
+    throws IOException, JsonProcessingException
+  {
     Ruby ruby = context.getRuntime();
     Object obj = arg.toJava(Object.class);
-    try {
       String s = mappers.get("raw").writeValueAsString(obj);
       return RubyUtils.rubyString(ruby, s);
-    }
-    catch (JsonProcessingException e) {
-      throw ParseError.newParseError(ruby, e.getLocalizedMessage());
-    }
-    catch (IOException e) {
-      throw ruby.newIOError(e.getLocalizedMessage());
-    }
+
+    // try {
+    //   String s = mappers.get("raw").writeValueAsString(obj);
+    //   return RubyUtils.rubyString(ruby, s);
+    // }
+    // catch (JsonProcessingException e) {
+    //   throw ParseError.newParseError(ruby, e.getLocalizedMessage());
+    // }
+    // catch (IOException e) {
+    //   throw ruby.newIOError(e.getLocalizedMessage());
+    // }
   }
 }

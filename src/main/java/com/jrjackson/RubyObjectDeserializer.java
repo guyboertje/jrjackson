@@ -26,8 +26,6 @@ public class RubyObjectDeserializer
 
   protected final static Ruby __ruby__ = Ruby.getGlobalRuntime();
 
-  private static final HashMap<String, RubyKeyConverter> converters = new HashMap<String, RubyKeyConverter>(3);
-
   private RubyKeyConverter converter;
   
   public RubyObjectDeserializer() { 
