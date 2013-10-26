@@ -13,6 +13,8 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 
 import org.jruby.*;
+import org.jruby.runtime.ThreadContext;
+import org.jruby.internal.runtime.methods.DynamicMethod;
 
 public class RubyAnySerializer extends StdSerializer<RubyObject>
 {
@@ -37,6 +39,45 @@ public class RubyAnySerializer extends StdSerializer<RubyObject>
     return val;
   }
 
+  private void serializeUnknownRubyObject(RubyObject rubyObject, JsonGenerator jgen, SerializerProvider provider)
+    throws IOException, JsonGenerationException
+  {
+    ThreadContext ctx = rubyObject.getRuntime().getCurrentContext();
+    RubyClass meta = rubyObject.getMetaClass();
+    DynamicMethod method = meta.searchMethod("to_h");
+    if (!method.isUndefined()) {
+      RubyObject obj = (RubyObject)method.call(ctx, rubyObject, meta, "to_h");
+      provider.findTypedValueSerializer(Map.class, true, null).serialize(obj, jgen, provider);
+      return;
+    }
+
+    method = meta.searchMethod("to_hash");
+    if (!method.isUndefined()) {
+      RubyObject obj = (RubyObject)method.call(ctx, rubyObject, meta, "to_hash");
+      provider.findTypedValueSerializer(Map.class, true, null).serialize(obj, jgen, provider);
+      return;
+    }
+
+    method = meta.searchMethod("to_a");
+    if (!method.isUndefined()) {
+      RubyObject obj = (RubyObject)method.call(ctx, rubyObject, meta, "to_a");
+      provider.findTypedValueSerializer(List.class, true, null).serialize(obj, jgen, provider);
+      return;
+    }
+
+    method = meta.searchMethod("to_json");
+    if (!method.isUndefined()) {
+      RubyObject obj = (RubyObject)method.call(ctx, rubyObject, meta, "to_json");
+      if (obj instanceof RubyString) {
+        jgen.writeRawValue(obj.toString());
+      } else {
+        provider.defaultSerializeValue(obj, jgen);
+      }
+      return;
+    }
+    throw new JsonGenerationException("Cannot find Serializer for class: " + rubyObject.getClass().getName());
+  }
+
   @Override
   public void serialize(RubyObject value, JsonGenerator jgen, SerializerProvider provider)
     throws IOException, JsonGenerationException
@@ -50,7 +91,7 @@ public class RubyAnySerializer extends StdSerializer<RubyObject>
     } else {
       Object val = value.toJava(rubyJavaClassLookup(value.getClass()));
       if ( val instanceof RubyObject) {
-        throw new JsonGenerationException("Cannot find Serializer for class: " + val.getClass().getName());
+        serializeUnknownRubyObject((RubyObject)val, jgen, provider);
       } else {
         provider.defaultSerializeValue(val, jgen);
       }

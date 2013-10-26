@@ -9,7 +9,7 @@ require 'jrjackson'
 
 class JrJacksonTest < Test::Unit::TestCase
 
-  class CustomObject
+  class CustomToH
     attr_accessor :one, :two, :six
     def initialize(a,b,c)
       @one, @two, @six = a,b,c
@@ -18,6 +18,28 @@ class JrJacksonTest < Test::Unit::TestCase
       {'one' => one, 'two' => two, 'six' => six}
     end
   end
+
+  class CustomToHash
+    attr_accessor :one, :two, :six
+    def initialize(a,b,c)
+      @one, @two, @six = a,b,c
+    end
+    def to_hash
+      {'one' => one, 'two' => two, 'six' => six}
+    end
+  end
+
+  class CustomToJson
+    attr_accessor :one, :two, :six
+    def initialize(a,b,c)
+      @one, @two, @six = a,b,c
+    end
+    def to_json
+      %Q|{"one":#{one},"two":#{two},"six":#{six}}|
+    end
+  end
+
+  CustomStruct = Struct.new(:one, :two, :six)
 
   def test_threading
     q1, q2, q3 = Queue.new, Queue.new, Queue.new
@@ -40,23 +62,22 @@ class JrJacksonTest < Test::Unit::TestCase
     assert a3.values.all? {|v| v.is_a?(Float)}, "Expected all values to be Float"
   end
 
-  # def test_serialize_non_json_datatypes_as_values
-  #   dt = Time.now
-  #   source = {"k1" => :first_symbol, "k2" => {"inner" => :inner_symbol}, "k3" => dt}
-  #   json_string = JrJackson::Json.dump(source)
-  #   puts "---------------------------", json_string
-  #   actual = ""
-  #   expected = {:k1 => "first_symbol", :k2 => {:inner => "inner_symbol"}, :k3 => dt.strftime("%F %R")}
-  #   # actual = JrJackson::Json.load(json_string, :symbolize_keys => true)
-  #   assert_equal expected, actual
-  # end
-
   def test_serialize_non_json_datatypes_as_values
     dt = Time.now
-    co = CustomObject.new("uno", :two, 6.0)
-    source = {"k1" => :first_symbol, "k2" => {"inner" => co}, "k3" => dt}
+    co1 = CustomToH.new("uno", :two, 6.0)
+    co2 = CustomToHash.new("uno", :two, 6.0)
+    co3 = CustomToJson.new(1.0, 2, 6.0)
+    co4 = CustomStruct.new(1, 2, 6)
+    source = {"k1" => :first_symbol, "k2" => co1, "k3" => dt, "k4" => co2, "k5" => co3, "k6" => co4}
     json_string = JrJackson::Json.dump(source)
-    expected = {:k1 => "first_symbol", :k2 => {:inner => {:one => "uno", :two => "two", :six => 6.0 }}, :k3 => dt.strftime("%F %T %Z")}
+    expected = {
+      :k1 => "first_symbol",
+      :k2 => {:one => "uno", :two => "two", :six => 6.0 },
+      :k3 => dt.strftime("%F %T %Z"),
+      :k4 => {:one => "uno", :two => "two", :six => 6.0 },
+      :k5 => {:one => 1.0, :two => 2.0, :six => 6.0 },
+      :k6 => [1, 2, 6],
+    }
     actual = JrJackson::Json.load(json_string, :symbolize_keys => true)
     assert_equal expected, actual
   end
