@@ -149,18 +149,18 @@ public class JrJacksonRaw extends RubyObject {
   {
     Ruby ruby = context.getRuntime();
     Object obj = arg.toJava(Object.class);
+      // String s = mappers.get("raw").writeValueAsString(obj);
+      // return RubyUtils.rubyString(ruby, s);
+
+    try {
       String s = mappers.get("raw").writeValueAsString(obj);
       return RubyUtils.rubyString(ruby, s);
-
-    // try {
-    //   String s = mappers.get("raw").writeValueAsString(obj);
-    //   return RubyUtils.rubyString(ruby, s);
-    // }
-    // catch (JsonProcessingException e) {
-    //   throw ParseError.newParseError(ruby, e.getLocalizedMessage());
-    // }
-    // catch (IOException e) {
-    //   throw ruby.newIOError(e.getLocalizedMessage());
-    // }
+    }
+    catch (JsonProcessingException e) {
+      throw ParseError.newParseError(ruby, e.getLocalizedMessage());
+    }
+    catch (IOException e) {
+      throw ruby.newIOError(e.getLocalizedMessage());
+    }
   }
 }

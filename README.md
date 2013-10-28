@@ -1,3 +1,5 @@
+
+
 LICENSE applicable to this library:
 
 Apache License 2.0 see http://www.apache.org/licenses/LICENSE-2.0
@@ -11,6 +13,15 @@ __NOTE:__ Smile support has been temporarily dropped
 The code has been refactored to use almost all Java.
 
 There is now a MultiJson adapter added for JrJackson
+
+***
+
+#### NEWS
+
+26th October 2013 - Added support to serialize arbitary (non JSON datatypes)
+ruby objects.  Normally the toJava internal metod is called, but additionally
+to_h, to_hash, to_a and finally to_json are tried.  Be aware that the to_json
+method might invoke a new selialization session and impact performance. 
 
 ***
 
@@ -76,8 +87,9 @@ generation/serialize
 json mri generate: 250                  12.02       0.00      12.02     ( 12.022)
 oj mri generate: 250                     7.18       0.00       7.18     (  7.183)
 json java generate: 250                  7.83       0.01       7.84     (  7.289)
-gson generate: 250                       5.44       0.00       5.44     (  5.387)
-jackson generate: 250                    5.32       0.00       5.32     (  5.146)
+gson generate: 250                       5.04       0.00       5.04     (  4.995)
+jackson generate: 250                    4.94       0.08       5.02     (  4.811)
+
 
 parsing/deserialize - after jrjackson parsing profiling
 
@@ -92,9 +104,6 @@ jackson parse string + bigdecimal: 250   6.27       0.00       6.27     (  5.973
 jackson parse symbol keys: 250           5.16       0.00       5.16     (  4.873)
 jackson parse symbol + bigdecimal: 250   4.75       0.06       4.81     (  4.461)
 jackson parse raw: 250                   3.23       0.05       3.28     (  3.021)
-jackson parse raw + bigdecimal: 250      3.06       0.06       3.12     (  2.681)
+jackson parse raw + bigdecimal: 250      3.06       0.06       3.12     (  2.639)
 
 ```
-
-
-

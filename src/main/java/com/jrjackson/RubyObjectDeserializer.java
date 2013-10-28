@@ -72,7 +72,8 @@ public class RubyObjectDeserializer
         return RubyUtils.rubyObject(__ruby__, jp.getEmbeddedObject());
 
       case VALUE_STRING:
-        return RubyUtils.rubyString(__ruby__, jp.getText().getBytes());
+        // return RubyUtils.rubyString(__ruby__, jp.getText().getBytes("UTF-8"));
+        return RubyUtils.rubyString(__ruby__, jp.getText());
 
       case VALUE_NUMBER_INT:
         /* [JACKSON-100]: caller may want to get all integral values
@@ -88,7 +89,6 @@ public class RubyObjectDeserializer
           return RubyUtils.rubyBigDecimal(__ruby__, jp.getDecimalValue());
         }
         return RubyUtils.rubyFloat(__ruby__, jp.getDoubleValue());
-        // return RubyUtils.rubyFloat(__ruby__, jp.getText());
 
       case VALUE_TRUE:
         return __ruby__.newBoolean(Boolean.TRUE);

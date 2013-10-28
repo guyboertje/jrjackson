@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 $LOAD_PATH << File.expand_path('../../lib', __FILE__)
 
 require "java"
@@ -62,21 +64,28 @@ class JrJacksonTest < Test::Unit::TestCase
     assert a3.values.all? {|v| v.is_a?(Float)}, "Expected all values to be Float"
   end
 
+  def test_deserialize_JSON_with_UTF8_characters
+    json_string = JrJackson::Json.dump({"utf8" => "żółć"})
+    expected = {utf8: "żółć"}
+    actual = JrJackson::Json.load(json_string, :symbolize_keys => true)
+    assert_equal expected, actual
+  end
+
   def test_serialize_non_json_datatypes_as_values
     dt = Time.now
     co1 = CustomToH.new("uno", :two, 6.0)
     co2 = CustomToHash.new("uno", :two, 6.0)
     co3 = CustomToJson.new(1.0, 2, 6.0)
     co4 = CustomStruct.new(1, 2, 6)
-    source = {"k1" => :first_symbol, "k2" => co1, "k3" => dt, "k4" => co2, "k5" => co3, "k6" => co4}
+    source = {"sym" => :a_symbol, "dt" => dt, "co1" => co1, "co2" => co2, "co3" => co3, "co4" => co4}
     json_string = JrJackson::Json.dump(source)
     expected = {
-      :k1 => "first_symbol",
-      :k2 => {:one => "uno", :two => "two", :six => 6.0 },
-      :k3 => dt.strftime("%F %T %Z"),
-      :k4 => {:one => "uno", :two => "two", :six => 6.0 },
-      :k5 => {:one => 1.0, :two => 2.0, :six => 6.0 },
-      :k6 => [1, 2, 6],
+      :sym => "a_symbol",
+      :dt => dt.strftime("%F %T %Z"),
+      :co1 => {:one => "uno", :two => "two", :six => 6.0 },
+      :co2 => {:one => "uno", :two => "two", :six => 6.0 },
+      :co3 => {:one => 1.0, :two => 2.0, :six => 6.0 },
+      :co4 => [1, 2, 6],
     }
     actual = JrJackson::Json.load(json_string, :symbolize_keys => true)
     assert_equal expected, actual
