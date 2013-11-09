@@ -97,7 +97,7 @@ public class RubyObjectDeserializer
         return __ruby__.newBoolean(Boolean.FALSE);
 
       case VALUE_NULL: // should not get this but...
-        return null;
+        return __ruby__.getNil();
 
       case END_ARRAY: // invalid
       case END_OBJECT: // invalid
