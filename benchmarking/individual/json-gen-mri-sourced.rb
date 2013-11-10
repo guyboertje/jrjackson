@@ -9,7 +9,7 @@ filename = File.expand_path(BenchOptions.source)
 JSON.parser = JSON::Ext::Parser
 hsh = JSON.parse(File.read(filename))
 
-Benchmark.bmbm("jackson parse symbol + bigdecimal:  ".size) do |x|
+Benchmark.bmbm(BenchOptions.output_width) do |x|
   x.report("json mri generate: #{BenchOptions.iterations}") do
     BenchOptions.iterations.times { JSON.fast_generate(hsh) }
   end

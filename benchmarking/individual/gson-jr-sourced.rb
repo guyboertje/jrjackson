@@ -7,7 +7,7 @@ filename = File.expand_path(BenchOptions.source)
 
 dumped_string = File.read(filename)
 
-Benchmark.bmbm("jackson parse symbol + bigdecimal:  ".size) do |x|
+Benchmark.bmbm(BenchOptions.output_width) do |x|
   x.report("gson parse: #{BenchOptions.iterations}") do
     BenchOptions.iterations.times { ::Gson::Decoder.new({}).decode(dumped_string) }
   end

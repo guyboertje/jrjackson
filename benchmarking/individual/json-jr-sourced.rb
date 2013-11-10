@@ -7,7 +7,7 @@ filename = File.expand_path(BenchOptions.source)
 
 dumped_string = File.read(filename)
 
-Benchmark.bmbm("jackson parse symbol + bigdecimal:  ".size) do |x|
+Benchmark.bmbm(BenchOptions.output_width) do |x|
   x.report("json java parse: #{BenchOptions.iterations}") do
     BenchOptions.iterations.times { ::JSON.parse(dumped_string) }
   end

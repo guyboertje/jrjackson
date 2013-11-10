@@ -11,4 +11,8 @@ module BenchOptions
   def source
     "benchmarking/fixtures/source#{CURRENT}.json"
   end
+
+  def output_width
+    44
+  end
 end

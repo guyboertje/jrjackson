@@ -25,31 +25,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 @JRubyModule(name = "JrJacksonRaw")
 public class JrJacksonRaw extends RubyObject {
-  // private static final HashMap<String, ObjectMapper> mappers = new HashMap<String, ObjectMapper>(3);
-  // private static final HashMap<String, RubySymbol> symbols = new HashMap<String, RubySymbol>(3);
-
-  // private Ruby _ruby;
-
-  // static {
-    // mappers.put("str",
-    //   RubyJacksonModule.mappedAs("str")
-    // );
-    // mappers.put("sym",
-    //   RubyJacksonModule.mappedAs("sym")
-    // );
-    // mappers.put("raw",
-    //   RubyJacksonModule.mappedAs("raw")
-    // );
-    // symbols.put("sym",
-    //   RubyUtils.rubySymbol(_ruby, "symbolize_keys")
-    // );
-    // symbols.put("raw",
-    //   RubyUtils.rubySymbol(_ruby, "raw")
-    // );
-    // symbols.put("bigdecimal",
-    //   RubyUtils.rubySymbol(_ruby, "use_bigdecimal")
-    // );
-  // }
 
   public JrJacksonRaw(Ruby ruby, RubyClass metaclass) {
     super(ruby, metaclass);
@@ -75,13 +50,13 @@ public class JrJacksonRaw extends RubyObject {
     if (opts != context.nil) {
       options = opts.convertToHash();
       if (flagged(options, RubyUtils.rubySymbol(_ruby, "symbolize_keys"))) {
-        local = RubyJacksonModule.mappedAs("sym", _ruby).copy();
+        local = RubyJacksonModule.mappedAs("sym", _ruby);
       }
       if (flagged(options, RubyUtils.rubySymbol(_ruby, "raw"))) {
-        local = RubyJacksonModule.mappedAs("raw").copy();
+        local = RubyJacksonModule.mappedAs("raw", _ruby);
       }
       if (local == null) {
-        local = RubyJacksonModule.mappedAs("str", _ruby).copy();
+        local = RubyJacksonModule.mappedAs("str", _ruby);
       }
       if (flagged(options, RubyUtils.rubySymbol(_ruby, "use_bigdecimal"))) {
         local.enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
@@ -91,7 +66,7 @@ public class JrJacksonRaw extends RubyObject {
       }
     }
     else {
-      local = RubyJacksonModule.mappedAs("str", _ruby).copy();
+      local = RubyJacksonModule.mappedAs("str", _ruby);
     }
     return _parse(context, arg, local);
   }

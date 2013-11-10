@@ -9,7 +9,7 @@ filename = File.expand_path(BenchOptions.source)
 opts = {raw: true}
 dumped_string = File.read(filename)
 
-Benchmark.bmbm("jackson parse symbol + bigdecimal:  ".size) do |x| 
+Benchmark.bmbm(BenchOptions.output_width) do |x| 
   x.report("jackson parse raw: #{BenchOptions.iterations}") do
     BenchOptions.iterations.times { JrJackson::Json.load(dumped_string, opts) }
   end
