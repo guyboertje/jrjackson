@@ -25,38 +25,38 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 @JRubyModule(name = "JrJacksonRaw")
 public class JrJacksonRaw extends RubyObject {
-  private static final HashMap<String, ObjectMapper> mappers = new HashMap<String, ObjectMapper>(3);
-  private static final HashMap<String, RubySymbol> symbols = new HashMap<String, RubySymbol>(3);
+  // private static final HashMap<String, ObjectMapper> mappers = new HashMap<String, ObjectMapper>(3);
+  // private static final HashMap<String, RubySymbol> symbols = new HashMap<String, RubySymbol>(3);
 
-  private static final Ruby _ruby = Ruby.getGlobalRuntime();
+  // private Ruby _ruby;
 
-  static {
-    mappers.put("str",
-      RubyJacksonModule.mappedAs("str")
-    );
-    mappers.put("sym",
-      RubyJacksonModule.mappedAs("sym")
-    );
-    mappers.put("raw",
-      RubyJacksonModule.mappedAs("raw")
-    );
-    symbols.put("sym",
-      RubyUtils.rubySymbol(_ruby, "symbolize_keys")
-    );
-    symbols.put("raw",
-      RubyUtils.rubySymbol(_ruby, "raw")
-    );
-    symbols.put("bigdecimal",
-      RubyUtils.rubySymbol(_ruby, "use_bigdecimal")
-    );
-  }
+  // static {
+    // mappers.put("str",
+    //   RubyJacksonModule.mappedAs("str")
+    // );
+    // mappers.put("sym",
+    //   RubyJacksonModule.mappedAs("sym")
+    // );
+    // mappers.put("raw",
+    //   RubyJacksonModule.mappedAs("raw")
+    // );
+    // symbols.put("sym",
+    //   RubyUtils.rubySymbol(_ruby, "symbolize_keys")
+    // );
+    // symbols.put("raw",
+    //   RubyUtils.rubySymbol(_ruby, "raw")
+    // );
+    // symbols.put("bigdecimal",
+    //   RubyUtils.rubySymbol(_ruby, "use_bigdecimal")
+    // );
+  // }
 
   public JrJacksonRaw(Ruby ruby, RubyClass metaclass) {
     super(ruby, metaclass);
   }
 
-  private static boolean flagged(RubyHash opts, String key) {
-    Object val = opts.get(symbols.get(key));
+  private static boolean flagged(RubyHash opts, RubySymbol key) {
+    Object val = opts.get(key);
     if (val == null) {
       return false;
     }
@@ -69,19 +69,21 @@ public class JrJacksonRaw extends RubyObject {
     throws IOException
   {
     RubyHash options = null;
-    String key = "str";
-    ObjectMapper local;
+    ObjectMapper local = null;
+    Ruby _ruby = context.getRuntime();
 
     if (opts != context.nil) {
       options = opts.convertToHash();
-      if (flagged(options, "sym")) {
-        key = "sym";
+      if (flagged(options, RubyUtils.rubySymbol(_ruby, "symbolize_keys"))) {
+        local = RubyJacksonModule.mappedAs("sym", _ruby).copy();
       }
-      if (flagged(options, "raw")) {
-        key = "raw";
+      if (flagged(options, RubyUtils.rubySymbol(_ruby, "raw"))) {
+        local = RubyJacksonModule.mappedAs("raw").copy();
       }
-      local = mappers.get(key).copy();
-      if (flagged(options, "bigdecimal")) {
+      if (local == null) {
+        local = RubyJacksonModule.mappedAs("str", _ruby).copy();
+      }
+      if (flagged(options, RubyUtils.rubySymbol(_ruby, "use_bigdecimal"))) {
         local.enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
       }
       else {
@@ -89,7 +91,7 @@ public class JrJacksonRaw extends RubyObject {
       }
     }
     else {
-      local = mappers.get(key).copy();
+      local = RubyJacksonModule.mappedAs("str", _ruby).copy();
     }
     return _parse(context, arg, local);
   }
@@ -98,28 +100,30 @@ public class JrJacksonRaw extends RubyObject {
   public static IRubyObject parse_raw(ThreadContext context, IRubyObject self, IRubyObject arg)
     throws IOException
   {
-    return _parse(context, arg, mappers.get("raw"));
+    ObjectMapper mapper = RubyJacksonModule.mappedAs("raw", context.getRuntime());
+    return _parse(context, arg, mapper);
   }
 
   @JRubyMethod(module = true, name = {"parse_sym", "load_sym"}, required = 1)
   public static IRubyObject parse_sym(ThreadContext context, IRubyObject self, IRubyObject arg)
     throws IOException
   {
-    return _parse(context, arg, mappers.get("sym"));
+    ObjectMapper mapper = RubyJacksonModule.mappedAs("sym", context.getRuntime());
+    return _parse(context, arg, mapper);
   }
 
   @JRubyMethod(module = true, name = {"parse_str", "load_str"}, required = 1)
   public static IRubyObject parse_str(ThreadContext context, IRubyObject self, IRubyObject arg)
     throws IOException
   {
-    return _parse(context, arg, mappers.get("str"));
+    ObjectMapper mapper = RubyJacksonModule.mappedAs("str", context.getRuntime());
+    return _parse(context, arg, mapper);
   }
 
-  public static IRubyObject _parse(ThreadContext context, IRubyObject arg, ObjectMapper mapper) 
+  private static IRubyObject _parse(ThreadContext context, IRubyObject arg, ObjectMapper mapper) 
     throws IOException
   {
     Ruby ruby = context.getRuntime();
-
     try {
       Object o;
       if (arg instanceof RubyString) {
@@ -147,20 +151,18 @@ public class JrJacksonRaw extends RubyObject {
   public static IRubyObject generate(ThreadContext context, IRubyObject self, IRubyObject arg)
     throws IOException, JsonProcessingException
   {
-    Ruby ruby = context.getRuntime();
+    Ruby _ruby = context.getRuntime();
     Object obj = arg.toJava(Object.class);
-      // String s = mappers.get("raw").writeValueAsString(obj);
-      // return RubyUtils.rubyString(ruby, s);
-
     try {
-      String s = mappers.get("raw").writeValueAsString(obj);
-      return RubyUtils.rubyString(ruby, s);
+      ObjectMapper mapper = RubyJacksonModule.mappedAs("raw", _ruby);
+      String s = mapper.writeValueAsString(obj);
+      return RubyUtils.rubyString(_ruby, s);
     }
     catch (JsonProcessingException e) {
-      throw ParseError.newParseError(ruby, e.getLocalizedMessage());
+      throw ParseError.newParseError(_ruby, e.getLocalizedMessage());
     }
     catch (IOException e) {
-      throw ruby.newIOError(e.getLocalizedMessage());
+      throw _ruby.newIOError(e.getLocalizedMessage());
     }
   }
 }

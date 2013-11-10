@@ -24,6 +24,11 @@ public class RubyJacksonModule extends SimpleModule
 
   public static ObjectMapper mappedAs(String key)
   {
+    return mappedAs(key, Ruby.getGlobalRuntime());
+  }
+
+  public static ObjectMapper mappedAs(String key, Ruby ruby)
+  {
     ObjectMapper mapper = new ObjectMapper();
     
     mapper.registerModule(
@@ -32,7 +37,7 @@ public class RubyJacksonModule extends SimpleModule
 
     if (key == "sym") {
       mapper.registerModule(
-        asSym()
+        asSym(ruby)
       );
     }
     else if (key == "raw") {
@@ -42,7 +47,7 @@ public class RubyJacksonModule extends SimpleModule
     }
     else {
       mapper.registerModule(
-        asStr()
+        asStr(ruby)
       );
     }
     mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -57,21 +62,21 @@ public class RubyJacksonModule extends SimpleModule
     );
   }
 
-  public static SimpleModule asSym()
+  public static SimpleModule asSym(Ruby ruby)
   { 
     return new RubyJacksonModule().addSerializer(
       RubyObject.class, RubyAnySerializer.instance
     ).addDeserializer(
-      Object.class, new RubyObjectDeserializer().setSymbolStrategy()
+      Object.class, new RubyObjectDeserializer().withRuby(ruby).setSymbolStrategy()
     );
   }
 
-  public static SimpleModule asStr()
+  public static SimpleModule asStr(Ruby ruby)
   { 
     return new RubyJacksonModule().addSerializer(
       RubyObject.class, RubyAnySerializer.instance
     ).addDeserializer(
-      Object.class, new RubyObjectDeserializer().setStringStrategy()
+      Object.class, new RubyObjectDeserializer().withRuby(ruby).setStringStrategy()
     );
   }
 }

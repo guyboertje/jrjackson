@@ -8,7 +8,7 @@ import org.jruby.RubyObject;
 
 public class RubySymbolConverter implements RubyKeyConverter
 {
-  public RubyObject convert(JsonParser jp) throws IOException {
-    return RubyUtils.rubySymbol(Ruby.getGlobalRuntime(), jp.getText());
+  public RubyObject convert(Ruby ruby, JsonParser jp) throws IOException {
+    return RubyUtils.rubySymbol(ruby, jp.getText());
   }
 }

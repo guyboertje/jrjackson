@@ -91,6 +91,13 @@ class JrJacksonTest < Test::Unit::TestCase
     assert_equal expected, actual
   end
 
+  def test_can_parse_nulls
+    expected = {"foo" => nil}
+    json = '{"foo":null}'
+    actual = JrJackson::Json.parse(json)
+    assert_equal expected, actual
+  end
+
   def test_can_parse_big_decimals
     expected = BigDecimal.new '0.12345678901234567890123456789'
     json = '{"foo":0.12345678901234567890123456789}'

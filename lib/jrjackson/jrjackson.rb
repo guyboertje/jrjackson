@@ -4,7 +4,7 @@ unless RUBY_PLATFORM =~ /java/
 end
 
 # require_relative "jars/jrjackson-1.2.4.jar"
-require_relative "linked/jrjackson-1.2.5.jar"
+require_relative "linked/jrjackson-1.2.6.jar"
 
 require 'com/jrjackson/jr_jackson'
 
@@ -33,7 +33,7 @@ module JrJackson
 
       def dump(object)
         case object
-        when Array, Hash, String
+        when Array, Hash, String, Java::JavaUtil::LinkedHashMap
           JrJackson::Raw.generate(object)
         when true, false
           object.to_s

@@ -22,14 +22,20 @@ public class RubyObjectDeserializer
 {
   private static final long serialVersionUID = 1L;
 
-  private final static RubyObject[] NO_OBJECTS = new RubyObject[0];
+  // private final static RubyObject[] NO_OBJECTS = new RubyObject[0];
 
-  protected final static Ruby __ruby__ = Ruby.getGlobalRuntime();
+  private Ruby _ruby;
 
   private RubyKeyConverter converter;
   
-  public RubyObjectDeserializer() { 
+  public RubyObjectDeserializer() {
     super(RubyObject.class);
+  }
+
+  public RubyObjectDeserializer withRuby(Ruby ruby)
+  {
+    _ruby = ruby;
+    return this;
   }
 
   public RubyObjectDeserializer setStringStrategy()
@@ -43,10 +49,6 @@ public class RubyObjectDeserializer
     converter = new RubySymbolConverter();
     return this;
   }
-
-  /**
-   * @since 2.2
-  */
 
   /**
   /**********************************************************
@@ -66,38 +68,38 @@ public class RubyObjectDeserializer
         return mapArray(jp, ctxt);
 
       case FIELD_NAME:
-        return converter.convert(jp);
+        return converter.convert(_ruby, jp);
 
       case VALUE_EMBEDDED_OBJECT:
-        return RubyUtils.rubyObject(__ruby__, jp.getEmbeddedObject());
+        return RubyUtils.rubyObject(_ruby, jp.getEmbeddedObject());
 
       case VALUE_STRING:
-        // return RubyUtils.rubyString(__ruby__, jp.getText().getBytes("UTF-8"));
-        return RubyUtils.rubyString(__ruby__, jp.getText());
+        // return RubyUtils.rubyString(_ruby, jp.getText().getBytes("UTF-8"));
+        return RubyUtils.rubyString(_ruby, jp.getText());
 
       case VALUE_NUMBER_INT:
         /* [JACKSON-100]: caller may want to get all integral values
          * returned as BigInteger, for consistency
          */
         if (ctxt.isEnabled(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS)) {
-            return RubyUtils.rubyBignum(__ruby__, jp.getBigIntegerValue());
+            return RubyUtils.rubyBignum(_ruby, jp.getBigIntegerValue());
           }
-        return RubyUtils.rubyFixnum(__ruby__, jp.getLongValue());
+        return RubyUtils.rubyFixnum(_ruby, jp.getLongValue());
 
       case VALUE_NUMBER_FLOAT:
         if (ctxt.isEnabled(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS)) {
-          return RubyUtils.rubyBigDecimal(__ruby__, jp.getDecimalValue());
+          return RubyUtils.rubyBigDecimal(_ruby, jp.getDecimalValue());
         }
-        return RubyUtils.rubyFloat(__ruby__, jp.getDoubleValue());
+        return RubyUtils.rubyFloat(_ruby, jp.getDoubleValue());
 
       case VALUE_TRUE:
-        return __ruby__.newBoolean(Boolean.TRUE);
+        return _ruby.newBoolean(Boolean.TRUE);
 
       case VALUE_FALSE:
-        return __ruby__.newBoolean(Boolean.FALSE);
+        return _ruby.newBoolean(Boolean.FALSE);
 
       case VALUE_NULL: // should not get this but...
-        return __ruby__.getNil();
+        return (RubyObject)_ruby.getNil();
 
       case END_ARRAY: // invalid
       case END_OBJECT: // invalid
@@ -123,7 +125,7 @@ public class RubyObjectDeserializer
     // }
     // Minor optimization to handle small lists (default size for ArrayList is 10)
     if (jp.nextToken() == JsonToken.END_ARRAY) {
-      return RubyArray.newArray(__ruby__);
+      return RubyArray.newArray(_ruby);
     }
     ObjectBuffer buffer = ctxt.leaseObjectBuffer();
     Object[] values = buffer.resetAndStart();
@@ -139,7 +141,7 @@ public class RubyObjectDeserializer
       values[ptr++] = value;
     } while (jp.nextToken() != JsonToken.END_ARRAY);
       // let's create almost full array, with 1/8 slack
-    RubyArray result = RubyArray.newArray(__ruby__, (totalSize + (totalSize >> 3) + 1));
+    RubyArray result = RubyArray.newArray(_ruby, (totalSize + (totalSize >> 3) + 1));
     buffer.completeAndClearBuffer(values, ptr, result);
     return result;
   }
@@ -157,29 +159,29 @@ public class RubyObjectDeserializer
     // 1.6: minor optimization; let's handle 1 and 2 entry cases separately
     if (t != JsonToken.FIELD_NAME) { // and empty one too
         // empty map might work; but caller may want to modify... so better just give small modifiable
-      return RubyHash.newHash(__ruby__);
+      return RubyHash.newHash(_ruby);
     }
 
-    RubyObject field1 = converter.convert(jp);
+    RubyObject field1 = converter.convert(_ruby, jp);
     jp.nextToken();
     RubyObject value1 = deserialize(jp, ctxt);
     if (jp.nextToken() != JsonToken.FIELD_NAME) { // single entry; but we want modifiable
-      return RuntimeHelpers.constructHash(__ruby__, field1, value1);
+      return RuntimeHelpers.constructHash(_ruby, field1, value1);
     }
 
-    RubyObject field2 = converter.convert(jp);
+    RubyObject field2 = converter.convert(_ruby, jp);
     jp.nextToken();
     RubyObject value2 = deserialize(jp, ctxt);
     if (jp.nextToken() != JsonToken.FIELD_NAME) {
-      return RuntimeHelpers.constructHash(__ruby__, field1, value1, field2, value2);
+      return RuntimeHelpers.constructHash(_ruby, field1, value1, field2, value2);
     }
 
     // And then the general case; default map size is 16
-    RubyHash result = RuntimeHelpers.constructHash(__ruby__, field1, value1, field2, value2);
+    RubyHash result = RuntimeHelpers.constructHash(_ruby, field1, value1, field2, value2);
     do {
-      RubyObject fieldName = converter.convert(jp);
+      RubyObject fieldName = converter.convert(_ruby, jp);
       jp.nextToken();
-      result.fastASetCheckString(__ruby__, fieldName, deserialize(jp, ctxt));
+      result.fastASetCheckString(_ruby, fieldName, deserialize(jp, ctxt));
     } while (jp.nextToken() != JsonToken.END_OBJECT);
     return result;
   }

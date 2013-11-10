@@ -8,5 +8,5 @@ import org.jruby.RubyObject;
 
 public interface RubyKeyConverter
 {
-  public RubyObject convert(JsonParser jp) throws IOException;
+  public RubyObject convert(Ruby ruby, JsonParser jp) throws IOException;
 }
