@@ -2,11 +2,11 @@
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
-require 'jrjackson/version'
+require 'jrjackson/build_info'
 
 Gem::Specification.new do |s|
   s.name        = 'jrjackson'
-  s.version     = JrJackson::VERSION
+  s.version     = JrJackson::BuildInfo.version
   s.date        = '2013-10-12'
   s.platform    = Gem::Platform::RUBY
   s.authors     = ['Guy Boertje']
@@ -18,6 +18,6 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency 'bundler', '~> 1.0'
 
-  s.files = `git ls-files`.split($/)
+  s.files = JrJackson::BuildInfo.files
 
 end

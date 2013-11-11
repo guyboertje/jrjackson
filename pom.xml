@@ -5,7 +5,7 @@
   <groupId>com.jrjackson.jruby</groupId>
   <artifactId>jrjackson</artifactId>
   <packaging>jar</packaging>
-  <version>1.2.6</version>
+  <version>1.2.7</version>
   <name>jrjackson</name>
   <url>http://maven.apache.org</url>
   
@@ -81,10 +81,12 @@
                         <goal>shade</goal>
                     </goals>
                     <configuration>
+                      <minimizeJar>true</minimizeJar>
                         <artifactSet>
-                            <excludes>
-                                <exclude>org.jruby:jruby</exclude>
-                            </excludes>
+                            <includes>
+                              <include>com.fasterxml.jackson.core:*</include>
+                              <include>com.fasterxml.jackson.module:jackson-module-afterburner</include>
+                            </includes>
                         </artifactSet>
                     </configuration>
                 </execution>
