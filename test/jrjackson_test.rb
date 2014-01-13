@@ -8,6 +8,7 @@ require 'test/unit'
 require 'thread'
 require 'bigdecimal'
 require 'jrjackson'
+require 'stringio'
 
 class JrJacksonTest < Test::Unit::TestCase
 
@@ -95,6 +96,13 @@ class JrJacksonTest < Test::Unit::TestCase
     expected = {"foo" => nil}
     json = '{"foo":null}'
     actual = JrJackson::Json.parse(json)
+    assert_equal expected, actual
+  end
+
+  def test_stringio
+    expected = {"foo" => 5}
+    json = ::StringIO.new('{"foo":5}')
+    actual = JrJackson::Json.load(json)
     assert_equal expected, actual
   end
 
