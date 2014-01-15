@@ -106,6 +106,12 @@ class JrJacksonTest < Test::Unit::TestCase
     assert_equal expected, actual
   end
 
+  def test_bad_utf
+    assert_raise JrJackson::ParseError do
+      JrJackson::Json.load("\x82\xAC\xEF")
+    end
+  end
+
   def test_can_parse_big_decimals
     expected = BigDecimal.new '0.12345678901234567890123456789'
     json = '{"foo":0.12345678901234567890123456789}'

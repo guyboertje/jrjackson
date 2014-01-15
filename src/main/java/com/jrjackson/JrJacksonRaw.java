@@ -6,11 +6,8 @@ import org.jruby.RubyObject;
 import org.jruby.RubyString;
 import org.jruby.RubySymbol;
 import org.jruby.RubyHash;
-import org.jruby.RubyIO;
 import org.jruby.anno.JRubyMethod;
 import org.jruby.anno.JRubyModule;
-import org.jruby.exceptions.RaiseException;
-import org.jruby.ext.stringio.RubyStringIO;
 import org.jruby.java.addons.IOJavaAddons;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
@@ -105,11 +102,10 @@ public class JrJacksonRaw extends RubyObject {
         o = mapper.readValue(
           ((RubyString)arg).getBytes(), Object.class
         );
-      } else if ((arg instanceof RubyIO) || (arg instanceof RubyStringIO)) {
+      } else {
+        // must be an IO object then
         IRubyObject stream = IOJavaAddons.AnyIO.any_to_inputstream(context, arg);
         o = mapper.readValue((InputStream)stream.toJava(InputStream.class), Object.class);
-      } else {
-        throw ruby.newArgumentError("Unsupported source. This method accepts String or IO");
       }
       return RubyUtils.rubyObject(ruby, o);
     }

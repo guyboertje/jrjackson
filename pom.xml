@@ -5,7 +5,7 @@
   <groupId>com.jrjackson.jruby</groupId>
   <artifactId>jrjackson</artifactId>
   <packaging>jar</packaging>
-  <version>1.2.7</version>
+  <version>1.2.8</version>
   <name>jrjackson</name>
   <url>http://maven.apache.org</url>
   
@@ -23,7 +23,7 @@
     <dependency>
       <groupId>org.jruby</groupId>
       <artifactId>jruby</artifactId>
-      <version>1.7.9</version>
+      <version>1.7.8</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
