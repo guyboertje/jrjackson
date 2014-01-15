@@ -1,3 +1,12 @@
+v0.2.6
+  fix issue-20
+    allow jruby to convert Ruby StringIO into Java
+    by not type checking passed arg
+    this is because jruby 1.7.9 has changed the type of java object backing Ruby StingIO
+  jar compiled for jruby 1.7.8 (jruby 1.7.9 in the maven repo has an error in the pom.xml)
+  jruby 1.7.8, jruby 1.7.9 (tested)
+  jackson 2.3.0
+
 v0.2.5
   fix issue-16
     reduce the gem size by:
