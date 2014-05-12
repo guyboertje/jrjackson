@@ -1,3 +1,8 @@
+v0.2.7
+  fixes for issues-23,24
+    add to_time as option for serializing Time like objects
+  jar compiled for jruby 1.7.11
+
 v0.2.6
   fix issue-20
     allow jruby to convert Ruby StringIO into Java

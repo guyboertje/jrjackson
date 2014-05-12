@@ -18,8 +18,10 @@ There is now a MultiJson adapter added for JrJackson
 
 #### NEWS
 
+11th May 2014 - Added to_time method call for Ruby object serialization
+
 26th October 2013 - Added support to serialize arbitary (non JSON datatypes)
-ruby objects.  Normally the toJava internal metod is called, but additionally
+ruby objects.  Normally the toJava internal method is called, but additionally
 to_h, to_hash, to_a and finally to_json are tried.  Be aware that the to_json
 method might invoke a new selialization session and impact performance. 
 
