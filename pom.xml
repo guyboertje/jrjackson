@@ -5,7 +5,7 @@
   <groupId>com.jrjackson.jruby</groupId>
   <artifactId>jrjackson</artifactId>
   <packaging>jar</packaging>
-  <version>1.2.8</version>
+  <version>1.2.9</version>
   <name>jrjackson</name>
   <url>http://maven.apache.org</url>
   
@@ -23,7 +23,8 @@
     <dependency>
       <groupId>org.jruby</groupId>
       <artifactId>jruby</artifactId>
-      <version>1.7.8</version>
+      <version>1.7.11</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -66,8 +67,7 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <version>2.16</version>
             <configuration>
-                <parallel>methods</parallel>
-                <threadCount>10</threadCount>
+                <skipTests>true</skipTests>
             </configuration>
         </plugin>
         <plugin>

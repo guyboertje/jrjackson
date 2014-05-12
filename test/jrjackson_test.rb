@@ -42,6 +42,15 @@ class JrJacksonTest < Test::Unit::TestCase
     end
   end
 
+  class CustomToTime
+    def initialize(tm = Time.now)
+      @now = tm
+    end
+    def to_time
+      @now
+    end
+  end
+
   CustomStruct = Struct.new(:one, :two, :six)
 
   def test_threading
@@ -78,7 +87,8 @@ class JrJacksonTest < Test::Unit::TestCase
     co2 = CustomToHash.new("uno", :two, 6.0)
     co3 = CustomToJson.new(1.0, 2, 6.0)
     co4 = CustomStruct.new(1, 2, 6)
-    source = {"sym" => :a_symbol, "dt" => dt, "co1" => co1, "co2" => co2, "co3" => co3, "co4" => co4}
+    co5 = CustomToTime.new(dt)
+    source = {'sym' => :a_symbol, 'dt' => dt, 'co1' => co1, 'co2' => co2, 'co3' => co3, 'co4' => co4, 'co5' => co5}
     json_string = JrJackson::Json.dump(source)
     expected = {
       :sym => "a_symbol",
@@ -87,6 +97,7 @@ class JrJacksonTest < Test::Unit::TestCase
       :co2 => {:one => "uno", :two => "two", :six => 6.0 },
       :co3 => {:one => 1.0, :two => 2.0, :six => 6.0 },
       :co4 => [1, 2, 6],
+      :co5 => dt.strftime("%F %T %Z")
     }
     actual = JrJackson::Json.load(json_string, :symbolize_keys => true)
     assert_equal expected, actual

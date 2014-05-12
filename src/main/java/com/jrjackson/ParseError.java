@@ -8,8 +8,9 @@ import org.jruby.exceptions.RaiseException;
 
 @JRubyClass(name = "JrJackson::ParseError", parent = "RuntimeError")
 public class ParseError {
-  public static RaiseException newParseError(Ruby ruby, String message) {
-    RubyClass errorClass = ruby.getModule("JrJackson").getClass("ParseError");
-    return new RaiseException(RubyException.newException(ruby, errorClass, message), true);
-  }
+
+    public static RaiseException newParseError(Ruby ruby, String message) {
+        RubyClass errorClass = ruby.getModule("JrJackson").getClass("ParseError");
+        return new RaiseException(RubyException.newException(ruby, errorClass, message), true);
+    }
 }
