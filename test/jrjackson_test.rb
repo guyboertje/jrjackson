@@ -103,6 +103,26 @@ class JrJacksonTest < Test::Unit::TestCase
     assert_equal expected, actual
   end
 
+  def test_raw_serialize_base_classes
+    # String
+    assert_equal JrJackson::Json.dump("foo"), "\"foo\""
+
+    # Hash and LinkedHashMap
+    assert_equal JrJackson::Json.dump({"foo" => 1}), "{\"foo\":1}"
+    assert_equal JrJackson::Json.dump(Java::JavaUtil::LinkedHashMap.new({"foo" => 1})), "{\"foo\":1}"
+
+    # Array and ArrayList
+    assert_equal JrJackson::Json.dump(["foo", 1]), "[\"foo\",1]"
+    assert_equal JrJackson::Json.dump(Java::JavaUtil::ArrayList.new(["foo", 1])), "[\"foo\",1]"
+
+    # true/false
+    assert_equal JrJackson::Json.dump(true), "true"
+    assert_equal JrJackson::Json.dump(false), "false"
+
+    # nil
+    assert_equal JrJackson::Json.dump(nil), "null"
+  end
+
   def test_can_parse_nulls
     expected = {"foo" => nil}
     json = '{"foo":null}'
