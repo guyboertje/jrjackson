@@ -107,13 +107,16 @@ class JrJacksonTest < Test::Unit::TestCase
     # String
     assert_equal JrJackson::Json.dump("foo"), "\"foo\""
 
-    # Hash and LinkedHashMap
+    # Hash and implementations of the Java Hash interface
     assert_equal JrJackson::Json.dump({"foo" => 1}), "{\"foo\":1}"
+    assert_equal JrJackson::Json.dump(Java::JavaUtil::HashMap.new({"foo" => 1})), "{\"foo\":1}"
     assert_equal JrJackson::Json.dump(Java::JavaUtil::LinkedHashMap.new({"foo" => 1})), "{\"foo\":1}"
 
-    # Array and ArrayList
+    # Array and implementations of the Java List interface
     assert_equal JrJackson::Json.dump(["foo", 1]), "[\"foo\",1]"
     assert_equal JrJackson::Json.dump(Java::JavaUtil::ArrayList.new(["foo", 1])), "[\"foo\",1]"
+    assert_equal JrJackson::Json.dump(Java::JavaUtil::LinkedList.new(["foo", 1])), "[\"foo\",1]"
+    assert_equal JrJackson::Json.dump(Java::JavaUtil::Vector.new(["foo", 1])), "[\"foo\",1]"
 
     # true/false
     assert_equal JrJackson::Json.dump(true), "true"

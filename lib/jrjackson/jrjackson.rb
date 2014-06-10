@@ -33,7 +33,7 @@ module JrJackson
 
       def dump(object)
         case object
-        when Hash, Array, String, Java::JavaUtil::LinkedHashMap, Java::JavaUtil::ArrayList
+        when Hash, Array, String, Java::JavaUtil::Map, Java::JavaUtil::List
           JrJackson::Raw.generate(object)
         when true, false
           object.to_s
