@@ -49,8 +49,22 @@ public class RubyJacksonModule extends SimpleModule {
         return mapper;
     }
 
+    public static ObjectMapper serializerMapper(SimpleDateFormat format) {
+        ObjectMapper mapper = new ObjectMapper().registerModule(
+            new RubyJacksonModule().addSerializer(RubyObject.class, RubyAnySerializer.instance)
+        );
+        mapper.registerModule(new AfterburnerModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        mapper.setDateFormat(format);
+        return mapper;
+    }
+
+    public static ObjectMapper serializerMapper() {
+        return static_mapper;
+    }
+
     // public static SimpleModule asRaw()
-    // { 
+    // {
     //   return static_mapper;
     // }
     public static SimpleModule asSym(Ruby ruby) {
