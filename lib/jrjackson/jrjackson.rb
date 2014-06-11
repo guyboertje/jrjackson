@@ -31,10 +31,10 @@ module JrJackson
         end
       end
 
-      def dump(object)
+      def dump(object, options = {})
         case object
         when Array, Hash, String, Java::JavaUtil::LinkedHashMap
-          JrJackson::Raw.generate(object)
+          JrJackson::Raw.generate(object, options)
         when true, false
           object.to_s
         when nil
