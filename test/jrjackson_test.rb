@@ -9,6 +9,7 @@ require 'thread'
 require 'bigdecimal'
 require 'jrjackson'
 require 'stringio'
+require 'time'
 
 class JrJacksonTest < Test::Unit::TestCase
 
@@ -124,6 +125,22 @@ class JrJacksonTest < Test::Unit::TestCase
 
     # nil
     assert_equal JrJackson::Json.dump(nil), "null"
+  end
+
+  def test_serialize_date
+    # default date format
+    time_string = "2014-06-10 18:18:40 EDT"
+    time = Time.parse(time_string)
+    assert_equal "{\"time\":\"#{time_string}\"}", JrJackson::Json.dump({"time" => time})
+
+    # using date_format option
+    assert_equal "{\"time\":\"2014-06-10\"}", JrJackson::Json.dump({"time" => time}, :date_format => "yyyy-MM-dd")
+    assert_equal "{\"time\":\"2014-06-10T18:18:40.000-0400\"}", JrJackson::Json.dump({"time" => time}, :date_format => "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+
+    # using date_format and timezone options
+    assert_equal "{\"time\":\"2014-06-10T22:18:40.000+0000\"}", JrJackson::Json.dump({"time" => time}, :date_format => "yyyy-MM-dd'T'HH:mm:ss.SSSZ", :timezone => "UTC")
+    # iso8601 date_format and timezone
+    assert_equal "{\"time\":\"2014-06-10T22:18:40.000Z\"}", JrJackson::Json.dump({"time" => time}, :date_format => "yyyy-MM-dd'T'HH:mm:ss.SSSX", :timezone => "UTC")
   end
 
   def test_can_parse_nulls

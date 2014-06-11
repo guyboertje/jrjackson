@@ -31,7 +31,7 @@ module JrJackson
         end
       end
 
-      def dump(object)
+      def dump(object, options = {})
         case object
         when Hash, Array, String, Java::JavaUtil::Map, Java::JavaUtil::List
           JrJackson::Raw.generate(object)

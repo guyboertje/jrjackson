@@ -13,6 +13,11 @@ import org.jruby.runtime.builtin.IRubyObject;
 import org.jruby.ext.stringio.StringIO;
 
 import java.io.IOException;
+<<<<<<< HEAD
+=======
+import java.util.*;
+import java.text.SimpleDateFormat;
+>>>>>>> 14c8e4e... configurable date format in serialization
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -112,13 +117,26 @@ public class JrJacksonRaw extends RubyObject {
     }
 
     // serialize
-    @JRubyMethod(module = true, name = {"generate", "dump"}, required = 1)
-    public static IRubyObject generate(ThreadContext context, IRubyObject self, IRubyObject arg)
+    @JRubyMethod(module = true, name = {"generate", "dump"}, required = 1, optional = 1)
+    public static IRubyObject generate(ThreadContext context, IRubyObject self, IRubyObject[] args)
             throws IOException, JsonProcessingException {
         Ruby _ruby = context.runtime;
-        Object obj = arg.toJava(Object.class);
+        Object obj = args[0].toJava(Object.class);
+        ObjectMapper mapper = RubyJacksonModule.serializerMapper();
+
+        RubyHash options = (args.length <= 1) ? RubyHash.newHash(self.getRuntime()) : args[1].convertToHash();
+
+        String format = (String) options.get(RubyUtils.rubySymbol(_ruby, "date_format"));
+        if (format != null) {
+            SimpleDateFormat sdf = new SimpleDateFormat(format);
+            String timezone = (String) options.get(RubyUtils.rubySymbol(_ruby, "timezone"));
+            if (timezone != null) {
+                sdf.setTimeZone(TimeZone.getTimeZone(timezone));
+            }
+            mapper = RubyJacksonModule.serializerMapper(sdf);
+        }
+
         try {
-            ObjectMapper mapper = RubyJacksonModule.mappedAs("raw", _ruby);
             String s = mapper.writeValueAsString(obj);
             return RubyUtils.rubyString(_ruby, s);
         } catch (JsonProcessingException e) {
