@@ -93,6 +93,10 @@ public class RubyAnySerializer extends StdSerializer<RubyObject> {
             provider.findTypedValueSerializer(Map.class, true, null).serialize(value, jgen, provider);
         } else if (value instanceof RubyArray) {
             provider.findTypedValueSerializer(List.class, true, null).serialize(value, jgen, provider);
+        } else if (value instanceof RubyStruct) {
+            ThreadContext ctx = value.getRuntime().getCurrentContext();
+            RubyObject obj = (RubyObject)value.callMethod(ctx, "to_a");
+            provider.findTypedValueSerializer(List.class, true, null).serialize(obj, jgen, provider);
         } else {
             Object val = value.toJava(rubyJavaClassLookup(value.getClass()));
             if (val instanceof RubyObject) {
