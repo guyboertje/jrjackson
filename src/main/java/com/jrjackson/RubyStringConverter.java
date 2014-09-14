@@ -10,6 +10,7 @@ public class RubyStringConverter implements RubyKeyConverter {
 
     @Override
     public RubyObject convert(Ruby ruby, JsonParser jp) throws IOException {
-        return RubyUtils.rubyString(ruby, jp.getText().getBytes());
+        //return RubyUtils.rubyString(ruby, jp.getText().getBytes());
+        return RubyUtils.rubyString(ruby, jp.getTextCharacters());
     }
 }
