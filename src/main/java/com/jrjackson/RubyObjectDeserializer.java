@@ -77,7 +77,8 @@ public class RubyObjectDeserializer
                 /* [JACKSON-100]: caller may want to get all integral values
                  * returned as BigInteger, for consistency
                  */
-                if (ctxt.isEnabled(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS)) {
+                JsonParser.NumberType numberType = jp.getNumberType();
+                if (ctxt.isEnabled(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS) || numberType == JsonParser.NumberType.BIG_INTEGER) {
                     return RubyUtils.rubyBignum(_ruby, jp.getBigIntegerValue());
                 }
                 return RubyUtils.rubyFixnum(_ruby, jp.getLongValue());
