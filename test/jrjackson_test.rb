@@ -155,6 +155,14 @@ class JrJacksonTest < Test::Unit::TestCase
     end
   end
 
+  def test_can_parse_bignum
+    expected = 12345678901234567890123456789
+    json = '{"foo":12345678901234567890123456789}'
+
+    actual = JrJackson::Json.parse(json)['foo']
+    assert_equal expected, actual
+  end
+
   def test_can_parse_big_decimals
     expected = BigDecimal.new '0.12345678901234567890123456789'
     json = '{"foo":0.12345678901234567890123456789}'
