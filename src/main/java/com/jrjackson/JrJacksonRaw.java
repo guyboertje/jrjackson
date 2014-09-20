@@ -8,17 +8,16 @@ import org.jruby.RubySymbol;
 import org.jruby.RubyHash;
 import org.jruby.anno.JRubyMethod;
 import org.jruby.anno.JRubyModule;
-import org.jruby.java.addons.IOJavaAddons;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
+import org.jruby.ext.stringio.StringIO;
 
-import java.io.InputStream;
 import java.io.IOException;
-import java.util.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.jruby.RubyIO;
 
 @JRubyModule(name = "JrJacksonRaw")
 public class JrJacksonRaw extends RubyObject {
@@ -41,7 +40,7 @@ public class JrJacksonRaw extends RubyObject {
             throws IOException {
         RubyHash options = null;
         ObjectMapper local = null;
-        Ruby _ruby = context.getRuntime();
+        Ruby _ruby = context.runtime;
 
         if (opts != context.nil) {
             options = opts.convertToHash();
@@ -68,37 +67,41 @@ public class JrJacksonRaw extends RubyObject {
     @JRubyMethod(module = true, name = {"parse_raw", "load_raw"}, required = 1)
     public static IRubyObject parse_raw(ThreadContext context, IRubyObject self, IRubyObject arg)
             throws IOException {
-        ObjectMapper mapper = RubyJacksonModule.mappedAs("raw", context.getRuntime());
+        ObjectMapper mapper = RubyJacksonModule.mappedAs("raw", context.runtime);
         return _parse(context, arg, mapper);
     }
 
     @JRubyMethod(module = true, name = {"parse_sym", "load_sym"}, required = 1)
     public static IRubyObject parse_sym(ThreadContext context, IRubyObject self, IRubyObject arg)
             throws IOException {
-        ObjectMapper mapper = RubyJacksonModule.mappedAs("sym", context.getRuntime());
+        ObjectMapper mapper = RubyJacksonModule.mappedAs("sym", context.runtime);
         return _parse(context, arg, mapper);
     }
 
     @JRubyMethod(module = true, name = {"parse_str", "load_str"}, required = 1)
     public static IRubyObject parse_str(ThreadContext context, IRubyObject self, IRubyObject arg)
             throws IOException {
-        ObjectMapper mapper = RubyJacksonModule.mappedAs("str", context.getRuntime());
+        ObjectMapper mapper = RubyJacksonModule.mappedAs("str", context.runtime);
         return _parse(context, arg, mapper);
     }
 
     private static IRubyObject _parse(ThreadContext context, IRubyObject arg, ObjectMapper mapper)
             throws IOException {
-        Ruby ruby = context.getRuntime();
+        Ruby ruby = context.runtime;
         try {
             Object o;
             if (arg instanceof RubyString) {
                 o = mapper.readValue(
-                        ((RubyString) arg).getBytes(), Object.class
+                  ((RubyString) arg).getByteList().bytes(), Object.class
+                );
+            } else if (arg instanceof StringIO) {
+                RubyString content = (RubyString)((StringIO) arg).string(context);
+                o = mapper.readValue(
+                  content.getByteList().bytes(), Object.class
                 );
             } else {
                 // must be an IO object then
-                IRubyObject stream = IOJavaAddons.AnyIO.any_to_inputstream(context, arg);
-                o = mapper.readValue((InputStream) stream.toJava(InputStream.class), Object.class);
+                o = mapper.readValue(((RubyIO)arg).getInStream(), Object.class);
             }
             return RubyUtils.rubyObject(ruby, o);
         } catch (JsonProcessingException e) {
@@ -112,7 +115,7 @@ public class JrJacksonRaw extends RubyObject {
     @JRubyMethod(module = true, name = {"generate", "dump"}, required = 1)
     public static IRubyObject generate(ThreadContext context, IRubyObject self, IRubyObject arg)
             throws IOException, JsonProcessingException {
-        Ruby _ruby = context.getRuntime();
+        Ruby _ruby = context.runtime;
         Object obj = arg.toJava(Object.class);
         try {
             ObjectMapper mapper = RubyJacksonModule.mappedAs("raw", _ruby);

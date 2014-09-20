@@ -38,9 +38,8 @@ public class RubyAnySerializer extends StdSerializer<RubyObject> {
         return val;
     }
 
-    private void serializeUnknownRubyObject(RubyObject rubyObject, JsonGenerator jgen, SerializerProvider provider)
+    private void serializeUnknownRubyObject(ThreadContext ctx, RubyObject rubyObject, JsonGenerator jgen, SerializerProvider provider)
             throws IOException, JsonGenerationException {
-        ThreadContext ctx = rubyObject.getRuntime().getCurrentContext();
         RubyClass meta = rubyObject.getMetaClass();
 
         DynamicMethod method = meta.searchMethod("to_time");
@@ -87,6 +86,7 @@ public class RubyAnySerializer extends StdSerializer<RubyObject> {
     @Override
     public void serialize(RubyObject value, JsonGenerator jgen, SerializerProvider provider)
             throws IOException, JsonGenerationException {
+        ThreadContext ctx = value.getRuntime().getCurrentContext();
         if (value instanceof RubySymbol || value instanceof RubyString) {
             jgen.writeString(value.toString());
         } else if (value instanceof RubyHash) {
@@ -94,13 +94,12 @@ public class RubyAnySerializer extends StdSerializer<RubyObject> {
         } else if (value instanceof RubyArray) {
             provider.findTypedValueSerializer(List.class, true, null).serialize(value, jgen, provider);
         } else if (value instanceof RubyStruct) {
-            ThreadContext ctx = value.getRuntime().getCurrentContext();
             RubyObject obj = (RubyObject)value.callMethod(ctx, "to_a");
             provider.findTypedValueSerializer(List.class, true, null).serialize(obj, jgen, provider);
         } else {
             Object val = value.toJava(rubyJavaClassLookup(value.getClass()));
             if (val instanceof RubyObject) {
-                serializeUnknownRubyObject((RubyObject) val, jgen, provider);
+                serializeUnknownRubyObject(ctx, (RubyObject) val, jgen, provider);
             } else {
                 provider.defaultSerializeValue(val, jgen);
             }

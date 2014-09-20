@@ -134,8 +134,17 @@ class JrJacksonTest < Test::Unit::TestCase
   end
 
   def test_stringio
-    expected = {"foo" => 5}
-    json = ::StringIO.new('{"foo":5}')
+    expected = {"foo" => 5, "utf8" => "żółć"}
+    json = ::StringIO.new('{"foo":5, "utf8":"żółć"}')
+    actual = JrJackson::Json.load(json)
+    assert_equal expected, actual
+  end
+
+  def test_ruby_io
+    expected = {"foo" => 5, "bar" => 6, "utf8" => "żółć"}
+    json, w = IO.pipe
+    w.write('{"foo":5, "bar":6, "utf8":"żółć"}')
+    w.close
     actual = JrJackson::Json.load(json)
     assert_equal expected, actual
   end
