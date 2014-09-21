@@ -122,20 +122,21 @@ public class JrJacksonRaw extends RubyObject {
             throws IOException, JsonProcessingException {
         Ruby _ruby = context.runtime;
         Object obj = args[0].toJava(Object.class);
-        ObjectMapper mapper = RubyJacksonModule.serializerMapper();
-
         RubyHash options = (args.length <= 1) ? RubyHash.newHash(self.getRuntime()) : args[1].convertToHash();
-
         String format = (String) options.get(RubyUtils.rubySymbol(_ruby, "date_format"));
+        
+        ObjectMapper mapper = RubyJacksonModule.mappedAs("raw", _ruby);
+        SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+        
         if (format != null) {
-            SimpleDateFormat sdf = new SimpleDateFormat(format);
+            simpleFormat = new SimpleDateFormat(format);
             String timezone = (String) options.get(RubyUtils.rubySymbol(_ruby, "timezone"));
             if (timezone != null) {
-                sdf.setTimeZone(TimeZone.getTimeZone(timezone));
+                simpleFormat.setTimeZone(TimeZone.getTimeZone(timezone));
             }
-            mapper = RubyJacksonModule.serializerMapper(sdf);
         }
-
+        mapper.setDateFormat(simpleFormat);
+        
         try {
             String s = mapper.writeValueAsString(obj);
             return RubyUtils.rubyString(_ruby, s);
