@@ -6,6 +6,7 @@ import org.jruby.RubyObject;
 import org.jruby.RubyString;
 import org.jruby.RubySymbol;
 import org.jruby.RubyHash;
+import org.jruby.RubyIO;
 import org.jruby.anno.JRubyMethod;
 import org.jruby.anno.JRubyModule;
 import org.jruby.runtime.ThreadContext;
@@ -13,16 +14,14 @@ import org.jruby.runtime.builtin.IRubyObject;
 import org.jruby.ext.stringio.StringIO;
 
 import java.io.IOException;
-<<<<<<< HEAD
-=======
-import java.util.*;
+
 import java.text.SimpleDateFormat;
->>>>>>> 14c8e4e... configurable date format in serialization
+import java.util.TimeZone;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.jruby.RubyIO;
+
 
 @JRubyModule(name = "JrJacksonRaw")
 public class JrJacksonRaw extends RubyObject {
@@ -93,6 +92,9 @@ public class JrJacksonRaw extends RubyObject {
     private static IRubyObject _parse(ThreadContext context, IRubyObject arg, ObjectMapper mapper)
             throws IOException {
         Ruby ruby = context.runtime;
+        // same format as Ruby Time #to_s
+        SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+        mapper.setDateFormat(simpleFormat);
         try {
             Object o;
             if (arg instanceof RubyString) {
@@ -122,11 +124,12 @@ public class JrJacksonRaw extends RubyObject {
             throws IOException, JsonProcessingException {
         Ruby _ruby = context.runtime;
         Object obj = args[0].toJava(Object.class);
-        RubyHash options = (args.length <= 1) ? RubyHash.newHash(self.getRuntime()) : args[1].convertToHash();
+        RubyHash options = (args.length <= 1) ? RubyHash.newHash(_ruby) : args[1].convertToHash();
         String format = (String) options.get(RubyUtils.rubySymbol(_ruby, "date_format"));
         
         ObjectMapper mapper = RubyJacksonModule.mappedAs("raw", _ruby);
-        SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+        // same format as Ruby Time #to_s
+        SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
         
         if (format != null) {
             simpleFormat = new SimpleDateFormat(format);
