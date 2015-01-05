@@ -3,8 +3,8 @@ unless RUBY_PLATFORM =~ /java/
   exit 255
 end
 
-require_relative "jars/jrjackson-1.2.9.jar"
-# require_relative "linked/jrjackson-1.2.9.jar"
+require_relative "jars/jrjackson-1.2.11.jar"
+# require_relative "linked/jrjackson-1.2.11.jar"
 
 require 'com/jrjackson/jr_jackson'
 
@@ -31,10 +31,10 @@ module JrJackson
         end
       end
 
-      def dump(object)
+      def dump(object, options = {})
         case object
         when Hash, Array, String, Java::JavaUtil::Map, Java::JavaUtil::List
-          JrJackson::Raw.generate(object)
+          JrJackson::Raw.generate(object, options)
         when true, false
           object.to_s
         when nil

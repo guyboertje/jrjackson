@@ -19,7 +19,6 @@ public class RubyJacksonModule extends SimpleModule {
     static {
         static_mapper.registerModule(new AfterburnerModule());
         static_mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        static_mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z"));
     }
 
     private RubyJacksonModule() {
@@ -45,14 +44,9 @@ public class RubyJacksonModule extends SimpleModule {
             );
         }
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z"));
         return mapper;
     }
 
-    // public static SimpleModule asRaw()
-    // { 
-    //   return static_mapper;
-    // }
     public static SimpleModule asSym(Ruby ruby) {
         return new RubyJacksonModule().addSerializer(
                 RubyObject.class, RubyAnySerializer.instance

@@ -9,6 +9,7 @@ require 'thread'
 require 'bigdecimal'
 require 'jrjackson'
 require 'stringio'
+require 'time'
 
 class JrJacksonTest < Test::Unit::TestCase
 
@@ -92,12 +93,12 @@ class JrJacksonTest < Test::Unit::TestCase
     json_string = JrJackson::Json.dump(source)
     expected = {
       :sym => "a_symbol",
-      :dt => dt.strftime("%F %T %Z"),
+      :dt => dt.strftime("%F %T %z"),
       :co1 => {:one => "uno", :two => "two", :six => 6.0 },
       :co2 => {:one => "uno", :two => "two", :six => 6.0 },
       :co3 => {:one => 1.0, :two => 2.0, :six => 6.0 },
       :co4 => [1, 2, 6],
-      :co5 => dt.strftime("%F %T %Z")
+      :co5 => dt.strftime("%F %T %z")
     }
     actual = JrJackson::Json.load(json_string, :symbolize_keys => true)
     assert_equal expected, actual
@@ -126,6 +127,32 @@ class JrJacksonTest < Test::Unit::TestCase
     assert_equal JrJackson::Json.dump(nil), "null"
   end
 
+  def test_serialize_date
+    # default date format
+    time_string = "2014-06-10 18:18:40 EDT"
+    source_time = Time.parse(time_string)
+    serialized_output = JrJackson::Json.dump({"time" => source_time})
+    other_time = Time.parse(serialized_output.split('"')[-2])
+    assert_equal other_time.to_f, source_time.to_f
+  end
+
+  def test_serialize_date_date_format
+
+    time = Time.new(2014,6,10,18,18,40, "-04:00")
+    # using date_format option
+    assert_equal "{\"time\":\"2014-06-10\"}", JrJackson::Json.dump({"time" => time}, :date_format => "yyyy-MM-dd")
+    assert_match /\{"time"\:"\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}[+-]\d{4}"\}/, JrJackson::Json.dump({"time" => time}, :date_format => "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+  end
+
+  def test_serialize_date_date_format_timezone
+
+    time = Time.new(2014,6,10,18,18,40, "-04:00")
+    # using date_format and timezone options
+    assert_equal "{\"time\":\"2014-06-10T22:18:40.000+0000\"}", JrJackson::Json.dump({"time" => time}, :date_format => "yyyy-MM-dd'T'HH:mm:ss.SSSZ", :timezone => "UTC")
+    # iso8601 date_format and timezone
+    assert_equal "{\"time\":\"2014-06-10T22:18:40.000Z\"}", JrJackson::Json.dump({"time" => time}, :date_format => "yyyy-MM-dd'T'HH:mm:ss.SSSX", :timezone => "UTC")
+  end
+
   def test_can_parse_nulls
     expected = {"foo" => nil}
     json = '{"foo":null}'
@@ -134,8 +161,17 @@ class JrJacksonTest < Test::Unit::TestCase
   end
 
   def test_stringio
-    expected = {"foo" => 5}
-    json = ::StringIO.new('{"foo":5}')
+    expected = {"foo" => 5, "utf8" => "żółć"}
+    json = ::StringIO.new('{"foo":5, "utf8":"żółć"}')
+    actual = JrJackson::Json.load(json)
+    assert_equal expected, actual
+  end
+
+  def test_ruby_io
+    expected = {"foo" => 5, "bar" => 6, "utf8" => "żółć"}
+    json, w = IO.pipe
+    w.write('{"foo":5, "bar":6, "utf8":"żółć"}')
+    w.close
     actual = JrJackson::Json.load(json)
     assert_equal expected, actual
   end

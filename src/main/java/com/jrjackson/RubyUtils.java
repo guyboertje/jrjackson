@@ -4,6 +4,7 @@ import java.util.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.CharBuffer;
 
 import org.jruby.*;
 import org.jruby.javasupport.JavaUtil;
@@ -24,10 +25,14 @@ public class RubyUtils {
         return RubyString.newString(ruby, node);
     }
 
+    public static RubyString rubyString(Ruby ruby, CharSequence node) {
+        return RubyString.newUnicodeString(ruby, node);
+    }
+
     public static RubySymbol rubySymbol(Ruby ruby, String node) {
         return RubySymbol.newSymbol(ruby, node);
     }
-
+   
     public static RubyArray rubyArray(Ruby ruby, Object[] arg) {
         return (RubyArray) JavaUtil.convertJavaToRuby(ruby, arg);
     }

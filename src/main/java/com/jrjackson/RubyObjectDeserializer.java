@@ -1,7 +1,6 @@
 package com.jrjackson;
 
 import java.io.IOException;
-import java.util.*;
 
 import com.fasterxml.jackson.core.*;
 
@@ -23,7 +22,8 @@ public class RubyObjectDeserializer
 
     private Ruby _ruby;
 
-    private RubyKeyConverter converter;
+    private RubyKeyConverter key_converter;
+    final private RubyStringConverter str_converter = new RubyStringConverter();
 
     public RubyObjectDeserializer() {
         super(RubyObject.class);
@@ -35,12 +35,12 @@ public class RubyObjectDeserializer
     }
 
     public RubyObjectDeserializer setStringStrategy() {
-        converter = new RubyStringConverter();
+        key_converter = str_converter;
         return this;
     }
 
     public RubyObjectDeserializer setSymbolStrategy() {
-        converter = new RubySymbolConverter();
+        key_converter = new RubySymbolConverter();
         return this;
     }
 
@@ -65,14 +65,13 @@ public class RubyObjectDeserializer
                 return mapArray(jp, ctxt);
 
             case FIELD_NAME:
-                return converter.convert(_ruby, jp);
+                return key_converter.convert(_ruby, jp);
 
             case VALUE_EMBEDDED_OBJECT:
                 return RubyUtils.rubyObject(_ruby, jp.getEmbeddedObject());
 
             case VALUE_STRING:
-                // return RubyUtils.rubyString(_ruby, jp.getText().getBytes("UTF-8"));
-                return RubyUtils.rubyString(_ruby, jp.getText());
+                return str_converter.convert(_ruby, jp);
 
             case VALUE_NUMBER_INT:
                 /* [JACKSON-100]: caller may want to get all integral values
@@ -166,14 +165,14 @@ public class RubyObjectDeserializer
             return RubyHash.newHash(_ruby);
         }
 
-        RubyObject field1 = converter.convert(_ruby, jp);
+        RubyObject field1 = key_converter.convert(_ruby, jp);
         jp.nextToken();
         RubyObject value1 = deserialize(jp, ctxt);
         if (jp.nextToken() != JsonToken.FIELD_NAME) { // single entry; but we want modifiable
             return RuntimeHelpers.constructHash(_ruby, field1, value1);
         }
 
-        RubyObject field2 = converter.convert(_ruby, jp);
+        RubyObject field2 = key_converter.convert(_ruby, jp);
         jp.nextToken();
         RubyObject value2 = deserialize(jp, ctxt);
         if (jp.nextToken() != JsonToken.FIELD_NAME) {
@@ -183,7 +182,7 @@ public class RubyObjectDeserializer
         // And then the general case; default map size is 16
         RubyHash result = RuntimeHelpers.constructHash(_ruby, field1, value1, field2, value2);
         do {
-            RubyObject fieldName = converter.convert(_ruby, jp);
+            RubyObject fieldName = key_converter.convert(_ruby, jp);
             jp.nextToken();
             result.fastASetCheckString(_ruby, fieldName, deserialize(jp, ctxt));
         } while (jp.nextToken() != JsonToken.END_OBJECT);
