@@ -15,6 +15,8 @@ chruby-exec jruby-9.0.0.0.pre1 -- ruby -J-Xmn512m -J-Xms2048m -J-Xmx2048m benchm
 chruby-exec jruby-9.0.0.0.pre1 -- ruby -J-Xmn512m -J-Xms2048m -J-Xmx2048m benchmarking/individual/raw-jr-sourced.rb
 chruby-exec jruby-9.0.0.0.pre1 -- ruby -J-Xmn512m -J-Xms2048m -J-Xmx2048m benchmarking/individual/raw-bd-jr-sourced.rb
 
+chruby-exec jruby-9.0.0.0.pre1 -- ruby -J-Xmn512m -J-Xms2048m -J-Xmx2048m benchmarking/individual/sj-jr-sourced.rb
+
 chruby-exec ruby-2.2.0 -- ruby benchmarking/individual/json-gen-mri-sourced.rb
 chruby-exec ruby-2.2.0 -- ruby benchmarking/individual/oj-gen-mri-sourced.rb
 

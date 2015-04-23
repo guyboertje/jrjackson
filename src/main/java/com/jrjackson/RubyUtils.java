@@ -4,11 +4,11 @@ import java.util.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.nio.CharBuffer;
 
 import org.jruby.*;
 import org.jruby.javasupport.JavaUtil;
 import org.jruby.ext.bigdecimal.RubyBigDecimal;
+import org.jruby.runtime.builtin.IRubyObject;
 import org.jruby.util.SafeDoubleParser;
 
 public class RubyUtils {
@@ -72,5 +72,18 @@ public class RubyUtils {
 
     public static RubyBoolean rubyBoolean(Ruby ruby, Boolean arg) {
         return ruby.newBoolean(arg);
+    }
+
+    public static RubyHash rubyHash(Ruby ruby, IRubyObject key, IRubyObject value) {
+        RubyHash hash = RubyHash.newHash(ruby);
+        hash.fastASet(key, value);
+        return hash;
+    }
+
+    public static RubyHash rubyHash(Ruby ruby, IRubyObject key1, IRubyObject value1,
+                                      IRubyObject key2, IRubyObject value2) {
+        RubyHash hash = rubyHash(ruby, key1, value1);
+        hash.fastASet(key2, value2);
+        return hash;
     }
 }

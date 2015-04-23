@@ -1,14 +1,14 @@
 package com.jrjackson;
 
-import java.text.SimpleDateFormat;
-
-import org.jruby.*;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.core.util.VersionUtil;
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
+
+import org.jruby.Ruby;
+import org.jruby.RubyObject;
+import org.jruby.runtime.builtin.IRubyObject;
 
 public class RubyJacksonModule extends SimpleModule {
 
@@ -33,7 +33,11 @@ public class RubyJacksonModule extends SimpleModule {
         ObjectMapper mapper = new ObjectMapper().registerModule(
                 new AfterburnerModule()
         );
-
+        
+        if ("saj".equals(key)) { 
+            return mapper;
+        }
+        
         if ("sym".equals(key)) {
             mapper.registerModule(
                     asSym(ruby)

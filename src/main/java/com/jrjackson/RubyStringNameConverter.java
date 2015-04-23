@@ -6,9 +6,10 @@ import java.io.IOException;
 import org.jruby.Ruby;
 import org.jruby.RubyObject;
 
-public class RubySymbolConverter implements RubyKeyConverter {
+public class RubyStringNameConverter implements RubyKeyConverter {
 
+    @Override
     public RubyObject convert(Ruby ruby, JsonParser jp) throws IOException {
-        return RubyUtils.rubySymbol(ruby, jp.getText());
+        return RubyUtils.rubyString(ruby, jp.getCurrentName());
     }
 }

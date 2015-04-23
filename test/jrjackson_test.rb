@@ -54,6 +54,157 @@ class JrJacksonTest < Test::Unit::TestCase
 
   CustomStruct = Struct.new(:one, :two, :six)
 
+
+  class ScHandler
+    attr_accessor :calls
+
+    def initialize(arr = [])
+      @calls = arr
+    end
+
+    def hash_start()
+      @calls << [:hash_start]
+      {}
+    end
+
+    def hash_end()
+      @calls << [:hash_end]
+    end
+
+    def hash_key(key)
+      @calls << [:hash_key, key]
+      return 'too' if 'two' == key
+      return :symbol if 'symbol' == key
+      key
+    end
+
+    def array_start()
+      @calls << [:array_start]
+      []
+    end
+
+    def array_end()
+      @calls << [:array_end]
+    end
+
+    def add_value(value)
+      @calls << [:add_value, value]
+    end
+
+    def hash_set(h, key, value)
+      # h[key] = value
+      @calls << [:hash_set, key, value]
+    end
+
+    def array_append(a, value)
+      # a.push(value)
+      @calls << [:array_append, value]
+    end
+  end
+
+  JsonString = %Q|{
+    "array": [
+      {
+        "num"   : 3,
+        "string": "message",
+        "hash"  : {
+          "h2"  : {
+            "a" : [ 1, 2, 3 ]
+          }
+        }
+      }
+    ],
+    "boolean" : true
+  }|
+
+  def test_sc_parse
+    array = []
+    handler = ScHandler.new(array)
+    JrJackson::Json.sc_load(handler, JsonString)
+    assert_equal(
+      [
+        [:hash_start],
+        [:array_start],
+        [:hash_start],
+        [:hash_key, 'num'],
+        [:hash_set, "num", 3],
+        [:hash_key, 'string'],
+        [:hash_set, "string", "message"],
+        [:hash_start],
+        [:hash_start],
+        [:array_start],
+        [:array_append, 1],
+        [:array_append, 2],
+        [:array_append, 3],
+        [:array_end],
+        [:hash_key, "a"],
+        [:hash_set, "a", []],
+        [:hash_end],
+        [:hash_key, "h2"],
+        [:hash_set, "h2", {}],
+        [:hash_end],
+        [:hash_key, "hash"],
+        [:hash_set, "hash", {}],
+        [:hash_end],
+        [:array_append, {}],
+        [:array_end],
+        [:hash_key, "array"],
+        [:hash_set, "array", []],
+        [:hash_key, 'boolean'],
+        [:hash_set, "boolean", true],
+        [:hash_end],
+        [:add_value, {}]
+      ],
+    handler.calls
+  )
+  end
+
+  class SjHandler
+    attr_reader :calls
+    def initialize(arr = []) @calls = arr; end
+    def hash_start(key) @calls << [:hash_start, key]; end
+    def hash_end(key) @calls << [:hash_end, key]; end
+    def array_start(key) @calls << [:array_start, key]; end
+    def array_end(key) @calls << [:array_end, key]; end
+    def add_value(value, key) @calls << [:add_value, value, key]; end
+    def error(message, line, column) @calls << [:error, message, line, column]; end
+  end
+
+  def test_sj_parse
+    handler = SjHandler.new()
+    JrJackson::Json.sj_load(handler, JsonString)
+    assert_equal(
+      [
+        [:hash_start, nil],
+        [:array_start, 'array'],
+        [:hash_start, nil],
+        [:add_value, 3, 'num'],
+        [:add_value, 'message', 'string'],
+        [:hash_start, 'hash'],
+        [:hash_start, 'h2'],
+        [:array_start, 'a'],
+        [:add_value, 1, nil],
+        [:add_value, 2, nil],
+        [:add_value, 3, nil],
+        [:array_end, 'a'],
+        [:hash_end, 'h2'],
+        [:hash_end, 'hash'],
+        [:hash_end, nil],
+        [:array_end, 'array'],
+        [:add_value, true, 'boolean'],
+        [:hash_end, nil]
+      ],
+      handler.calls
+    )
+  end
+
+  def test_datetime
+    h = {datetime: DateTime.parse("2014-01-27T18:24:46+01:00")}
+    expected = '{"datetime":"2014-01-27 17:24:46 +0000"}'
+    actual = JrJackson::Json.dump(h)
+    assert_equal expected, actual
+  end
+
   def test_threading
     q1, q2, q3 = Queue.new, Queue.new, Queue.new
 
@@ -78,6 +229,13 @@ class JrJacksonTest < Test::Unit::TestCase
   def test_deserialize_JSON_with_UTF8_characters
     json_string = JrJackson::Json.dump({"utf8" => "żółć"})
     expected = {utf8: "żółć"}
+    actual = JrJackson::Json.load(json_string, :symbolize_keys => true)
+    assert_equal expected, actual
+  end
+
+  def test_deserialize_JSON_with_two_entries
+    json_string = JrJackson::Json.dump({'foo' => 'foo_value', 'bar' => 'bar_value'})
+    expected = {foo: 'foo_value', bar: 'bar_value'}
     actual = JrJackson::Json.load(json_string, :symbolize_keys => true)
     assert_equal expected, actual
   end

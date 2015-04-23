@@ -1,5 +1,7 @@
 package com.jrjackson;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
 import org.jruby.Ruby;
 import org.jruby.RubyClass;
 import org.jruby.RubyObject;
@@ -21,6 +23,7 @@ import java.util.TimeZone;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.jruby.exceptions.RaiseException;
 
 
 @JRubyModule(name = "JrJacksonRaw")
@@ -68,29 +71,72 @@ public class JrJacksonRaw extends RubyObject {
         return _parse(context, arg, local);
     }
 
+    @JRubyMethod(module = true, name = {"sj_parse", "sj_load"}, required = 3)
+    public static IRubyObject sj_parse(ThreadContext context, IRubyObject self, IRubyObject handler, IRubyObject arg, IRubyObject opts)
+            throws RaiseException {
+        StreamParse sp = new SajParse(context, handler);
+        return _sjcparse(context, handler, arg, opts, sp);
+    }
+    
+    @JRubyMethod(module = true, name = {"sc_parse", "sc_load"}, required = 3)
+    public static IRubyObject sc_parse(ThreadContext context, IRubyObject self, IRubyObject handler, IRubyObject arg, IRubyObject opts)
+            throws RaiseException {
+        StreamParse sp = new SchParse(context, handler);
+        return _sjcparse(context, handler, arg, opts, sp);
+    }
+    
+    private static IRubyObject _sjcparse(ThreadContext context, IRubyObject handler, IRubyObject arg, IRubyObject opts, StreamParse sp)
+            throws RaiseException {
+        
+        ObjectMapper mapper = RubyJacksonModule.mappedAs("raw", context.runtime);
+        JsonFactory jfactory = mapper.getFactory();
+        JsonParser jParser;
+        try {
+            if (arg instanceof RubyString) {
+                jParser = jfactory.createParser(
+                    ((RubyString) arg).getByteList().bytes()
+                );
+            } else if (arg instanceof StringIO) {
+                RubyString content = (RubyString)((StringIO) arg).string(context);
+                jParser = jfactory.createParser(
+                    content.getByteList().bytes()
+                );
+            } else {
+                // must be an IO object then
+                jParser = jfactory.createParser(
+                    ((RubyIO)arg).getInStream()
+                );
+            }
+        } catch (IOException e) {
+            throw context.runtime.newIOError(e.getLocalizedMessage());
+        }
+        
+        return sp.deserialize(jParser);
+    }
+    
     @JRubyMethod(module = true, name = {"parse_raw", "load_raw"}, required = 1)
     public static IRubyObject parse_raw(ThreadContext context, IRubyObject self, IRubyObject arg)
-            throws IOException {
+            throws IOException, RaiseException {
         ObjectMapper mapper = RubyJacksonModule.mappedAs("raw", context.runtime);
         return _parse(context, arg, mapper);
     }
 
     @JRubyMethod(module = true, name = {"parse_sym", "load_sym"}, required = 1)
     public static IRubyObject parse_sym(ThreadContext context, IRubyObject self, IRubyObject arg)
-            throws IOException {
+            throws IOException, RaiseException {
         ObjectMapper mapper = RubyJacksonModule.mappedAs("sym", context.runtime);
         return _parse(context, arg, mapper);
     }
 
     @JRubyMethod(module = true, name = {"parse_str", "load_str"}, required = 1)
     public static IRubyObject parse_str(ThreadContext context, IRubyObject self, IRubyObject arg)
-            throws IOException {
+            throws IOException, RaiseException {
         ObjectMapper mapper = RubyJacksonModule.mappedAs("str", context.runtime);
         return _parse(context, arg, mapper);
     }
 
     private static IRubyObject _parse(ThreadContext context, IRubyObject arg, ObjectMapper mapper)
-            throws IOException {
+            throws IOException, RaiseException {
         Ruby ruby = context.runtime;
         // same format as Ruby Time #to_s
         SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
@@ -121,7 +167,7 @@ public class JrJacksonRaw extends RubyObject {
     // serialize
     @JRubyMethod(module = true, name = {"generate", "dump"}, required = 1, optional = 1)
     public static IRubyObject generate(ThreadContext context, IRubyObject self, IRubyObject[] args)
-            throws IOException, JsonProcessingException {
+            throws IOException, RaiseException {
         Ruby _ruby = context.runtime;
         Object obj = args[0].toJava(Object.class);
         RubyHash options = (args.length <= 1) ? RubyHash.newHash(_ruby) : args[1].convertToHash();

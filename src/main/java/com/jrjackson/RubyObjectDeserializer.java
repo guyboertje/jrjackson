@@ -13,7 +13,7 @@ import org.jruby.Ruby;
 import org.jruby.RubyObject;
 import org.jruby.RubyArray;
 import org.jruby.RubyHash;
-import org.jruby.javasupport.util.RuntimeHelpers;
+
 
 public class RubyObjectDeserializer
         extends StdDeserializer<RubyObject> {
@@ -35,12 +35,12 @@ public class RubyObjectDeserializer
     }
 
     public RubyObjectDeserializer setStringStrategy() {
-        key_converter = str_converter;
+        key_converter = new RubyStringNameConverter();
         return this;
     }
 
     public RubyObjectDeserializer setSymbolStrategy() {
-        key_converter = new RubySymbolConverter();
+        key_converter = new RubySymbolNameConverter();
         return this;
     }
 
@@ -57,6 +57,10 @@ public class RubyObjectDeserializer
     @Override
     public RubyObject deserialize(JsonParser jp, DeserializationContext ctxt)
             throws IOException, JsonProcessingException {
+        
+        boolean use_big_decimal = ctxt.isEnabled(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
+        boolean use_big_integer = ctxt.isEnabled(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS);
+        
         switch (jp.getCurrentToken()) {
             case START_OBJECT:
                 return mapObject(jp, ctxt);
@@ -78,13 +82,13 @@ public class RubyObjectDeserializer
                  * returned as BigInteger, for consistency
                  */
                 JsonParser.NumberType numberType = jp.getNumberType();
-                if (ctxt.isEnabled(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS) || numberType == JsonParser.NumberType.BIG_INTEGER) {
+                if (use_big_integer || numberType == JsonParser.NumberType.BIG_INTEGER) {
                     return RubyUtils.rubyBignum(_ruby, jp.getBigIntegerValue());
                 }
                 return RubyUtils.rubyFixnum(_ruby, jp.getLongValue());
 
             case VALUE_NUMBER_FLOAT:
-                if (ctxt.isEnabled(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS)) {
+                if (use_big_decimal) {
                     return RubyUtils.rubyBigDecimal(_ruby, jp.getDecimalValue());
                 }
                 return RubyUtils.rubyFloat(_ruby, jp.getDoubleValue());
@@ -168,19 +172,21 @@ public class RubyObjectDeserializer
         RubyObject field1 = key_converter.convert(_ruby, jp);
         jp.nextToken();
         RubyObject value1 = deserialize(jp, ctxt);
+        
         if (jp.nextToken() != JsonToken.FIELD_NAME) { // single entry; but we want modifiable
-            return RuntimeHelpers.constructHash(_ruby, field1, value1);
+            return RubyUtils.rubyHash(_ruby, field1, value1);
         }
 
         RubyObject field2 = key_converter.convert(_ruby, jp);
         jp.nextToken();
-        RubyObject value2 = deserialize(jp, ctxt);
+        
+        RubyHash result =  RubyUtils.rubyHash(_ruby, field1, value1, field2, deserialize(jp, ctxt));
+        
         if (jp.nextToken() != JsonToken.FIELD_NAME) {
-            return RuntimeHelpers.constructHash(_ruby, field1, value1, field2, value2);
+            return  result;
         }
 
         // And then the general case; default map size is 16
-        RubyHash result = RuntimeHelpers.constructHash(_ruby, field1, value1, field2, value2);
         do {
             RubyObject fieldName = key_converter.convert(_ruby, jp);
             jp.nextToken();
