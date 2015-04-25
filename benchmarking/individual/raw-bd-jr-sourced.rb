@@ -14,3 +14,9 @@ Benchmark.bmbm(BenchOptions.output_width) do |x|
     BenchOptions.iterations.times { JrJackson::Json.load(dumped_string, opts) }
   end
 end
+
+Benchmark.bmbm(BenchOptions.output_width) do |x| 
+  x.report("jackson parse raw + bigdecimal direct: #{BenchOptions.iterations}") do
+    BenchOptions.iterations.times { JrJackson::Raw.parse_raw_bd(dumped_string) }
+  end
+end

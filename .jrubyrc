@@ -75,7 +75,7 @@ invokedynamic.log.constants=false
 
 # Enable all possible uses of invokedynamic.
 # Options: [true, false], Default: false.
-invokedynamic.all=false
+invokedynamic.all=true
 
 # Enable all safe (but maybe not fast) uses of invokedynamic.
 # Options: [true, false], Default: false.
@@ -259,7 +259,7 @@ jit.max=16384
 
 # Specify the major Ruby version to be compatible with.
 # Options: [1.8, 1.9, 2.0], Default: 1.9.
-compat.version=1.9
+compat.version=2.0
 
 # Enable or disable ObjectSpace.each_object.
 # Options: [true, false], Default: false.

@@ -360,6 +360,9 @@ class JrJacksonTest < Test::Unit::TestCase
 
     actual = JrJackson::Json.parse(json, :use_bigdecimal => true, :raw => true)['foo']
     assert_bigdecimal_similar expected, actual
+
+    actual = JrJackson::Raw.parse_raw_bd(json)['foo']
+    assert_bigdecimal_similar expected, actual
   end
 
   def assert_bigdecimal_equal(expected, actual)

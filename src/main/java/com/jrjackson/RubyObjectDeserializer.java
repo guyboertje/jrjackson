@@ -5,7 +5,6 @@ import java.io.IOException;
 import com.fasterxml.jackson.core.*;
 
 import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.util.ObjectBuffer;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
@@ -22,25 +21,21 @@ public class RubyObjectDeserializer
 
     private Ruby _ruby;
 
-    private RubyKeyConverter key_converter;
-    final private RubyStringConverter str_converter = new RubyStringConverter();
+    private RubyKeyConverter _key_converter;
+    private RubyValueConverter _int_converter;
+    private RubyValueConverter _float_converter;
+    final private RubyStringConverter _str_converter = new RubyStringConverter();
 
     public RubyObjectDeserializer() {
         super(RubyObject.class);
     }
 
-    public RubyObjectDeserializer withRuby(Ruby ruby) {
+    public RubyObjectDeserializer with(Ruby ruby, RubyKeyConverter nameConv,
+            RubyValueConverter intConv, RubyValueConverter floatConv) {
         _ruby = ruby;
-        return this;
-    }
-
-    public RubyObjectDeserializer setStringStrategy() {
-        key_converter = new RubyStringNameConverter();
-        return this;
-    }
-
-    public RubyObjectDeserializer setSymbolStrategy() {
-        key_converter = new RubySymbolNameConverter();
+        _key_converter = nameConv;
+        _int_converter = intConv;
+        _float_converter = floatConv;
         return this;
     }
 
@@ -58,9 +53,6 @@ public class RubyObjectDeserializer
     public RubyObject deserialize(JsonParser jp, DeserializationContext ctxt)
             throws IOException, JsonProcessingException {
         
-        boolean use_big_decimal = ctxt.isEnabled(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
-        boolean use_big_integer = ctxt.isEnabled(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS);
-        
         switch (jp.getCurrentToken()) {
             case START_OBJECT:
                 return mapObject(jp, ctxt);
@@ -69,29 +61,22 @@ public class RubyObjectDeserializer
                 return mapArray(jp, ctxt);
 
             case FIELD_NAME:
-                return key_converter.convert(_ruby, jp);
+                return _key_converter.convert(_ruby, jp);
 
             case VALUE_EMBEDDED_OBJECT:
                 return RubyUtils.rubyObject(_ruby, jp.getEmbeddedObject());
 
             case VALUE_STRING:
-                return str_converter.convert(_ruby, jp);
+                return _str_converter.convert(_ruby, jp);
 
             case VALUE_NUMBER_INT:
                 /* [JACKSON-100]: caller may want to get all integral values
                  * returned as BigInteger, for consistency
                  */
-                JsonParser.NumberType numberType = jp.getNumberType();
-                if (use_big_integer || numberType == JsonParser.NumberType.BIG_INTEGER) {
-                    return RubyUtils.rubyBignum(_ruby, jp.getBigIntegerValue());
-                }
-                return RubyUtils.rubyFixnum(_ruby, jp.getLongValue());
+                return _int_converter.convert(_ruby, jp);
 
             case VALUE_NUMBER_FLOAT:
-                if (use_big_decimal) {
-                    return RubyUtils.rubyBigDecimal(_ruby, jp.getDecimalValue());
-                }
-                return RubyUtils.rubyFloat(_ruby, jp.getDoubleValue());
+                return _float_converter.convert(_ruby, jp);
 
             case VALUE_TRUE:
                 return _ruby.newBoolean(Boolean.TRUE);
@@ -169,7 +154,7 @@ public class RubyObjectDeserializer
             return RubyHash.newHash(_ruby);
         }
 
-        RubyObject field1 = key_converter.convert(_ruby, jp);
+        RubyObject field1 = _key_converter.convert(_ruby, jp);
         jp.nextToken();
         RubyObject value1 = deserialize(jp, ctxt);
         
@@ -177,7 +162,7 @@ public class RubyObjectDeserializer
             return RubyUtils.rubyHash(_ruby, field1, value1);
         }
 
-        RubyObject field2 = key_converter.convert(_ruby, jp);
+        RubyObject field2 = _key_converter.convert(_ruby, jp);
         jp.nextToken();
         
         RubyHash result =  RubyUtils.rubyHash(_ruby, field1, value1, field2, deserialize(jp, ctxt));
@@ -188,7 +173,7 @@ public class RubyObjectDeserializer
 
         // And then the general case; default map size is 16
         do {
-            RubyObject fieldName = key_converter.convert(_ruby, jp);
+            RubyObject fieldName = _key_converter.convert(_ruby, jp);
             jp.nextToken();
             result.fastASetCheckString(_ruby, fieldName, deserialize(jp, ctxt));
         } while (jp.nextToken() != JsonToken.END_OBJECT);

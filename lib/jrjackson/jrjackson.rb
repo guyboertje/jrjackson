@@ -3,8 +3,8 @@ unless RUBY_PLATFORM =~ /java/
   exit 255
 end
 
-require_relative "jars/jrjackson-1.2.13.jar"
-# require_relative "linked/jrjackson-1.2.13.jar"
+# require_relative "jars/jrjackson-1.2.14.jar"
+require_relative "linked/jrjackson-1.2.14.jar"
 
 require 'com/jrjackson/jr_jackson'
 
@@ -32,6 +32,9 @@ module JrJackson
           end
           if options.size == 1 && !!options[:symbolize_keys]
             return JrJackson::Raw.parse_sym(json_source)
+          end
+          if options.size == 2 && !!options[:raw] && !!options[:use_bigdecimal]
+            return JrJackson::Raw.parse_raw_bd(json_source)
           end
           JrJackson::Raw.parse(json_source, options)
         else
