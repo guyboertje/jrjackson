@@ -26,7 +26,7 @@ public class RubyJacksonModule extends SimpleModule {
     }
     
     public static ObjectMapper mapperWith(Ruby ruby, RubyKeyConverter nameConverter,
-            RubyValueConverter intConverter, RubyValueConverter floatConverter){
+            RubyConverter intConverter, RubyConverter floatConverter){
         
         ObjectMapper mapper = new ObjectMapper().registerModule(
                 new AfterburnerModule()
@@ -50,14 +50,6 @@ public class RubyJacksonModule extends SimpleModule {
     }
     
     public static ObjectMapper rawBigDecimalMapper() {
-//        ObjectMapper mapper = new ObjectMapper().registerModule(
-//                new AfterburnerModule()
-//        ).registerModule(
-//                new RubyJacksonModule().addSerializer(
-//                    RubyObject.class, RubyAnySerializer.instance
-//                )
-//        );
-//        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         static_mapper.enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
         return static_mapper;
     }
@@ -74,7 +66,7 @@ public class RubyJacksonModule extends SimpleModule {
                         Object.class,
                         new RubyObjectDeserializer().with(
                             ruby,
-                            new RubySymbolNameConverter(),
+                            new RubySymbolKeyConverter(),
                             new RubyBigIntValueConverter(),
                             new RubyFloatValueConverter()
                         )
@@ -97,7 +89,7 @@ public class RubyJacksonModule extends SimpleModule {
                         Object.class,
                         new RubyObjectDeserializer().with(
                             ruby,
-                            new RubyStringNameConverter(),
+                            new RubyStringKeyConverter(),
                             new RubyBigIntValueConverter(),
                             new RubyFloatValueConverter()
                         )

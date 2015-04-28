@@ -22,8 +22,8 @@ public class RubyObjectDeserializer
     private Ruby _ruby;
 
     private RubyKeyConverter _key_converter;
-    private RubyValueConverter _int_converter;
-    private RubyValueConverter _float_converter;
+    private RubyConverter _int_converter;
+    private RubyConverter _float_converter;
     final private RubyStringConverter _str_converter = new RubyStringConverter();
 
     public RubyObjectDeserializer() {
@@ -31,7 +31,7 @@ public class RubyObjectDeserializer
     }
 
     public RubyObjectDeserializer with(Ruby ruby, RubyKeyConverter nameConv,
-            RubyValueConverter intConv, RubyValueConverter floatConv) {
+            RubyConverter intConv, RubyConverter floatConv) {
         _ruby = ruby;
         _key_converter = nameConv;
         _int_converter = intConv;

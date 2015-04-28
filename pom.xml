@@ -5,12 +5,13 @@
   <groupId>com.jrjackson.jruby</groupId>
   <artifactId>jrjackson</artifactId>
   <packaging>jar</packaging>
-  <version>1.2.14</version>
+  <version>1.2.15</version>
   <name>jrjackson</name>
   <url>http://maven.apache.org</url>
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <netbeans.hint.jdkPlatform>JDK_1.8</netbeans.hint.jdkPlatform>
   </properties>
 
   <dependencies>

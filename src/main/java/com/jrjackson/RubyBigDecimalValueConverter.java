@@ -9,7 +9,7 @@ import org.jruby.RubyObject;
  *
  * @author Guy Boertje
  */
-public class RubyBigDecimalValueConverter implements RubyValueConverter {
+public class RubyBigDecimalValueConverter implements RubyConverter {
 
     @Override
     public RubyObject convert(Ruby ruby, JsonParser jp) throws IOException {

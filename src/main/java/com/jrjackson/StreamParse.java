@@ -1,9 +1,6 @@
 package com.jrjackson;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-
-import java.io.IOException;
 
 import org.jruby.Ruby;
 import org.jruby.RubyClass;

@@ -4,7 +4,7 @@ unless RUBY_PLATFORM =~ /java/
 end
 
 # require_relative "jars/jrjackson-1.2.14.jar"
-require_relative "linked/jrjackson-1.2.14.jar"
+require_relative "linked/jrjackson-1.2.15.jar"
 
 require 'com/jrjackson/jr_jackson'
 
@@ -19,6 +19,14 @@ module JrJackson
 
       def sc_load(handler, json_source, options = nil)
         JrJackson::Raw.sc_parse(handler, json_source, options)
+      end
+
+      def load_ro(json_source, options = nil)
+        JrJackson::Raw.parse_ro(json_source, options)
+      end
+
+      def load_jo(json_source, options = nil)
+        JrJackson::Raw.parse_jo(json_source, options)
       end
 
       def load(json_source, options = nil)
@@ -64,6 +72,8 @@ module JrJackson
       alias :sc_parse :sc_load
       alias :sj_parse :sj_load
       alias :parse :load
+      alias :parse_ro :load_ro
+      alias :parse_jo :load_jo
       alias :generate :dump
 
       private

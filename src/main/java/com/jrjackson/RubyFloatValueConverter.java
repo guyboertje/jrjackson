@@ -9,7 +9,7 @@ import org.jruby.RubyObject;
  *
  * @author Guy Boertje
  */
-public class RubyFloatValueConverter implements RubyValueConverter {
+public class RubyFloatValueConverter implements RubyConverter {
 
     @Override
     public RubyObject convert(Ruby ruby, JsonParser jp) throws IOException {

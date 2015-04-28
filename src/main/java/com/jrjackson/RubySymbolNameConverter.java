@@ -1,15 +1,12 @@
 package com.jrjackson;
 
-import com.fasterxml.jackson.core.*;
-
-import java.io.IOException;
 import org.jruby.Ruby;
 import org.jruby.RubyObject;
 
-public class RubySymbolNameConverter implements RubyKeyConverter {
+public class RubySymbolNameConverter implements RubyNameConverter {
     
     @Override
-    public RubyObject convert(Ruby ruby, JsonParser jp) throws IOException {
-        return RubyUtils.rubySymbol(ruby, jp.getCurrentName());
+    public RubyObject convert(Ruby ruby, String s) {
+        return RubyUtils.rubySymbol(ruby, s);
     }
 }
