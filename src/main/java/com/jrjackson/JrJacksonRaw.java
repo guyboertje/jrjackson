@@ -20,6 +20,8 @@ import java.util.TimeZone;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 
@@ -121,7 +123,7 @@ public class JrJacksonRaw extends RubyObject {
     // serialize
     @JRubyMethod(module = true, name = {"generate", "dump"}, required = 1, optional = 1)
     public static IRubyObject generate(ThreadContext context, IRubyObject self, IRubyObject[] args)
-            throws IOException, JsonProcessingException {
+            throws IOException, JsonProcessingException, Exception {
         Ruby _ruby = context.runtime;
         Object obj = args[0].toJava(Object.class);
         RubyHash options = (args.length <= 1) ? RubyHash.newHash(_ruby) : args[1].convertToHash();
@@ -139,7 +141,11 @@ public class JrJacksonRaw extends RubyObject {
             }
         }
         mapper.setDateFormat(simpleFormat);
-        
+        if (flagged(options, RubyUtils.rubySymbol(_ruby, "pretty"))) {
+            mapper.enable(SerializationFeature.INDENT_OUTPUT);            
+        } else {
+            mapper.disable(SerializationFeature.INDENT_OUTPUT);
+        }
         try {
             String s = mapper.writeValueAsString(obj);
             return RubyUtils.rubyString(_ruby, s);
