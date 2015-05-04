@@ -189,6 +189,25 @@ class JrJacksonTest < Test::Unit::TestCase
     actual = JrJackson::Json.parse(json)['foo']
     assert_equal expected, actual
   end
+  
+  def test_can_pretty_print
+    hash = {foo: "bar"}
+    
+
+    expected = 
+    %Q|{
+  "foo" : "bar"
+}|
+
+
+    actual = JrJackson::Json.dump(hash, :pretty => true)
+    assert_equal expected, actual
+    
+    expected = %Q|{"foo":"bar"}|
+    actual = JrJackson::Json.dump(hash)
+    assert_equal expected, actual
+
+  end
 
   def test_can_parse_big_decimals
     expected = BigDecimal.new '0.12345678901234567890123456789'
