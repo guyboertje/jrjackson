@@ -123,7 +123,7 @@ public class JrJacksonRaw extends RubyObject {
     // serialize
     @JRubyMethod(module = true, name = {"generate", "dump"}, required = 1, optional = 1)
     public static IRubyObject generate(ThreadContext context, IRubyObject self, IRubyObject[] args)
-            throws IOException, JsonProcessingException, Exception {
+            throws IOException, JsonProcessingException {
         Ruby _ruby = context.runtime;
         Object obj = args[0].toJava(Object.class);
         RubyHash options = (args.length <= 1) ? RubyHash.newHash(_ruby) : args[1].convertToHash();
