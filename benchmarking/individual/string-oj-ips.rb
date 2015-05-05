@@ -18,10 +18,9 @@ json_source = Oj.dump(obj)
 
 puts "Json string size: #{json_source.size}"
 Benchmark.ips do |x|
+  x.config(:time => 5, :warmup => 5)
 
   x.report("oj gem") { Oj.strict_load(json_source) }
   x.report("json gem") { JSON::Ext::Parser.new(json_source).parse }
-
+  
 end
-
-# x.report("handler") { JrJackson::Raw.parse_h(json_source) }

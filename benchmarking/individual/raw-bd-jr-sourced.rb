@@ -10,12 +10,6 @@ opts = {use_bigdecimal: true, raw: true}
 dumped_string = File.read(filename)
 
 Benchmark.bmbm(BenchOptions.output_width) do |x| 
-  x.report("jackson parse raw + bigdecimal: #{BenchOptions.iterations}") do
-    BenchOptions.iterations.times { JrJackson::Json.load(dumped_string, opts) }
-  end
-end
-
-Benchmark.bmbm(BenchOptions.output_width) do |x| 
   x.report("jackson parse raw + bigdecimal direct: #{BenchOptions.iterations}") do
     BenchOptions.iterations.times { JrJackson::Raw.parse_raw_bd(dumped_string) }
   end
@@ -23,6 +17,6 @@ end
 
 Benchmark.bmbm(BenchOptions.output_width) do |x| 
   x.report("jackson parse j raw: #{BenchOptions.iterations}") do
-    BenchOptions.iterations.times { JrJackson::Raw.parse_r(dumped_string, opts) }
+    BenchOptions.iterations.times { JrJackson::Java.parse(dumped_string, nil) }
   end
 end

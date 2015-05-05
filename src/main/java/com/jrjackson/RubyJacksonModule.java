@@ -12,9 +12,7 @@ import org.jruby.RubyObject;
 
 public class RubyJacksonModule extends SimpleModule {
 
-    private static final ObjectMapper static_mapper = new ObjectMapper().registerModule(
-            new RubyJacksonModule().addSerializer(RubyObject.class, RubyAnySerializer.instance)
-    );
+    private static final ObjectMapper static_mapper = new ObjectMapper();
 
     static {
         static_mapper.registerModule(new AfterburnerModule());
@@ -28,75 +26,25 @@ public class RubyJacksonModule extends SimpleModule {
     public static ObjectMapper mapperWith(Ruby ruby, RubyKeyConverter nameConverter,
             RubyConverter intConverter, RubyConverter floatConverter){
         
-        ObjectMapper mapper = new ObjectMapper().registerModule(
-                new AfterburnerModule()
-        );
-        
-        mapper.registerModule(
-            new RubyJacksonModule().addSerializer(
-                RubyObject.class, RubyAnySerializer.instance
-            ).addDeserializer(
+        return static_mapper.copy().registerModule(
+            new RubyJacksonModule().addDeserializer(
                 Object.class,
                 new RubyObjectDeserializer().with(ruby, nameConverter, intConverter, floatConverter)
             )
         );
-        
-        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        return mapper;
     }
 
     public static ObjectMapper rawMapper() {
-        return static_mapper;
+        return static_mapper.registerModule(
+            new RubyJacksonModule().addSerializer(
+                RubyObject.class, RubyAnySerializer.instance
+            )
+        );
     }
     
-    public static ObjectMapper rawBigDecimalMapper() {
+    public static ObjectMapper rawBigNumberMapper() {
         static_mapper.enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
+        static_mapper.enable(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS);
         return static_mapper;
-    }
-    
-    public static ObjectMapper symMapper(Ruby ruby) {
-        ObjectMapper mapper = new ObjectMapper().registerModule(
-                new AfterburnerModule()
-        );
-
-        mapper.registerModule(
-                new RubyJacksonModule().addSerializer(
-                        RubyObject.class, RubyAnySerializer.instance
-                ).addDeserializer(
-                        Object.class,
-                        new RubyObjectDeserializer().with(
-                            ruby,
-                            new RubySymbolKeyConverter(),
-                            new RubyBigIntValueConverter(),
-                            new RubyFloatValueConverter()
-                        )
-                )
-        );
-        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        mapper.enable(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS);
-        return mapper;
-    }
-    
-    public static ObjectMapper strMapper(Ruby ruby) {
-        ObjectMapper mapper = new ObjectMapper().registerModule(
-                new AfterburnerModule()
-        );
-
-        mapper.registerModule(
-                new RubyJacksonModule().addSerializer(
-                        RubyObject.class, RubyAnySerializer.instance
-                ).addDeserializer(
-                        Object.class,
-                        new RubyObjectDeserializer().with(
-                            ruby,
-                            new RubyStringKeyConverter(),
-                            new RubyBigIntValueConverter(),
-                            new RubyFloatValueConverter()
-                        )
-                )
-        );
-        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        mapper.enable(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS);
-        return mapper;
     }
 }

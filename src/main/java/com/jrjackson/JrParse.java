@@ -14,12 +14,12 @@ import org.jruby.runtime.builtin.IRubyObject;
  *
  * @author Guy Boertje
  */
-public class JsParse {
+public class JrParse {
     private final RubyHandler _handler;
     protected final HashMap<JsonStreamContext, IRubyObject> _objectMap = new HashMap<JsonStreamContext, IRubyObject>();
     protected JsonStreamContext _deepestContext;
     
-    public JsParse(RubyHandler handler) {
+    public JrParse(RubyHandler handler) {
         _handler = handler;
         
     }

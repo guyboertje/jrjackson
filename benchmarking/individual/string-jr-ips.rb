@@ -45,10 +45,9 @@ puts "Json string size: #{json_source.size}"
 
 Benchmark.ips do |x|
   x.config(:time => 5, :warmup => 5)
-  
-  x.report("symbol keys use handler") { JrJackson::Raw.parse_ro(json_source, nil) }
-  x.report("raw use handler") { JrJackson::Raw.parse_jo(json_source, nil) }
-  x.report("raw") { JrJackson::Raw.parse_raw(json_source) }
-  x.report("raw bd") { JrJackson::Raw.parse_raw_bd(json_source) }
 
+  x.report("raw bd") { JrJackson::Raw.parse_raw_bd(json_source) }
+  x.report("raw") { JrJackson::Raw.parse_raw(json_source) }
+  x.report("symbol keys use handler") { JrJackson::Ruby.parse(json_source, nil) }
+  x.report("raw use handler") { JrJackson::Java.parse(json_source, nil) }
 end

@@ -3,8 +3,8 @@ unless RUBY_PLATFORM =~ /java/
   exit 255
 end
 
-# require_relative "jars/jrjackson-1.2.14.jar"
-require_relative "linked/jrjackson-1.2.15.jar"
+require_relative "jars/jrjackson-1.2.15.jar"
+# require_relative "linked/jrjackson-1.2.15.jar"
 
 require 'com/jrjackson/jr_jackson'
 
@@ -14,19 +14,19 @@ module JrJackson
       TIME_REGEX = %r(\A(\d{4}-\d\d-\d\d|(\w{3}\s){2}\d\d)\s\d\d:\d\d:\d\d)
 
       def sj_load(handler, json_source, options = nil)
-        JrJackson::Raw.sj_parse(handler, json_source, options)
+        JrJackson::Saj.parse(handler, json_source, options)
       end
 
       def sc_load(handler, json_source, options = nil)
-        JrJackson::Raw.sc_parse(handler, json_source, options)
+        JrJackson::Sch.parse(handler, json_source, options)
       end
 
-      def load_ro(json_source, options = nil)
-        JrJackson::Raw.parse_ro(json_source, options)
+      def load_ruby(json_source, options = nil)
+        JrJackson::Ruby.parse(json_source, options)
       end
 
-      def load_jo(json_source, options = nil)
-        JrJackson::Raw.parse_jo(json_source, options)
+      def load_java(json_source, options = nil)
+        JrJackson::Java.parse(json_source, options)
       end
 
       def load(json_source, options = nil)
@@ -35,15 +35,15 @@ module JrJackson
         end
 
         if options && !options.empty?
-          if options.size == 1 && !!options[:raw]
-            return JrJackson::Raw.parse_raw(json_source)
-          end
-          if options.size == 1 && !!options[:symbolize_keys]
-            return JrJackson::Raw.parse_sym(json_source)
-          end
-          if options.size == 2 && !!options[:raw] && !!options[:use_bigdecimal]
-            return JrJackson::Raw.parse_raw_bd(json_source)
-          end
+          # if options.size == 1 && !!options[:raw]
+          #   return JrJackson::Raw.parse_raw(json_source)
+          # end
+          # if options.size == 1 && !!options[:symbolize_keys]
+          #   return JrJackson::Raw.parse_sym(json_source)
+          # end
+          # if options.size == 2 && !!options[:raw] && !!options[:use_bigdecimal]
+          #   return JrJackson::Raw.parse_raw_bd(json_source)
+          # end
           JrJackson::Raw.parse(json_source, options)
         else
           JrJackson::Raw.parse_str(json_source)
@@ -52,8 +52,8 @@ module JrJackson
 
       def dump(object, options = {})
         case object
-        when Hash, Array, String, Java::JavaUtil::Map, Java::JavaUtil::List
-          JrJackson::Raw.generate(object, options)
+        when Hash, Array, String, ::Java::JavaUtil::Map, ::Java::JavaUtil::List
+          JrJackson::Base.generate(object, options)
         when true, false
           object.to_s
         when nil
@@ -72,8 +72,8 @@ module JrJackson
       alias :sc_parse :sc_load
       alias :sj_parse :sj_load
       alias :parse :load
-      alias :parse_ro :load_ro
-      alias :parse_jo :load_jo
+      alias :parse_ruby :load_ruby
+      alias :parse_java :load_java
       alias :generate :dump
 
       private
