@@ -28,7 +28,6 @@ import org.jruby.RubySymbol;
 import org.jruby.RubyTime;
 
 //import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-
 //public class RubyAnySerializer extends StdSerializer<IRubyObject> {
 public class RubyAnySerializer {
 
@@ -39,6 +38,7 @@ public class RubyAnySerializer {
 
     public RubyAnySerializer() {
 //        super(IRubyObject.class);
+
     }
 
     private void serializeUnknownRubyObject(ThreadContext ctx, IRubyObject rubyObject, JsonGenerator jgen, SerializerProvider provider)
@@ -88,7 +88,7 @@ public class RubyAnySerializer {
         if (!method.isUndefined()) {
             RubyObject obj = (RubyObject) method.call(ctx, rubyObject, meta, "to_json");
             if (obj instanceof RubyString) {
-                
+
                 jgen.writeRawValue(obj.toString());
             } else {
                 serialize(obj, jgen, provider);
@@ -101,7 +101,7 @@ public class RubyAnySerializer {
 //    @Override
     public void serialize(IRubyObject value, JsonGenerator jgen, SerializerProvider provider)
             throws IOException, JsonGenerationException {
-        
+
         if (value.isNil()) {
 
             jgen.writeNull(); // for RubyNil and NullObjects
@@ -111,17 +111,17 @@ public class RubyAnySerializer {
             provider.defaultSerializeValue(((JavaProxy) value).getObject(), jgen);
 
         } else if (value instanceof RubyString) {
-            
+
             RubyUtils.writeBytes(value, jgen);
 
         } else if (value instanceof RubySymbol) {
 //            jgen.writeString(value.toString());
-            RubyString s = ((RubySymbol)value).asString();
+            RubyString s = ((RubySymbol) value).asString();
             jgen.writeUTF8String(s.getBytes(), 0, s.size());
-            
+
         } else if (value instanceof RubyBoolean) {
-          
-          jgen.writeBoolean(value.isTrue());
+
+            jgen.writeBoolean(value.isTrue());
 
         } else if (value instanceof RubyFloat) {
 
@@ -157,7 +157,9 @@ public class RubyAnySerializer {
             serializeTime((RubyTime) value, jgen, provider);
 
         } else {
+
             serializeUnknownRubyObject(value.getRuntime().getCurrentContext(), value, jgen, provider);
+
         }
     }
 
@@ -197,10 +199,10 @@ public class RubyAnySerializer {
         } else if (df instanceof RubyDateFormat) {
             // why another branch? I thought there was an easy win on to_s
             // maybe with jruby 9000
-            RubyDateFormat rdf = (RubyDateFormat)df.clone();
+            RubyDateFormat rdf = (RubyDateFormat) df.clone();
             jgen.writeString(rdf.format(dt.getJavaDate()));
         } else {
-            SimpleDateFormat sdf = (SimpleDateFormat)df.clone();
+            SimpleDateFormat sdf = (SimpleDateFormat) df.clone();
             jgen.writeString(df.format(dt.getJavaDate()));
         }
     }
@@ -222,7 +224,6 @@ public class RubyAnySerializer {
      * @throws java.io.IOException
      * @throws com.fasterxml.jackson.core.JsonGenerationException
      */
-//    @Override
     public void serializeWithType(IRubyObject value, JsonGenerator jgen, SerializerProvider provider, TypeSerializer typeSer)
             throws IOException, JsonGenerationException {
         typeSer.writeTypePrefixForScalar(value, jgen);
