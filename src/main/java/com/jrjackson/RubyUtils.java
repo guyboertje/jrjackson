@@ -5,13 +5,30 @@ import java.util.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import org.jruby.*;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.jruby.Ruby;
+import org.jruby.RubyArray;
+import org.jruby.RubyBignum;
+import org.jruby.RubyBoolean;
+import org.jruby.RubyFixnum;
+import org.jruby.RubyFloat;
+import org.jruby.RubyHash;
+import org.jruby.RubyObject;
+import org.jruby.RubyString;
+import org.jruby.RubySymbol;
+
 import org.jruby.javasupport.JavaUtil;
 import org.jruby.ext.bigdecimal.RubyBigDecimal;
 import org.jruby.runtime.builtin.IRubyObject;
 import org.jruby.util.SafeDoubleParser;
 
 public class RubyUtils {
+
+    private final static DateTimeFormatter FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss Z").withLocale(Locale.ENGLISH);
+    private final static DateTimeFormatter UTC_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss 'UTC'").withLocale(Locale.ENGLISH);
 
     public static RubyObject rubyObject(Ruby ruby, Object node) {
         return (RubyObject) JavaUtil.convertJavaToRuby(ruby, node);
@@ -32,7 +49,7 @@ public class RubyUtils {
     public static RubySymbol rubySymbol(Ruby ruby, String node) {
         return RubySymbol.newSymbol(ruby, node);
     }
-   
+
     public static RubyArray rubyArray(Ruby ruby, Object[] arg) {
         return (RubyArray) JavaUtil.convertJavaToRuby(ruby, arg);
     }
@@ -85,5 +102,34 @@ public class RubyUtils {
         RubyHash hash = rubyHash(ruby, key1, value1);
         hash.fastASet(key2, value2);
         return hash;
+    }
+
+    public static String jodaTimeString(DateTime dt) {
+        // copied from the RubyTime to_s method
+        // to prevent the double handling of a String -> RubyString -> String
+        DateTimeFormatter simpleDateFormat;
+        if (dt.getZone() == DateTimeZone.UTC) {
+            simpleDateFormat = UTC_FORMATTER;
+        } else {
+            simpleDateFormat = FORMATTER;
+        }
+
+        return simpleDateFormat.print(dt);
+
+        // JrJackson: no access to private boolean isTzRelative
+
+//        String result = simpleDateFormat.print(dt);
+//
+//        if (isTzRelative) {
+//            // display format needs to invert the UTC offset if this object was
+//            // created with a specific offset in the 7-arg form of #new
+//            DateTimeZone dtz = dt.getZone();
+//            int offset = dtz.toTimeZone().getOffset(dt.getMillis());
+//            DateTimeZone invertedDTZ = DateTimeZone.forOffsetMillis(offset);
+//            DateTime invertedDT = dt.withZone(invertedDTZ);
+//            result = simpleDateFormat.print(invertedDT);
+//        }
+//
+//        return result;
     }
 }
