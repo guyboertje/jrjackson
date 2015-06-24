@@ -9,12 +9,15 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatter;
 
 import org.jruby.*;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.internal.runtime.methods.DynamicMethod;
+import org.jruby.runtime.builtin.IRubyObject;
 
-public class RubyAnySerializer extends StdSerializer<RubyObject> {
+public class RubyAnySerializer extends StdSerializer<IRubyObject> {
 
     /**
      * Singleton instance to use.
@@ -27,7 +30,7 @@ public class RubyAnySerializer extends StdSerializer<RubyObject> {
     }
 
     public RubyAnySerializer() {
-        super(RubyObject.class);
+        super(IRubyObject.class);
     }
 
     private Class<?> rubyJavaClassLookup(Class target) {
@@ -38,14 +41,15 @@ public class RubyAnySerializer extends StdSerializer<RubyObject> {
         return val;
     }
 
-    private void serializeUnknownRubyObject(ThreadContext ctx, RubyObject rubyObject, JsonGenerator jgen, SerializerProvider provider)
+    private void serializeUnknownRubyObject(ThreadContext ctx, IRubyObject rubyObject, JsonGenerator jgen, SerializerProvider provider)
             throws IOException, JsonGenerationException {
         RubyClass meta = rubyObject.getMetaClass();
 
         DynamicMethod method = meta.searchMethod("to_time");
         if (!method.isUndefined()) {
-            RubyObject obj = (RubyObject) method.call(ctx, rubyObject, meta, "to_time");
-            provider.defaultSerializeValue(obj, jgen);
+            RubyTime dt = (RubyTime) method.call(ctx, rubyObject, meta, "to_time");
+            String time = RubyUtils.jodaTimeString(dt.getDateTime());
+            jgen.writeString(time);
             return;
         }
 
@@ -84,23 +88,25 @@ public class RubyAnySerializer extends StdSerializer<RubyObject> {
     }
 
     @Override
-    public void serialize(RubyObject value, JsonGenerator jgen, SerializerProvider provider)
+    public void serialize(IRubyObject value, JsonGenerator jgen, SerializerProvider provider)
             throws IOException, JsonGenerationException {
         ThreadContext ctx = value.getRuntime().getCurrentContext();
-        if (value instanceof RubySymbol || value instanceof RubyString) {
+        if (value.isNil()) {
+            jgen.writeNull(); // for RubyNil and NullObjects
+        } else if (value instanceof RubySymbol || value instanceof RubyString) {
             jgen.writeString(value.toString());
         } else if (value instanceof RubyHash) {
             provider.findTypedValueSerializer(Map.class, true, null).serialize(value, jgen, provider);
         } else if (value instanceof RubyArray) {
             provider.findTypedValueSerializer(List.class, true, null).serialize(value, jgen, provider);
         } else if (value instanceof RubyStruct) {
-            RubyObject obj = (RubyObject)value.callMethod(ctx, "to_a");
+            RubyObject obj = (RubyObject) value.callMethod(ctx, "to_a");
             provider.findTypedValueSerializer(List.class, true, null).serialize(obj, jgen, provider);
         } else {
-            Object val = value.toJava(rubyJavaClassLookup(value.getClass()));
-            if (val instanceof RubyObject) {
-                serializeUnknownRubyObject(ctx, (RubyObject) val, jgen, provider);
+            if (value instanceof RubyBasicObject) {
+                serializeUnknownRubyObject(ctx, value, jgen, provider);
             } else {
+                Object val = value.toJava(rubyJavaClassLookup(value.getClass()));
                 provider.defaultSerializeValue(val, jgen);
             }
         }
@@ -117,7 +123,7 @@ public class RubyAnySerializer extends StdSerializer<RubyObject> {
      * @throws com.fasterxml.jackson.core.JsonGenerationException
      */
     @Override
-    public void serializeWithType(RubyObject value, JsonGenerator jgen, SerializerProvider provider, TypeSerializer typeSer)
+    public void serializeWithType(IRubyObject value, JsonGenerator jgen, SerializerProvider provider, TypeSerializer typeSer)
             throws IOException, JsonGenerationException {
         typeSer.writeTypePrefixForScalar(value, jgen);
         serialize(value, jgen, provider);

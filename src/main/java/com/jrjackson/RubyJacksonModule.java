@@ -1,6 +1,5 @@
 package com.jrjackson;
 
-import java.text.SimpleDateFormat;
 
 import org.jruby.*;
 
@@ -9,11 +8,12 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.core.util.VersionUtil;
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
+import org.jruby.runtime.builtin.IRubyObject;
 
 public class RubyJacksonModule extends SimpleModule {
 
     private static final ObjectMapper static_mapper = new ObjectMapper().registerModule(
-            new RubyJacksonModule().addSerializer(RubyObject.class, RubyAnySerializer.instance)
+            new RubyJacksonModule().addSerializer(IRubyObject.class, RubyAnySerializer.instance)
     );
 
     static {
@@ -49,7 +49,7 @@ public class RubyJacksonModule extends SimpleModule {
 
     public static SimpleModule asSym(Ruby ruby) {
         return new RubyJacksonModule().addSerializer(
-                RubyObject.class, RubyAnySerializer.instance
+                IRubyObject.class, RubyAnySerializer.instance
         ).addDeserializer(
                 Object.class, new RubyObjectDeserializer().withRuby(ruby).setSymbolStrategy()
         );
@@ -57,7 +57,7 @@ public class RubyJacksonModule extends SimpleModule {
 
     public static SimpleModule asStr(Ruby ruby) {
         return new RubyJacksonModule().addSerializer(
-                RubyObject.class, RubyAnySerializer.instance
+                IRubyObject.class, RubyAnySerializer.instance
         ).addDeserializer(
                 Object.class, new RubyObjectDeserializer().withRuby(ruby).setStringStrategy()
         );

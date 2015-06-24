@@ -87,7 +87,7 @@ invokedynamic.invocation=true
 
 # Use SwitchPoint for class modification guards on invocations.
 # Options: [true, false], Default: true.
-invokedynamic.invocation.switchpoint=true
+# invokedynamic.invocation.switchpoint=true
 
 # Also bind indirect method invokers to invokedynamic.
 # Options: [true, false], Default: true.
