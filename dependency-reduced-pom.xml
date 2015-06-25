@@ -4,7 +4,7 @@
   <groupId>com.jrjackson.jruby</groupId>
   <artifactId>jrjackson</artifactId>
   <name>jrjackson</name>
-  <version>1.2.15</version>
+  <version>1.2.16</version>
   <url>http://maven.apache.org</url>
   <build>
     <plugins>

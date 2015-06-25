@@ -6,6 +6,7 @@ module BenchOptions
 
   def iterations
     SETS[CURRENT]
+    # 5000
   end
 
   def source

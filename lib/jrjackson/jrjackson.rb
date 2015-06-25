@@ -3,8 +3,8 @@ unless RUBY_PLATFORM =~ /java/
   exit 255
 end
 
-require_relative "jars/jrjackson-1.2.15.jar"
-# require_relative "linked/jrjackson-1.2.15.jar"
+# require_relative "jars/jrjackson-1.2.16.jar"
+require_relative "linked/jrjackson-1.2.16.jar"
 
 require 'com/jrjackson/jr_jackson'
 

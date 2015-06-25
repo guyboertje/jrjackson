@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
 
 import org.jruby.Ruby;
-import org.jruby.RubyObject;
+import org.jruby.runtime.builtin.IRubyObject;
 
 public class RubyJacksonModule extends SimpleModule {
 
@@ -22,10 +22,10 @@ public class RubyJacksonModule extends SimpleModule {
     private RubyJacksonModule() {
         super("JrJacksonStrModule", VersionUtil.versionFor(RubyJacksonModule.class));
     }
-    
+
     public static ObjectMapper mapperWith(Ruby ruby, RubyKeyConverter nameConverter,
             RubyConverter intConverter, RubyConverter floatConverter){
-        
+
         return static_mapper.copy().registerModule(
             new RubyJacksonModule().addDeserializer(
                 Object.class,
@@ -37,11 +37,11 @@ public class RubyJacksonModule extends SimpleModule {
     public static ObjectMapper rawMapper() {
         return static_mapper.registerModule(
             new RubyJacksonModule().addSerializer(
-                RubyObject.class, RubyAnySerializer.instance
+                IRubyObject.class, RubyAnySerializer.instance
             )
         );
     }
-    
+
     public static ObjectMapper rawBigNumberMapper() {
         static_mapper.enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
         static_mapper.enable(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS);
