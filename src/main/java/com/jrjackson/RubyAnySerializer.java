@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import org.jruby.ext.bigdecimal.RubyBigDecimal;
+
 import org.jruby.internal.runtime.methods.DynamicMethod;
 import org.jruby.java.proxies.JavaProxy;
 import org.jruby.runtime.ThreadContext;
