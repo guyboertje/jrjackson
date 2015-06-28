@@ -126,11 +126,11 @@ public class JrJacksonRaw extends RubyObject {
         Object obj = args[0].toJava(Object.class);
         RubyHash options = (args.length <= 1) ? RubyHash.newHash(_ruby) : args[1].convertToHash();
         String format = (String) options.get(RubyUtils.rubySymbol(_ruby, "date_format"));
-        
+
         ObjectMapper mapper = RubyJacksonModule.mappedAs("raw", _ruby);
         // same format as Ruby Time #to_s
         SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
-        
+
         if (format != null) {
             simpleFormat = new SimpleDateFormat(format);
             String timezone = (String) options.get(RubyUtils.rubySymbol(_ruby, "timezone"));
@@ -139,7 +139,6 @@ public class JrJacksonRaw extends RubyObject {
             }
         }
         mapper.setDateFormat(simpleFormat);
-        
         try {
             String s = mapper.writeValueAsString(obj);
             return RubyUtils.rubyString(_ruby, s);

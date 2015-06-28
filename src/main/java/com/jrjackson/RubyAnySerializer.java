@@ -27,6 +27,7 @@ public class RubyAnySerializer extends StdSerializer<IRubyObject> {
     private static final HashMap<Class, Class> class_maps = new HashMap<Class, Class>();
 
     static {
+        // not need now - clean up required
         class_maps.put(RubyBoolean.class, Boolean.class);
         class_maps.put(RubyFloat.class, Double.class);
         class_maps.put(RubyFixnum.class, Long.class);
@@ -93,19 +94,52 @@ public class RubyAnySerializer extends StdSerializer<IRubyObject> {
             throws IOException, JsonGenerationException {
         ThreadContext ctx = value.getRuntime().getCurrentContext();
         if (value.isNil()) {
+
             jgen.writeNull(); // for RubyNil and NullObjects
+
         } else if (value instanceof RubyString) {
+
             jgen.writeString(value.toString());
+
         } else if (value instanceof RubySymbol) {
+
             jgen.writeString(value.toString());
+
+        } else if (value instanceof RubyBoolean) {
+
+            jgen.writeBoolean(value.isTrue());
+
+        } else if (value instanceof RubyFloat) {
+
+            jgen.writeNumber(RubyNumeric.num2dbl(value));
+
+        } else if (value instanceof RubyFixnum) {
+
+            jgen.writeNumber(RubyNumeric.num2long(value));
+
+        } else if (value instanceof RubyBignum) {
+
+            jgen.writeNumber(((RubyBignum) value).getBigIntegerValue());
+
+        } else if (value instanceof RubyBigDecimal) {
+
+            jgen.writeNumber(((RubyBigDecimal) value).getBigDecimalValue());
+
         } else if (value instanceof RubyHash) {
-            provider.findTypedValueSerializer(Map.class, true, null).serialize(value, jgen, provider);
+
+            provider.findTypedValueSerializer(value.getJavaClass(), true, null).serialize(value, jgen, provider);
+
         } else if (value instanceof RubyArray) {
-            provider.findTypedValueSerializer(List.class, true, null).serialize(value, jgen, provider);
+
+            provider.findTypedValueSerializer(value.getJavaClass(), true, null).serialize(value, jgen, provider);
+
         } else if (value instanceof RubyStruct) {
-            RubyObject obj = (RubyObject) value.callMethod(ctx, "to_a");
-            provider.findTypedValueSerializer(List.class, true, null).serialize(obj, jgen, provider);
+
+            IRubyObject obj = value.callMethod(ctx, "to_a");
+            provider.findTypedValueSerializer(obj.getJavaClass(), true, null).serialize(obj, jgen, provider);
+
         } else {
+
             Class<?> cls = rubyJavaClassLookup(value.getClass());
             if (cls != null) {
                 Object val = value.toJava(cls);
@@ -117,6 +151,7 @@ public class RubyAnySerializer extends StdSerializer<IRubyObject> {
             } else {
                 serializeUnknownRubyObject(ctx, value, jgen, provider);
             }
+
         }
     }
 
