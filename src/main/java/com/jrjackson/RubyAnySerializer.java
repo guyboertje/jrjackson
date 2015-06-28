@@ -28,8 +28,6 @@ import org.jruby.RubyStruct;
 import org.jruby.RubySymbol;
 import org.jruby.RubyTime;
 
-//import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-//public class RubyAnySerializer extends StdSerializer<IRubyObject> {
 public class RubyAnySerializer {
 
     /**
