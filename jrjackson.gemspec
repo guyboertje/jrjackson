@@ -7,7 +7,7 @@ require 'jrjackson/build_info'
 Gem::Specification.new do |s|
   s.name        = 'jrjackson'
   s.version     = JrJackson::BuildInfo.version
-  s.date        = '2013-10-12'
+  s.date        = JrJackson::BuildInfo.release_date
   s.platform    = Gem::Platform::RUBY
   s.authors     = ['Guy Boertje']
   s.email       = ['guyboertje@gmail.com']

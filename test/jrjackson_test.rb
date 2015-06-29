@@ -204,6 +204,16 @@ class JrJacksonTest < Test::Unit::TestCase
     assert_bigdecimal_similar expected, actual
   end
 
+  def test_cannot_serialize_object
+    err = assert_raises(JrJackson::ParseError) { JrJackson::Json.dump({"foo" => Object.new}) }
+    assert_match /Cannot find Serializer for class: org.jruby.RubyObject/, err.message
+  end
+
+  def test_cannot_serialize_basic_object
+    err = assert_raises(JrJackson::ParseError) { JrJackson::Json.dump({"foo" => BasicObject.new}) }
+    assert_match /Cannot find Serializer for class: org.jruby.RubyBasicObject/, err.message
+  end
+
   def assert_bigdecimal_equal(expected, actual)
     assert_equal expected, actual
     assert_equal expected.class, actual.class
