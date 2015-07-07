@@ -11,8 +11,24 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.DateFormat;
+import org.jruby.Ruby;
+import org.jruby.RubyArray;
+import org.jruby.RubyBignum;
+import org.jruby.RubyBoolean;
+import org.jruby.RubyClass;
+import org.jruby.RubyFixnum;
+import org.jruby.RubyFloat;
+import org.jruby.RubyHash;
+//import org.jruby.RubyHash.RubyHashEntry;
+import org.jruby.RubyNumeric;
+import org.jruby.RubyObject;
+import org.jruby.RubyString;
+import org.jruby.RubyStruct;
+import org.jruby.RubySymbol;
+import org.jruby.RubyTime;
 
-import org.jruby.*;
+
 import org.jruby.ext.bigdecimal.RubyBigDecimal;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.internal.runtime.methods.DynamicMethod;
@@ -24,9 +40,10 @@ public class RubyAnySerializer extends StdSerializer<IRubyObject> {
      * Singleton instance to use.
      */
     public static final RubyAnySerializer instance = new RubyAnySerializer();
-    private static final HashMap<Class, Class> class_maps = new HashMap<Class, Class>();
+    private static final HashMap<Class, Class> class_maps = new HashMap<>();
 
     static {
+        // not need now - clean up required
         class_maps.put(RubyBoolean.class, Boolean.class);
         class_maps.put(RubyFloat.class, Double.class);
         class_maps.put(RubyFixnum.class, Long.class);
@@ -39,12 +56,7 @@ public class RubyAnySerializer extends StdSerializer<IRubyObject> {
     }
 
     private Class<?> rubyJavaClassLookup(Class target) {
-        return  class_maps.get(target);
-//        Class<?> val = class_maps.get(target);
-//        if (val == null) {
-//            return Object.class;
-//        }
-//        return val;
+        return class_maps.get(target);
     }
 
     private void serializeUnknownRubyObject(ThreadContext ctx, IRubyObject rubyObject, JsonGenerator jgen, SerializerProvider provider)
@@ -54,8 +66,8 @@ public class RubyAnySerializer extends StdSerializer<IRubyObject> {
         DynamicMethod method = meta.searchMethod("to_time");
         if (!method.isUndefined()) {
             RubyTime dt = (RubyTime) method.call(ctx, rubyObject, meta, "to_time");
-            String time = RubyUtils.jodaTimeString(dt.getDateTime());
-            jgen.writeString(time);
+//            System.err.println("------->>>> calling to_time");
+            serializeTime(dt, jgen, provider);
             return;
         }
 
@@ -84,7 +96,6 @@ public class RubyAnySerializer extends StdSerializer<IRubyObject> {
         if (!method.isUndefined()) {
             RubyObject obj = (RubyObject) method.call(ctx, rubyObject, meta, "to_json");
             if (obj instanceof RubyString) {
-//                jgen.write
                 jgen.writeRawValue(obj.toString());
             } else {
                 provider.defaultSerializeValue(obj, jgen);
@@ -99,22 +110,80 @@ public class RubyAnySerializer extends StdSerializer<IRubyObject> {
             throws IOException, JsonGenerationException {
         ThreadContext ctx = value.getRuntime().getCurrentContext();
         if (value.isNil()) {
+
             jgen.writeNull(); // for RubyNil and NullObjects
+
         } else if (value instanceof RubyString) {
-//            jgen.writeString(value.toString());
-            jgen.writeBinary(((RubyString)value).getBytes());
-        } else if (value instanceof RubySymbol) {
+
             jgen.writeString(value.toString());
+
+        } else if (value instanceof RubySymbol) {
+
+            jgen.writeString(value.toString());
+
+        } else if (value instanceof RubyBoolean) {
+
+            jgen.writeBoolean(value.isTrue());
+
+        } else if (value instanceof RubyFloat) {
+
+            jgen.writeNumber(RubyNumeric.num2dbl(value));
+
+        } else if (value instanceof RubyFixnum) {
+
+            jgen.writeNumber(RubyNumeric.num2long(value));
+
+        } else if (value instanceof RubyBignum) {
+
+            jgen.writeNumber(((RubyBignum) value).getBigIntegerValue());
+
+        } else if (value instanceof RubyBigDecimal) {
+
+            jgen.writeNumber(((RubyBigDecimal) value).getBigDecimalValue());
+
         } else if (value instanceof RubyHash) {
-            provider.findTypedValueSerializer(Map.class, true, null).serialize(value, jgen, provider);
+
+//            System.err.println("----->> RubyHash");
+
+            RubyHash h = (RubyHash) value;
+
+            jgen.writeStartObject();
+
+            for (Iterator iterator = h.directEntrySet().iterator(); iterator.hasNext();) {
+                RubyHash.RubyHashEntry next = (RubyHash.RubyHashEntry)iterator.next();
+                serializeKey((IRubyObject)next.getKey(), jgen, provider);
+
+                serialize((IRubyObject)next.getValue(), jgen, provider);
+            }
+
+            jgen.writeEndObject();
+
+//            provider.findTypedValueSerializer(value.getJavaClass(), true, null).serialize(value, jgen, provider);
+
         } else if (value instanceof RubyArray) {
-            RubyArray a = (RubyArray)value;
-            Object l = a.toJava(List.class);
-            provider.findTypedValueSerializer(List.class, true, null).serialize(l, jgen, provider);
+
+//            System.err.println("----->> RubyArray");
+            RubyArray arr = (RubyArray) value;
+            IRubyObject[] a = arr.toJavaArray();
+            jgen.writeStartArray();
+            for (IRubyObject val : a) {
+                serialize(val, jgen, provider);
+            }
+            jgen.writeEndArray();
+//            provider.findTypedValueSerializer(value.getJavaClass(), true, null).serialize(value, jgen, provider);
+
         } else if (value instanceof RubyStruct) {
-            RubyObject obj = (RubyObject)value.callMethod(ctx, "to_a");
-            provider.findTypedValueSerializer(List.class, true, null).serialize(obj, jgen, provider);
+
+            IRubyObject obj = value.callMethod(ctx, "to_a");
+            serialize(obj, jgen, provider);
+//            provider.findTypedValueSerializer(obj.getJavaClass(), true, null).serialize(obj, jgen, provider);
+
+        } else if (value instanceof RubyTime) {
+//            System.err.println("------->>>> RubyTime");
+            serializeTime((RubyTime) value, jgen, provider);
+
         } else {
+
             Class<?> cls = rubyJavaClassLookup(value.getClass());
             if (cls != null) {
                 Object val = value.toJava(cls);
@@ -126,7 +195,31 @@ public class RubyAnySerializer extends StdSerializer<IRubyObject> {
             } else {
                 serializeUnknownRubyObject(ctx, value, jgen, provider);
             }
+
         }
+    }
+
+    private void serializeTime(RubyTime dt, JsonGenerator jgen, SerializerProvider provider)
+            throws IOException, JsonGenerationException {
+        DateFormat df = provider.getConfig().getDateFormat();
+        if (df == null) {
+            // DateFormat should always be set
+            System.err.println("---------- no format given, Hmmmm");
+            provider.defaultSerializeValue(dt.getJavaDate(), jgen);
+        } else if (df instanceof RubyDateFormat) {
+//            System.err.println("---------- using internal to_s mechanism");
+            jgen.writeString(dt.to_s().asJavaString());
+        } else {
+//            System.err.println("---------- using not simple date format");
+            provider.defaultSerializeValue(dt.getJavaDate(), jgen);
+        }
+    }
+
+    private void serializeKey(IRubyObject key, JsonGenerator jgen, SerializerProvider provider)
+            throws IOException, JsonGenerationException {
+
+        jgen.writeFieldName(key.asJavaString());
+
     }
 
     /**

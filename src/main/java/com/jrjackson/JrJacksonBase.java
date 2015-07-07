@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ser.std.CollectionSerializer;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
@@ -39,23 +40,22 @@ public class JrJacksonBase extends RubyObject {
         RubyHash options = (args.length <= 1) ? RubyHash.newHash(_ruby) : args[1].convertToHash();
         String format = (String) options.get(RubyUtils.rubySymbol(_ruby, "date_format"));
         ObjectMapper mapper = RubyJacksonModule.rawMapper();
-        // same format as Ruby Time #to_s
-        SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
         if (format != null) {
-            simpleFormat = new SimpleDateFormat(format);
+            SimpleDateFormat simpleFormat = new SimpleDateFormat(format);
             String timezone = (String) options.get(RubyUtils.rubySymbol(_ruby, "timezone"));
             if (timezone != null) {
                 simpleFormat.setTimeZone(TimeZone.getTimeZone(timezone));
             }
+            mapper.setDateFormat(simpleFormat);
+        } else {
+            // using a 'marker' class instance, will not use later but default to #to_s
+            mapper.setDateFormat(new RubyDateFormat("yyyy-MM-dd HH:mm:ss Z"));
         }
-        mapper.setDateFormat(simpleFormat);
         try {
             String s = mapper.writeValueAsString(obj);
             return RubyUtils.rubyString(_ruby, s);
         } catch (JsonProcessingException e) {
             throw ParseError.newParseError(_ruby, e.getLocalizedMessage());
-        } catch (IOException e) {
-            throw _ruby.newIOError(e.getLocalizedMessage());
         }
     }
 
@@ -119,5 +119,5 @@ public class JrJacksonBase extends RubyObject {
     public JrJacksonBase(Ruby runtime, RubyClass metaClass) {
         super(runtime, metaClass);
     }
-    
+
 }

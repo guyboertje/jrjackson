@@ -12,6 +12,15 @@ require 'stringio'
 require 'time'
 
 class JrJacksonTest < Test::Unit::TestCase
+#   def test_serialize_date
+#     # default date format
+#     time_string = "2014-12-18 18:18:18 +0000"
+#     source_time = Time.parse(time_string)
+#     # source_time = Date.today
+#     serialized_output = JrJackson::Json.dump({current_time: source_time})
+#     assert_equal %Q{{"current_time":"#{time_string}"}}, serialized_output
+#   end
+# end
 
   class CustomToH
     attr_accessor :one, :two, :six
@@ -48,7 +57,7 @@ class JrJacksonTest < Test::Unit::TestCase
       @now = tm
     end
     def to_time
-      @now
+      @now.to_time
     end
   end
 
@@ -243,21 +252,22 @@ class JrJacksonTest < Test::Unit::TestCase
 
   def test_serialize_non_json_datatypes_as_values
     dt = Time.now
+    today = Date.today
     co1 = CustomToH.new("uno", :two, 6.0)
     co2 = CustomToHash.new("uno", :two, 6.0)
     co3 = CustomToJson.new(1.0, 2, 6.0)
     co4 = CustomStruct.new(1, 2, 6)
-    co5 = CustomToTime.new(dt)
+    co5 = CustomToTime.new(today)
     source = {'sym' => :a_symbol, 'dt' => dt, 'co1' => co1, 'co2' => co2, 'co3' => co3, 'co4' => co4, 'co5' => co5}
     json_string = JrJackson::Json.dump(source)
     expected = {
       :sym => "a_symbol",
-      :dt => dt.strftime("%F %T %z"),
+      :dt => dt.to_s,
       :co1 => {:one => "uno", :two => "two", :six => 6.0 },
       :co2 => {:one => "uno", :two => "two", :six => 6.0 },
       :co3 => {:one => 1.0, :two => 2.0, :six => 6.0 },
       :co4 => [1, 2, 6],
-      :co5 => dt.strftime("%F %T %z")
+      :co5 => today.to_time.to_s
     }
     actual = JrJackson::Json.load(json_string, :symbolize_keys => true)
     assert_equal expected, actual
