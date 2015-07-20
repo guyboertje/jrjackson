@@ -1,18 +1,15 @@
 package com.jrjackson;
 
 import java.io.IOException;
-import java.util.*;
 
 import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.databind.SerializationConfig;
 
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+//import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.text.DateFormat;
-import org.jruby.Ruby;
 import org.jruby.RubyArray;
 import org.jruby.RubyBignum;
 import org.jruby.RubyBoolean;
@@ -20,7 +17,6 @@ import org.jruby.RubyClass;
 import org.jruby.RubyFixnum;
 import org.jruby.RubyFloat;
 import org.jruby.RubyHash;
-//import org.jruby.RubyHash.RubyHashEntry;
 import org.jruby.RubyNumeric;
 import org.jruby.RubyObject;
 import org.jruby.RubyString;
@@ -32,31 +28,19 @@ import org.jruby.RubyTime;
 import org.jruby.ext.bigdecimal.RubyBigDecimal;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.internal.runtime.methods.DynamicMethod;
+import org.jruby.java.proxies.JavaProxy;
 import org.jruby.runtime.builtin.IRubyObject;
 
-public class RubyAnySerializer extends StdSerializer<IRubyObject> {
+//public class RubyAnySerializer extends StdSerializer<IRubyObject> {
+public class RubyAnySerializer {
 
     /**
-     * Singleton instance to use.
+     * Singleton instance to use.""
      */
     public static final RubyAnySerializer instance = new RubyAnySerializer();
-    private static final HashMap<Class, Class> class_maps = new HashMap<>();
-
-    static {
-        // not need now - clean up required
-        class_maps.put(RubyBoolean.class, Boolean.class);
-        class_maps.put(RubyFloat.class, Double.class);
-        class_maps.put(RubyFixnum.class, Long.class);
-        class_maps.put(RubyBignum.class, BigInteger.class);
-        class_maps.put(RubyBigDecimal.class, BigDecimal.class);
-    }
 
     public RubyAnySerializer() {
-        super(IRubyObject.class);
-    }
-
-    private Class<?> rubyJavaClassLookup(Class target) {
-        return class_maps.get(target);
+//        super(IRubyObject.class);
     }
 
     private void serializeUnknownRubyObject(ThreadContext ctx, IRubyObject rubyObject, JsonGenerator jgen, SerializerProvider provider)
@@ -74,21 +58,21 @@ public class RubyAnySerializer extends StdSerializer<IRubyObject> {
         method = meta.searchMethod("to_h");
         if (!method.isUndefined()) {
             RubyObject obj = (RubyObject) method.call(ctx, rubyObject, meta, "to_h");
-            provider.findTypedValueSerializer(Map.class, true, null).serialize(obj, jgen, provider);
+            serializeHash(obj, jgen, provider);
             return;
         }
 
         method = meta.searchMethod("to_hash");
         if (!method.isUndefined()) {
             RubyObject obj = (RubyObject) method.call(ctx, rubyObject, meta, "to_hash");
-            provider.findTypedValueSerializer(Map.class, true, null).serialize(obj, jgen, provider);
+            serializeHash(obj, jgen, provider);
             return;
         }
 
         method = meta.searchMethod("to_a");
         if (!method.isUndefined()) {
             RubyObject obj = (RubyObject) method.call(ctx, rubyObject, meta, "to_a");
-            provider.findTypedValueSerializer(List.class, true, null).serialize(obj, jgen, provider);
+            serializeArray(obj, jgen, provider);
             return;
         }
 
@@ -98,20 +82,26 @@ public class RubyAnySerializer extends StdSerializer<IRubyObject> {
             if (obj instanceof RubyString) {
                 jgen.writeRawValue(obj.toString());
             } else {
-                provider.defaultSerializeValue(obj, jgen);
+                serialize(obj, jgen, provider);
             }
             return;
         }
         throw new JsonGenerationException("Cannot find Serializer for class: " + rubyObject.getClass().getName());
     }
 
-    @Override
+//    @Override
     public void serialize(IRubyObject value, JsonGenerator jgen, SerializerProvider provider)
             throws IOException, JsonGenerationException {
-        ThreadContext ctx = value.getRuntime().getCurrentContext();
+
         if (value.isNil()) {
 
             jgen.writeNull(); // for RubyNil and NullObjects
+
+        } else if (value instanceof JavaProxy) {
+
+            jgen.writeObject(value.dataGetStruct());
+
+//            provider.defaultSerializeValue(value.dataGetStruct(), jgen);
 
         } else if (value instanceof RubyString) {
 
@@ -143,65 +133,58 @@ public class RubyAnySerializer extends StdSerializer<IRubyObject> {
 
         } else if (value instanceof RubyHash) {
 
-//            System.err.println("----->> RubyHash");
-
-            RubyHash h = (RubyHash) value;
-
-            jgen.writeStartObject();
-
-            for (Iterator iterator = h.directEntrySet().iterator(); iterator.hasNext();) {
-                RubyHash.RubyHashEntry next = (RubyHash.RubyHashEntry)iterator.next();
-                serializeKey((IRubyObject)next.getKey(), jgen, provider);
-
-                serialize((IRubyObject)next.getValue(), jgen, provider);
-            }
-
-            jgen.writeEndObject();
-
-//            provider.findTypedValueSerializer(value.getJavaClass(), true, null).serialize(value, jgen, provider);
+            serializeHash(value, jgen, provider);
 
         } else if (value instanceof RubyArray) {
 
-//            System.err.println("----->> RubyArray");
-            RubyArray arr = (RubyArray) value;
-            IRubyObject[] a = arr.toJavaArray();
-            jgen.writeStartArray();
-            for (IRubyObject val : a) {
-                serialize(val, jgen, provider);
-            }
-            jgen.writeEndArray();
-//            provider.findTypedValueSerializer(value.getJavaClass(), true, null).serialize(value, jgen, provider);
+            serializeArray(value, jgen, provider);
 
         } else if (value instanceof RubyStruct) {
 
-            IRubyObject obj = value.callMethod(ctx, "to_a");
-            serialize(obj, jgen, provider);
-//            provider.findTypedValueSerializer(obj.getJavaClass(), true, null).serialize(obj, jgen, provider);
+            IRubyObject obj = value.callMethod(value.getRuntime().getCurrentContext(), "to_a");
+            serializeArray(obj, jgen, provider);
 
         } else if (value instanceof RubyTime) {
 //            System.err.println("------->>>> RubyTime");
             serializeTime((RubyTime) value, jgen, provider);
 
         } else {
-
-            Class<?> cls = rubyJavaClassLookup(value.getClass());
-            if (cls != null) {
-                Object val = value.toJava(cls);
-                if (val != null) {
-                    provider.defaultSerializeValue(val, jgen);
-                } else {
-                    serializeUnknownRubyObject(ctx, value, jgen, provider);
-                }
-            } else {
-                serializeUnknownRubyObject(ctx, value, jgen, provider);
-            }
-
+            serializeUnknownRubyObject(value.getRuntime().getCurrentContext(), value, jgen, provider);
         }
+    }
+
+    private void serializeArray(IRubyObject value, JsonGenerator jgen, SerializerProvider provider)
+            throws IOException, JsonGenerationException {
+//            System.err.println("----->> RubyArray");
+
+        RubyArray arr = (RubyArray) value;
+        IRubyObject[] a = arr.toJavaArray();
+        jgen.writeStartArray();
+        for (IRubyObject val : a) {
+            serialize(val, jgen, provider);
+        }
+        jgen.writeEndArray();
+    }
+
+    private void serializeHash(IRubyObject value, JsonGenerator jgen, SerializerProvider provider)
+            throws IOException, JsonGenerationException {
+//            System.err.println("----->> RubyHash");
+
+        RubyHash h = (RubyHash) value;
+        jgen.writeStartObject();
+        for (Object o : h.directEntrySet()) {
+            RubyHash.RubyHashEntry next = (RubyHash.RubyHashEntry) o;
+            serializeKey((IRubyObject) next.getKey(), jgen, provider);
+            serialize((IRubyObject) next.getValue(), jgen, provider);
+        }
+        jgen.writeEndObject();
     }
 
     private void serializeTime(RubyTime dt, JsonGenerator jgen, SerializerProvider provider)
             throws IOException, JsonGenerationException {
-        DateFormat df = provider.getConfig().getDateFormat();
+//        DateFormat df = provider.getConfig().getDateFormat();
+        SerializationConfig cfg = provider.getConfig();
+        DateFormat df = cfg.getDateFormat();
         if (df == null) {
             // DateFormat should always be set
             System.err.println("---------- no format given, Hmmmm");
@@ -232,7 +215,7 @@ public class RubyAnySerializer extends StdSerializer<IRubyObject> {
      * @throws java.io.IOException
      * @throws com.fasterxml.jackson.core.JsonGenerationException
      */
-    @Override
+//    @Override
     public void serializeWithType(IRubyObject value, JsonGenerator jgen, SerializerProvider provider, TypeSerializer typeSer)
             throws IOException, JsonGenerationException {
         typeSer.writeTypePrefixForScalar(value, jgen);

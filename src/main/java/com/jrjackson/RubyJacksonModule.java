@@ -1,19 +1,22 @@
 package com.jrjackson;
 
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.core.util.VersionUtil;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MappingJsonFactory;
+import com.fasterxml.jackson.databind.ser.DefaultSerializerProvider;
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
+import java.text.SimpleDateFormat;
 
 import org.jruby.Ruby;
-import org.jruby.RubyTime;
-import org.jruby.runtime.builtin.IRubyObject;
 
 public class RubyJacksonModule extends SimpleModule {
 
     private static final ObjectMapper static_mapper = new ObjectMapper();
+    public static final JsonFactory factory = new MappingJsonFactory(static_mapper);
 
     static {
         static_mapper.registerModule(new AfterburnerModule());
@@ -35,11 +38,23 @@ public class RubyJacksonModule extends SimpleModule {
         );
     }
 
+//    public static ObjectMapper rawMapper() {
+//        return static_mapper.registerModule(
+//            new RubyJacksonModule().addSerializer(
+//                IRubyObject.class, RubyAnySerializer.instance
+//            )
+//        );
+//    }
+
     public static ObjectMapper rawMapper() {
-        return static_mapper.registerModule(
-            new RubyJacksonModule().addSerializer(
-                IRubyObject.class, RubyAnySerializer.instance
-            )
+        return static_mapper;
+    }
+
+    public static DefaultSerializerProvider createProvider(SimpleDateFormat sdf) {
+        static_mapper.setDateFormat(sdf);
+        return ((DefaultSerializerProvider)static_mapper.getSerializerProvider()).createInstance(
+            static_mapper.getSerializationConfig(),
+            static_mapper.getSerializerFactory()
         );
     }
 
@@ -48,4 +63,6 @@ public class RubyJacksonModule extends SimpleModule {
         static_mapper.enable(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS);
         return static_mapper;
     }
+
+
 }

@@ -6,12 +6,14 @@
 package com.jrjackson;
 
 import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ser.std.CollectionSerializer;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
+import java.util.Map;
 import java.util.TimeZone;
 import org.jruby.Ruby;
 import org.jruby.RubyClass;
@@ -25,23 +27,30 @@ import org.jruby.ext.stringio.StringIO;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 import org.jruby.anno.JRubyMethod;
-
+import org.jruby.java.proxies.MapJavaProxy;
+import org.jruby.java.proxies.ConcreteJavaProxy;
+import org.jruby.java.proxies.JavaProxy;
 /**
  *
  * @author guy
  */
 public class JrJacksonBase extends RubyObject {
 
+    private static final SimpleDateFormat RDF = new RubyDateFormat("");
+
     // serialize
     @JRubyMethod(module = true, name = {"generate", "dump"}, required = 1, optional = 1)
     public static IRubyObject generate(ThreadContext context, IRubyObject self, IRubyObject[] args) throws IOException, RaiseException {
         Ruby _ruby = context.runtime;
-        Object obj = args[0].toJava(Object.class);
         RubyHash options = (args.length <= 1) ? RubyHash.newHash(_ruby) : args[1].convertToHash();
         String format = (String) options.get(RubyUtils.rubySymbol(_ruby, "date_format"));
         ObjectMapper mapper = RubyJacksonModule.rawMapper();
+
+        StringWriter out = new StringWriter();
+        JsonGenerator jgen = RubyJacksonModule.factory.createGenerator(out);
+        SimpleDateFormat simpleFormat;
         if (format != null) {
-            SimpleDateFormat simpleFormat = new SimpleDateFormat(format);
+            simpleFormat = new SimpleDateFormat(format);
             String timezone = (String) options.get(RubyUtils.rubySymbol(_ruby, "timezone"));
             if (timezone != null) {
                 simpleFormat.setTimeZone(TimeZone.getTimeZone(timezone));
@@ -49,11 +58,14 @@ public class JrJacksonBase extends RubyObject {
             mapper.setDateFormat(simpleFormat);
         } else {
             // using a 'marker' class instance, will not use later but default to #to_s
-            mapper.setDateFormat(new RubyDateFormat("yyyy-MM-dd HH:mm:ss Z"));
+            simpleFormat = RDF;
         }
+
         try {
-            String s = mapper.writeValueAsString(obj);
-            return RubyUtils.rubyString(_ruby, s);
+            System.err.println(args[0].getClass());
+            RubyAnySerializer.instance.serialize(args[0], jgen, RubyJacksonModule.createProvider(simpleFormat));
+            jgen.close();
+            return RubyUtils.rubyString(_ruby, out.toString());
         } catch (JsonProcessingException e) {
             throw ParseError.newParseError(_ruby, e.getLocalizedMessage());
         }
