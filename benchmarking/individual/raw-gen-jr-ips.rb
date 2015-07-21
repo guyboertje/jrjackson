@@ -15,18 +15,19 @@ obj = {
   'f' => nil,     # nil
   'g' => Date.today,
   'h' => { 'a' => { 'b' => { 'c' => { 'd' => {'e' => { 'f' => { 'g' => nil }}}}}}}, # deep hash, not that deep
-  'i' => [[[[[[[nil]]]]]]]  # deep array, again, not that deep
+  'i' => [[[[[[[nil]]]]]]],  # deep array, again, not that deep
+  'j' => Java::JavaUtil::ArrayList.new(["foo", 1])
 }
-
-puts '-------------------------------------'
-puts JrJackson::Base.generate(obj)
-puts '-------------------------------------'
 
 gson = ::Gson::Encoder.new({})
 
-puts '-------------------------------------'
-puts gson.encode(obj)
-puts '-------------------------------------'
+# puts '-------------------------------------'
+# puts gson.encode(obj)
+# puts '-------------------------------------'
+
+# puts '-------------------------------------'
+# puts JrJackson::Base.generate(obj)
+# puts '-------------------------------------'
 
 Benchmark.ips do |x|
   x.config(:time => 5, :warmup => 5)
