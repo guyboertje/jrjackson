@@ -33,13 +33,4 @@ public class RubyDateFormat extends SimpleDateFormat{
         super(pattern, formatSymbols);
     }
 
-    @Override
-    public StringBuffer format(Date date, StringBuffer toAppendTo, FieldPosition pos) {
-        try {
-            throw new IllegalArgumentException("test test test");
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        }
-        return toAppendTo;
-    }
 }

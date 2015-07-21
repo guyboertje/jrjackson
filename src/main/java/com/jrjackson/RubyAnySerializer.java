@@ -1,15 +1,18 @@
 package com.jrjackson;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.databind.SerializationConfig;
-
-//import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
-
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
+import org.jruby.ext.bigdecimal.RubyBigDecimal;
+import org.jruby.internal.runtime.methods.DynamicMethod;
+import org.jruby.java.proxies.JavaProxy;
+import org.jruby.runtime.ThreadContext;
+import org.jruby.runtime.builtin.IRubyObject;
+
+import java.io.IOException;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import org.jruby.RubyArray;
 import org.jruby.RubyBignum;
 import org.jruby.RubyBoolean;
@@ -24,12 +27,7 @@ import org.jruby.RubyStruct;
 import org.jruby.RubySymbol;
 import org.jruby.RubyTime;
 
-
-import org.jruby.ext.bigdecimal.RubyBigDecimal;
-import org.jruby.runtime.ThreadContext;
-import org.jruby.internal.runtime.methods.DynamicMethod;
-import org.jruby.java.proxies.JavaProxy;
-import org.jruby.runtime.builtin.IRubyObject;
+//import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 //public class RubyAnySerializer extends StdSerializer<IRubyObject> {
 public class RubyAnySerializer {
@@ -50,7 +48,6 @@ public class RubyAnySerializer {
         DynamicMethod method = meta.searchMethod("to_time");
         if (!method.isUndefined()) {
             RubyTime dt = (RubyTime) method.call(ctx, rubyObject, meta, "to_time");
-//            System.err.println("------->>>> calling to_time");
             serializeTime(dt, jgen, provider);
             return;
         }
@@ -92,16 +89,14 @@ public class RubyAnySerializer {
 //    @Override
     public void serialize(IRubyObject value, JsonGenerator jgen, SerializerProvider provider)
             throws IOException, JsonGenerationException {
-
+        
         if (value.isNil()) {
 
             jgen.writeNull(); // for RubyNil and NullObjects
 
         } else if (value instanceof JavaProxy) {
 
-            jgen.writeObject(value.dataGetStruct());
-
-//            provider.defaultSerializeValue(value.dataGetStruct(), jgen);
+            provider.defaultSerializeValue(((JavaProxy) value).getObject(), jgen);
 
         } else if (value instanceof RubyString) {
 
@@ -182,19 +177,16 @@ public class RubyAnySerializer {
 
     private void serializeTime(RubyTime dt, JsonGenerator jgen, SerializerProvider provider)
             throws IOException, JsonGenerationException {
-//        DateFormat df = provider.getConfig().getDateFormat();
-        SerializationConfig cfg = provider.getConfig();
-        DateFormat df = cfg.getDateFormat();
+        DateFormat df = provider.getConfig().getDateFormat();
         if (df == null) {
             // DateFormat should always be set
-            System.err.println("---------- no format given, Hmmmm");
-            provider.defaultSerializeValue(dt.getJavaDate(), jgen);
+            provider.defaultSerializeDateValue(dt.getJavaDate(), jgen);
         } else if (df instanceof RubyDateFormat) {
-//            System.err.println("---------- using internal to_s mechanism");
-            jgen.writeString(dt.to_s().asJavaString());
+            RubyDateFormat rdf = (RubyDateFormat)df.clone();
+            jgen.writeString(rdf.format(dt.getJavaDate()));
         } else {
-//            System.err.println("---------- using not simple date format");
-            provider.defaultSerializeValue(dt.getJavaDate(), jgen);
+            SimpleDateFormat sdf = (SimpleDateFormat)df.clone();
+            jgen.writeString(df.format(dt.getJavaDate()));
         }
     }
 

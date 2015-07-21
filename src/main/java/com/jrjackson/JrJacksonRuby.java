@@ -24,12 +24,25 @@ public class JrJacksonRuby extends JrJacksonBase {
     }
 
     // deserialize
-     @JRubyMethod(module = true, name = {"parse", "load"}, required = 2)
+     @JRubyMethod(module = true, name = {"parse_sym", "load_sym"}, required = 2)
+    public static Object parse_sym(ThreadContext context, IRubyObject self, IRubyObject arg, IRubyObject opts)
+            throws JsonProcessingException, IOException, RaiseException {
+        
+        return _parse(context, arg, new RubySymbolNameConverter());
+    }
+    
+    @JRubyMethod(module = true, name = {"parse", "load"}, required = 2)
     public static Object parse(ThreadContext context, IRubyObject self, IRubyObject arg, IRubyObject opts)
             throws JsonProcessingException, IOException, RaiseException {
         
+        return _parse(context, arg, new RubyStringNameConverter());
+    }
+    
+    private static Object _parse(ThreadContext context, IRubyObject arg, RubyNameConverter konv) 
+            throws JsonProcessingException, IOException, RaiseException {
+        
         RubyHandler handler = new RubyHandler(context,
-                new RubySymbolNameConverter(),
+                konv,
                 new RubyBigIntValueConverter(),
                 new RubyBigDecimalValueConverter());
         JrParse parse = new JrParse(handler);

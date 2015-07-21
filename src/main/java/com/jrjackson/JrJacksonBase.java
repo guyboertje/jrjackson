@@ -10,33 +10,30 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.text.SimpleDateFormat;
-import java.util.Map;
-import java.util.TimeZone;
-import org.jruby.Ruby;
-import org.jruby.RubyClass;
 import org.jruby.RubyHash;
 import org.jruby.RubyIO;
 import org.jruby.RubyObject;
 import org.jruby.RubyString;
-import org.jruby.RubySymbol;
+import org.jruby.anno.JRubyMethod;
 import org.jruby.exceptions.RaiseException;
 import org.jruby.ext.stringio.StringIO;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
-import org.jruby.anno.JRubyMethod;
-import org.jruby.java.proxies.MapJavaProxy;
-import org.jruby.java.proxies.ConcreteJavaProxy;
-import org.jruby.java.proxies.JavaProxy;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
+import org.jruby.Ruby;
+import org.jruby.RubyClass;
+import org.jruby.RubySymbol;
 /**
  *
  * @author guy
  */
 public class JrJacksonBase extends RubyObject {
 
-    private static final SimpleDateFormat RDF = new RubyDateFormat("");
+    private static final SimpleDateFormat RDF = new RubyDateFormat("yyyy-MM-dd HH:mm:ss Z");
 
     // serialize
     @JRubyMethod(module = true, name = {"generate", "dump"}, required = 1, optional = 1)
@@ -62,7 +59,6 @@ public class JrJacksonBase extends RubyObject {
         }
 
         try {
-            System.err.println(args[0].getClass());
             RubyAnySerializer.instance.serialize(args[0], jgen, RubyJacksonModule.createProvider(simpleFormat));
             jgen.close();
             return RubyUtils.rubyString(_ruby, out.toString());

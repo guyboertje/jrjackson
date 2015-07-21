@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.core.util.VersionUtil;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.MappingJsonFactory;
+//import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.fasterxml.jackson.databind.ser.DefaultSerializerProvider;
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
 import java.text.SimpleDateFormat;
@@ -16,7 +16,8 @@ import org.jruby.Ruby;
 public class RubyJacksonModule extends SimpleModule {
 
     private static final ObjectMapper static_mapper = new ObjectMapper();
-    public static final JsonFactory factory = new MappingJsonFactory(static_mapper);
+    public static final JsonFactory factory = new JsonFactory(static_mapper);
+//    public static final JsonFactory factory = new MappingJsonFactory(static_mapper);
 
     static {
         static_mapper.registerModule(new AfterburnerModule());
