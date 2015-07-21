@@ -329,24 +329,48 @@ class JrJacksonTest < Test::Unit::TestCase
       "utf8"=>"żółć",
       "zzz"=>{"bar"=>-9}}
     json = '{"utf8":"żółć", "moo": "bar", "zzz": {"bar":-9}, "arr": [2,3,4], "flo": 3.33}'
-    
+
     actual = JrJackson::Json.parse_java(json)
     assert_equal expected, actual
   end
 
-  def test_can_parse_returning_ruby_objects
+  def test_can_parse_returning_ruby_objects_string_keys
     expected = {
-      :a => 'Alpha', # string
-      :b => true,    # boolean
-      :c => 12345,   # number
-      :d => [ true, [false, [-123456789, nil], 0.39676E1, ['Something else.', false], nil]], # mix it up array
-      :e => { :zero => nil, :one => 1, :two => 2, :three => [3], :four => [0, 1, 2, 3, 4] }, # hash
-      :f => nil,     # nil
-      :h => { :a => { :b => { :c => { :d => {:e => { :f => { :g => nil }}}}}}}, # deep hash, not that deep
-      :i => [[[[[[[nil]]]]]]]  # deep array, again, not that deep
+      "a"=>"żółć", # string
+      "b"=>true,    # boolean
+      "c"=>12345,   # number
+      "d"=>
+       [true,
+        [false,
+         [-123456789, nil],
+         0.39676E1,
+         ["Something else.", false],
+         nil]], # mix it up array
+      "e"=>{"zero"=>nil, "one"=>1, "two"=>2, "three"=>[3], "four"=>[0, 1, 2, 3, 4]}, # hash
+      "żółć"=>nil,# nil
+      "h"=>{"a"=>{"b"=>{"c"=>{"d"=>{"e"=>{"f"=>{"g"=>nil}}}}}}},# deep hash, not that deep
+      "i"=>[[[[[[[nil]]]]]]] # deep array, again, not that deep
     }
     json = JrJackson::Json.dump(expected)
     actual = JrJackson::Json.parse_ruby(json)
+    assert_equal expected, actual
+    actual = JrJackson::Ruby.parse(json, {})
+    assert_equal expected, actual
+  end
+
+  def test_can_parse_returning_ruby_objects_symbol_keys
+    expected = {:a=>"Alpha",
+     :b=>true,
+     :c=>12345,
+     :d=>
+      [true, [false, [-123456789, nil], 3.9676, ["Something else.", false], nil]],
+     :e=>{:zero=>nil, :one=>1, :two=>2, :three=>[3], :four=>[0, 1, 2, 3, 4]},
+     :f=>nil,
+     :h=>{:a=>{:b=>{:c=>{:d=>{:e=>{:f=>{:g=>nil}}}}}}},
+     :i=>[[[[[[[nil]]]]]]]
+    }
+    json = JrJackson::Json.dump(expected)
+    actual = JrJackson::Ruby.parse_sym(json, {})
     assert_equal expected, actual
   end
 
