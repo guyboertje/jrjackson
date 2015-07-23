@@ -5,11 +5,13 @@
  */
 package com.jrjackson;
 
+import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.ByteArrayOutputStream;
 import org.jruby.RubyHash;
 import org.jruby.RubyIO;
 import org.jruby.RubyObject;
@@ -24,9 +26,11 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
+import org.jcodings.specific.UTF8Encoding;
 import org.jruby.Ruby;
 import org.jruby.RubyClass;
 import org.jruby.RubySymbol;
+import org.jruby.util.ByteList;
 /**
  *
  * @author guy
@@ -34,17 +38,40 @@ import org.jruby.RubySymbol;
 public class JrJacksonBase extends RubyObject {
 
     private static final SimpleDateFormat RDF = new RubyDateFormat("yyyy-MM-dd HH:mm:ss Z");
+    
+    @JRubyMethod(module = true, name = {"gen"}, required = 1, optional = 1)
+    public static IRubyObject gen(ThreadContext context, IRubyObject self, IRubyObject[] args)
+            throws IOException, RaiseException {
+        Ruby _ruby = context.runtime;
+        RubyHash h = (RubyHash) args[0];
+        
+//        %Q|{"message"=>"#{o['message']}", "@version"=>"1", "@timestamp"=>"#{ts}", "host"=>"#{o['host']}"}|
+//        RubyString s = RubyString.newString(_ruby, "{\"message\"=>\"");
+//        s.cat(str)
+        String out = "{\"message\"=>\"" +
+            h.get("message").toString() +
+            "\", \"@version\"=>\"1\", \"@timestamp\"=>\"" +
+            h.get("@timestamp").toString() +
+            "\", \"host\"=>\"" +
+            h.get("host").toString() +
+            "\"}";
+          
+        return RubyUtils.rubyString(_ruby, out);
+    }
 
     // serialize
     @JRubyMethod(module = true, name = {"generate", "dump"}, required = 1, optional = 1)
-    public static IRubyObject generate(ThreadContext context, IRubyObject self, IRubyObject[] args) throws IOException, RaiseException {
+    public static IRubyObject generate(ThreadContext context, IRubyObject self, IRubyObject[] args)
+            throws IOException, RaiseException {
         Ruby _ruby = context.runtime;
         RubyHash options = (args.length <= 1) ? RubyHash.newHash(_ruby) : args[1].convertToHash();
         String format = (String) options.get(RubyUtils.rubySymbol(_ruby, "date_format"));
         ObjectMapper mapper = RubyJacksonModule.rawMapper();
 
         StringWriter out = new StringWriter();
-        JsonGenerator jgen = RubyJacksonModule.factory.createGenerator(out);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        
+        JsonGenerator jgen = RubyJacksonModule.factory.createGenerator(baos, JsonEncoding.UTF8);
         SimpleDateFormat simpleFormat;
         if (format != null) {
             simpleFormat = new SimpleDateFormat(format);
@@ -61,7 +88,9 @@ public class JrJacksonBase extends RubyObject {
         try {
             RubyAnySerializer.instance.serialize(args[0], jgen, RubyJacksonModule.createProvider(simpleFormat));
             jgen.close();
-            return RubyUtils.rubyString(_ruby, out.toString());
+            ByteList bl = new ByteList(baos.toByteArray(), UTF8Encoding.INSTANCE);
+            return RubyString.newString(_ruby, bl);
+//            return RubyUtils.rubyString(_ruby, out.toString());
         } catch (JsonProcessingException e) {
             throw ParseError.newParseError(_ruby, e.getLocalizedMessage());
         }
