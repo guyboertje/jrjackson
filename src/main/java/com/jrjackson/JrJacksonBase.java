@@ -31,6 +31,7 @@ import org.jruby.Ruby;
 import org.jruby.RubyClass;
 import org.jruby.RubySymbol;
 import org.jruby.util.ByteList;
+
 /**
  *
  * @author guy
@@ -38,24 +39,24 @@ import org.jruby.util.ByteList;
 public class JrJacksonBase extends RubyObject {
 
     private static final SimpleDateFormat RDF = new RubyDateFormat("yyyy-MM-dd HH:mm:ss Z");
-    
+
     @JRubyMethod(module = true, name = {"gen"}, required = 1, optional = 1)
     public static IRubyObject gen(ThreadContext context, IRubyObject self, IRubyObject[] args)
             throws IOException, RaiseException {
         Ruby _ruby = context.runtime;
         RubyHash h = (RubyHash) args[0];
-        
+
 //        %Q|{"message"=>"#{o['message']}", "@version"=>"1", "@timestamp"=>"#{ts}", "host"=>"#{o['host']}"}|
 //        RubyString s = RubyString.newString(_ruby, "{\"message\"=>\"");
 //        s.cat(str)
-        String out = "{\"message\"=>\"" +
-            h.get("message").toString() +
-            "\", \"@version\"=>\"1\", \"@timestamp\"=>\"" +
-            h.get("@timestamp").toString() +
-            "\", \"host\"=>\"" +
-            h.get("host").toString() +
-            "\"}";
-          
+        String out = "{\"message\"=>\""
+                + h.get("message").toString()
+                + "\", \"@version\"=>\"1\", \"@timestamp\"=>\""
+                + h.get("@timestamp").toString()
+                + "\", \"host\"=>\""
+                + h.get("host").toString()
+                + "\"}";
+
         return RubyUtils.rubyString(_ruby, out);
     }
 
@@ -66,12 +67,17 @@ public class JrJacksonBase extends RubyObject {
         Ruby _ruby = context.runtime;
         RubyHash options = (args.length <= 1) ? RubyHash.newHash(_ruby) : args[1].convertToHash();
         String format = (String) options.get(RubyUtils.rubySymbol(_ruby, "date_format"));
-        ObjectMapper mapper = RubyJacksonModule.rawMapper();
 
-        StringWriter out = new StringWriter();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//        StringWriter out = new StringWriter();
+//        JsonGenerator jgen = RubyJacksonModule.factory.createGenerator(out);
+
         
-        JsonGenerator jgen = RubyJacksonModule.factory.createGenerator(baos, JsonEncoding.UTF8);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        JsonGenerator jgen = RubyJacksonModule.factory.createGenerator(
+                baos, JsonEncoding.UTF8);
+        
+        
+        
         SimpleDateFormat simpleFormat;
         if (format != null) {
             simpleFormat = new SimpleDateFormat(format);
@@ -79,17 +85,25 @@ public class JrJacksonBase extends RubyObject {
             if (timezone != null) {
                 simpleFormat.setTimeZone(TimeZone.getTimeZone(timezone));
             }
-            mapper.setDateFormat(simpleFormat);
         } else {
             // using a 'marker' class instance, will not use later but default to #to_s
             simpleFormat = RDF;
         }
 
+        
+        
+        
         try {
-            RubyAnySerializer.instance.serialize(args[0], jgen, RubyJacksonModule.createProvider(simpleFormat));
+            RubyAnySerializer.instance.serialize(args[0], jgen,
+                    RubyJacksonModule.createProvider(simpleFormat));
             jgen.close();
-            ByteList bl = new ByteList(baos.toByteArray(), UTF8Encoding.INSTANCE);
+            
+            
+            ByteList bl = new ByteList(baos.toByteArray(),
+                    UTF8Encoding.INSTANCE);
             return RubyString.newString(_ruby, bl);
+            
+            
 //            return RubyUtils.rubyString(_ruby, out.toString());
         } catch (JsonProcessingException e) {
             throw ParseError.newParseError(_ruby, e.getLocalizedMessage());
