@@ -2,6 +2,7 @@ require 'bigdecimal'
 require 'benchmark/ips'
 require 'gson'
 require 'json/ext'
+
 require 'time'
 
 require File.expand_path('lib/jrjackson')
