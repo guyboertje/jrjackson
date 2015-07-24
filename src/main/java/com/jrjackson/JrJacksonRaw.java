@@ -26,8 +26,8 @@ public class JrJacksonRaw extends JrJacksonBase {
     @JRubyMethod(module = true, name = {"parse", "load"}, required = 2)
     public static IRubyObject parse(ThreadContext context, IRubyObject self, IRubyObject arg, IRubyObject opts)
             throws IOException {
-        RubyHash options = null;
         Ruby _ruby = context.runtime;
+        RubyHash options = null;
  
         if (opts != context.nil) {
             options = opts.convertToHash();

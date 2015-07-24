@@ -24,6 +24,7 @@ import org.jruby.runtime.builtin.IRubyObject;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 import org.jcodings.specific.UTF8Encoding;
@@ -56,8 +57,9 @@ public class JrJacksonBase extends RubyObject {
                 + "\", \"host\"=>\""
                 + h.get("host").toString()
                 + "\"}";
-
-        return RubyUtils.rubyString(_ruby, out);
+        ByteList bl = new ByteList(out.getBytes(StandardCharsets.UTF_8),
+                    UTF8Encoding.INSTANCE);
+        return RubyString.newString(_ruby, bl);
     }
 
     // serialize
@@ -90,20 +92,13 @@ public class JrJacksonBase extends RubyObject {
             simpleFormat = RDF;
         }
 
-        
-        
-        
         try {
             RubyAnySerializer.instance.serialize(args[0], jgen,
                     RubyJacksonModule.createProvider(simpleFormat));
             jgen.close();
-            
-            
             ByteList bl = new ByteList(baos.toByteArray(),
                     UTF8Encoding.INSTANCE);
             return RubyString.newString(_ruby, bl);
-            
-            
 //            return RubyUtils.rubyString(_ruby, out.toString());
         } catch (JsonProcessingException e) {
             throw ParseError.newParseError(_ruby, e.getLocalizedMessage());

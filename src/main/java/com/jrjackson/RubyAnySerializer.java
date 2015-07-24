@@ -99,16 +99,19 @@ public class RubyAnySerializer {
             provider.defaultSerializeValue(((JavaProxy) value).getObject(), jgen);
 
         } else if (value instanceof RubyString) {
-
-            jgen.writeString(value.toString());
+//            jgen.writeString(value.toString());
+            
+            RubyString s = (RubyString)value;
+            jgen.writeUTF8String(s.getBytes(), 0, s.size());
 
         } else if (value instanceof RubySymbol) {
-
-            jgen.writeString(value.toString());
+//            jgen.writeString(value.toString());
+            RubyString s = ((RubySymbol)value).asString();
+            jgen.writeUTF8String(s.getBytes(), 0, s.size());
 
         } else if (value instanceof RubyBoolean) {
-
-            jgen.writeBoolean(value.isTrue());
+            
+          jgen.writeBoolean(value.isTrue());
 
         } else if (value instanceof RubyFloat) {
 
@@ -182,6 +185,8 @@ public class RubyAnySerializer {
             // DateFormat should always be set
             provider.defaultSerializeDateValue(dt.getJavaDate(), jgen);
         } else if (df instanceof RubyDateFormat) {
+            // why another branch? I thought there was an easy win on to_s
+            // maybe with jruby 9000
             RubyDateFormat rdf = (RubyDateFormat)df.clone();
             jgen.writeString(rdf.format(dt.getJavaDate()));
         } else {
