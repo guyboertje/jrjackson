@@ -9,7 +9,7 @@ obj = {
   'd' => [ true, [false, [-123456789, nil], 3.9676, ['Something else.', false], nil]], # mix it up array
   'e' => { 'zero' => nil, 'one' => 1, 'two' => 2, 'three' => [3], 'four' => [0, 1, 2, 3, 4] }, # hash
   'f' => nil,     # nil
-  'g' => Date.today,
+  'g' => Time.now,
   'h' => { 'a' => { 'b' => { 'c' => { 'd' => {'e' => { 'f' => { 'g' => nil }}}}}}}, # deep hash, not that deep
   'i' => [[[[[[[nil]]]]]]],  # deep array, again, not that deep
   'j' => Java::JavaUtil::ArrayList.new(["foo", 1])
