@@ -26,6 +26,7 @@ import org.jruby.RubyString;
 import org.jruby.RubyStruct;
 import org.jruby.RubySymbol;
 import org.jruby.RubyTime;
+import org.jruby.util.ByteList;
 
 //import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
@@ -102,15 +103,19 @@ public class RubyAnySerializer {
 //            jgen.writeString(value.toString());
             
             RubyString s = (RubyString)value;
-            jgen.writeUTF8String(s.getBytes(), 0, s.size());
+            ByteList b = s.getByteList();
+            jgen.writeUTF8String(b.unsafeBytes(), 0, b.length());
+//            byte[] b = s.getBytes();
+//            jgen.writeUTF8String(b, 0, b.length);
+//            jgen.writeUTF8String(s.getBytes(), 0, s.size());
 
         } else if (value instanceof RubySymbol) {
 //            jgen.writeString(value.toString());
             RubyString s = ((RubySymbol)value).asString();
             jgen.writeUTF8String(s.getBytes(), 0, s.size());
-
-        } else if (value instanceof RubyBoolean) {
             
+        } else if (value instanceof RubyBoolean) {
+          
           jgen.writeBoolean(value.isTrue());
 
         } else if (value instanceof RubyFloat) {
