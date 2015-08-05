@@ -1,5 +1,7 @@
 package com.jrjackson;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import java.io.IOException;
 import java.util.*;
 
 import java.math.BigDecimal;
@@ -23,6 +25,7 @@ import org.jruby.RubySymbol;
 import org.jruby.javasupport.JavaUtil;
 import org.jruby.ext.bigdecimal.RubyBigDecimal;
 import org.jruby.runtime.builtin.IRubyObject;
+import org.jruby.util.ByteList;
 import org.jruby.util.SafeDoubleParser;
 
 public class RubyUtils {
@@ -131,5 +134,16 @@ public class RubyUtils {
 //        }
 //
 //        return result;
+    }
+    
+    public static void writeBytes(IRubyObject value, JsonGenerator jgen) 
+        throws IOException {
+//            jgen.writeString(value.toString());
+//            byte[] b = s.getBytes();
+//            jgen.writeUTF8String(b, 0, b.length);
+//            jgen.writeUTF8String(s.getBytes(), 0, s.size());
+            RubyString s = (RubyString)value;
+            ByteList b = s.getByteList();
+            jgen.writeUTF8String(b.unsafeBytes(), 0, b.length());
     }
 }

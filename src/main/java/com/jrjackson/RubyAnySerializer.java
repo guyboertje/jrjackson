@@ -74,10 +74,22 @@ public class RubyAnySerializer {
             return;
         }
 
+        method = meta.searchMethod("to_json_data");
+        if (!method.isUndefined()) {
+            RubyObject obj = (RubyObject) method.call(ctx, rubyObject, meta, "to_json_data");
+            if (obj instanceof RubyString) {
+                RubyUtils.writeBytes(obj, jgen);
+            } else {
+                serialize(obj, jgen, provider);
+            }
+            return;
+        }
+
         method = meta.searchMethod("to_json");
         if (!method.isUndefined()) {
             RubyObject obj = (RubyObject) method.call(ctx, rubyObject, meta, "to_json");
             if (obj instanceof RubyString) {
+                
                 jgen.writeRawValue(obj.toString());
             } else {
                 serialize(obj, jgen, provider);
@@ -100,14 +112,8 @@ public class RubyAnySerializer {
             provider.defaultSerializeValue(((JavaProxy) value).getObject(), jgen);
 
         } else if (value instanceof RubyString) {
-//            jgen.writeString(value.toString());
             
-            RubyString s = (RubyString)value;
-            ByteList b = s.getByteList();
-            jgen.writeUTF8String(b.unsafeBytes(), 0, b.length());
-//            byte[] b = s.getBytes();
-//            jgen.writeUTF8String(b, 0, b.length);
-//            jgen.writeUTF8String(s.getBytes(), 0, s.size());
+            RubyUtils.writeBytes(value, jgen);
 
         } else if (value instanceof RubySymbol) {
 //            jgen.writeString(value.toString());
