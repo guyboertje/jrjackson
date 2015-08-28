@@ -25,17 +25,17 @@ public class JrParse {
     }
     
     public void deserialize(JsonParser jp) throws JsonProcessingException, IOException {
-//        try {
+        try {
             
             while (jp.nextValue() != null) {
                 handleCurrentToken(jp);
             }
             
-//        } catch (JsonProcessingException e) {
-//            _handler.raiseError(e.getLocalizedMessage());
-//        } catch (IOException e) {
-//            _handler.raiseError(e.getLocalizedMessage());
-//        }
+        } catch (JsonProcessingException e) {
+            _handler.raiseError(e.getLocalizedMessage());
+        } catch (IOException e) {
+            _handler.raiseError(e.getLocalizedMessage());
+        }
     }
     
     private void callAddValue(JsonStreamContext x) {

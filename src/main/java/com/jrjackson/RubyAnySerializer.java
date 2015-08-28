@@ -26,7 +26,6 @@ import org.jruby.RubyString;
 import org.jruby.RubyStruct;
 import org.jruby.RubySymbol;
 import org.jruby.RubyTime;
-import org.jruby.util.ByteList;
 
 //import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 

@@ -45,12 +45,17 @@ puts "Json string size: #{json_source.size}"
 # end
 
 # puts "NOT using GC suite"
+puts 'Sleeping'
+sleep 30
+puts 'Working'
 
 Benchmark.ips do |x|
-  x.config(:time => 5, :warmup => 5)
+  x.config(:time => 20, :warmup => 20)
 
-  x.report("raw bd") { JrJackson::Raw.parse_raw_bd(json_source) }
-  x.report("raw") { JrJackson::Raw.parse_raw(json_source) }
-  x.report("symbol keys use handler") { JrJackson::Ruby.parse(json_source, nil) }
-  x.report("raw use handler") { JrJackson::Java.parse(json_source, nil) }
+  x.report("symbol keys use handler") { JrJackson::Ruby.parse_sym(json_source, nil) }
+  # x.report("raw use handler") { JrJackson::Java.parse(json_source, nil) }
+  # x.report("raw bd") { JrJackson::Raw.parse_raw_bd(json_source) }
+  # x.report("raw") { JrJackson::Raw.parse_str(json_source) }
+
+  x.compare!
 end

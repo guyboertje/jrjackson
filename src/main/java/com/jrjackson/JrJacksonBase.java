@@ -23,8 +23,6 @@ import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
 import java.io.IOException;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 import org.jcodings.specific.UTF8Encoding;
@@ -40,27 +38,6 @@ import org.jruby.util.ByteList;
 public class JrJacksonBase extends RubyObject {
 
     private static final SimpleDateFormat RDF = new RubyDateFormat("yyyy-MM-dd HH:mm:ss Z");
-
-    @JRubyMethod(module = true, name = {"gen"}, required = 1, optional = 1)
-    public static IRubyObject gen(ThreadContext context, IRubyObject self, IRubyObject[] args)
-            throws IOException, RaiseException {
-        Ruby _ruby = context.runtime;
-        RubyHash h = (RubyHash) args[0];
-
-//        %Q|{"message"=>"#{o['message']}", "@version"=>"1", "@timestamp"=>"#{ts}", "host"=>"#{o['host']}"}|
-//        RubyString s = RubyString.newString(_ruby, "{\"message\"=>\"");
-//        s.cat(str)
-        String out = "{\"message\"=>\""
-                + h.get("message").toString()
-                + "\", \"@version\"=>\"1\", \"@timestamp\"=>\""
-                + h.get("@timestamp").toString()
-                + "\", \"host\"=>\""
-                + h.get("host").toString()
-                + "\"}";
-        ByteList bl = new ByteList(out.getBytes(StandardCharsets.UTF_8),
-                    UTF8Encoding.INSTANCE);
-        return RubyString.newString(_ruby, bl);
-    }
 
     // serialize
     @JRubyMethod(module = true, name = {"generate", "dump"}, required = 1, optional = 1)

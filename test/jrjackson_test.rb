@@ -438,6 +438,8 @@ class JrJacksonTest < Test::Unit::TestCase
     assert_match /Cannot find Serializer for class: org.jruby.RubyBasicObject/, err.message
   end
 
+  # -----------------------------
+
   def assert_bigdecimal_equal(expected, actual)
     assert_equal expected, actual
     assert_equal expected.class, actual.class
