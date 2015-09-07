@@ -57,8 +57,8 @@ Benchmark.ips do |x|
   # x.report("raw use handler") { JrJackson::Java.parse(json_source, nil) }
   # x.report("raw bd") { JrJackson::Raw.parse_raw_bd(json_source) }
   # x.report("raw") { JrJackson::Raw.parse_str(json_source) }
-  # x.report("JSON") { JSON.load(json_source) }
-  x.report("compat_parse symbol") { JrJackson::Ruby.compat_parse(json_source, {symbolize_keys: true}) }
+  x.report("JSON") { JSON.parse(json_source, {symbolize_names: true}) }
+  # x.report("compat_parse symbol") { JrJackson::Ruby.compat_parse(json_source, {symbolize_keys: true}) }
 
   x.compare!
 end
