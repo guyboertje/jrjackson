@@ -1,3 +1,21 @@
+v0.3.2
+  update changelog
+
+v0.3.1
+  remove old jar
+
+v0.3.0
+  this is a major refactor.
+  parse and generate performance improvements.
+    see JrJackson::Ruby and JrJackson::Java modules
+  pretty generation support.
+  jruby 9.0.1.0 and 1.7.22
+  jackson 2.6.1
+
+v0.2.9
+  fix for issue 39
+    incorrect error when serializing BasicObject
+
 v0.2.8
   fixes for issues-28,29,31
     correction for Time#to_s
