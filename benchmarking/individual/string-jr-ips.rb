@@ -1,4 +1,5 @@
 require 'benchmark/ips'
+require 'json/ext'
 
 require File.expand_path('lib/jrjackson')
 
@@ -45,9 +46,9 @@ puts "Json string size: #{json_source.size}"
 # end
 
 # puts "NOT using GC suite"
-puts 'Sleeping'
-sleep 30
-puts 'Working'
+# puts 'Sleeping'
+# sleep 30
+# puts 'Working'
 
 Benchmark.ips do |x|
   x.config(:time => 20, :warmup => 20)
@@ -56,6 +57,8 @@ Benchmark.ips do |x|
   # x.report("raw use handler") { JrJackson::Java.parse(json_source, nil) }
   # x.report("raw bd") { JrJackson::Raw.parse_raw_bd(json_source) }
   # x.report("raw") { JrJackson::Raw.parse_str(json_source) }
+  # x.report("JSON") { JSON.load(json_source) }
+  x.report("compat_parse symbol") { JrJackson::Ruby.compat_parse(json_source, {symbolize_keys: true}) }
 
   x.compare!
 end

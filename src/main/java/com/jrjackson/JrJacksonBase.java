@@ -50,13 +50,15 @@ public class JrJacksonBase extends RubyObject {
 //        StringWriter out = new StringWriter();
 //        JsonGenerator jgen = RubyJacksonModule.factory.createGenerator(out);
 
-        
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         JsonGenerator jgen = RubyJacksonModule.factory.createGenerator(
                 baos, JsonEncoding.UTF8);
-        
-        
-        
+
+        if (flagged(options, RubyUtils.rubySymbol(_ruby, "pretty"))) {
+            jgen.useDefaultPrettyPrinter();
+        }
+
         SimpleDateFormat simpleFormat;
         if (format != null) {
             simpleFormat = new SimpleDateFormat(format);
@@ -91,12 +93,23 @@ public class JrJacksonBase extends RubyObject {
         return flag;
     }
 
+    protected static boolean flagged(RubyHash opts, RubySymbol key, boolean returnVal) {
+        if(!opts.containsKey(key)) {
+            return returnVal;
+        }
+        Object val = opts.get(key);
+        if (val == null) {
+            return returnVal;
+        }
+        boolean flag = (Boolean) val;
+        return flag;
+    }
+
     protected static IRubyObject _sjcparse(ThreadContext context, IRubyObject handler, IRubyObject arg, IRubyObject opts, StreamParse sp) throws RaiseException {
-        ObjectMapper mapper = RubyJacksonModule.rawMapper();
-        JsonFactory jf = mapper.getFactory();
+
         JsonParser jp;
         try {
-            jp = buildParser(context, jf, arg);
+            jp = buildParser(context, RubyJacksonModule.factory, arg);
         } catch (IOException e) {
             throw context.runtime.newIOError(e.getLocalizedMessage());
         }

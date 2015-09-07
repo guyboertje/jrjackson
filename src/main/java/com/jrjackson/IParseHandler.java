@@ -49,5 +49,5 @@ public interface IParseHandler<T, U, V> {
 
     T trueValue();
 
-    
+
 }

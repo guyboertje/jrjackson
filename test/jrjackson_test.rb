@@ -331,7 +331,16 @@ class JrJacksonTest < Test::Unit::TestCase
     json = '{"utf8":"żółć", "moo": "bar", "zzz": {"bar":-9}, "arr": [2,3,4], "flo": 3.33}'
 
     actual = JrJackson::Json.parse_java(json)
-    assert_equal expected, actual
+
+    assert_equal Java::JavaUtil::HashMap, actual.class
+    assert_equal Java::JavaUtil::ArrayList, actual["arr"].class
+    assert_equal Java::JavaMath::BigDecimal, actual["flo"].class
+    assert_equal "3.33", actual["flo"].to_s
+    assert_equal "bar", actual["moo"]
+    assert_equal "żółć", actual["utf8"]
+    assert_equal Java::JavaUtil::HashMap, actual["zzz"].class
+    assert_equal Bignum, actual["zzz"]["bar"].class
+    assert_equal -9, actual["zzz"]["bar"]
   end
 
   def test_can_parse_returning_ruby_objects_string_keys
@@ -355,6 +364,28 @@ class JrJacksonTest < Test::Unit::TestCase
     actual = JrJackson::Json.parse_ruby(json)
     assert_equal expected, actual
     actual = JrJackson::Ruby.parse(json, {})
+    assert_equal expected, actual
+  end
+
+  def test_can_compat_parse_returning_ruby_objects_string_keys
+    expected = {
+      "a"=>"żółć", # string
+      "b"=>true,    # boolean
+      "c"=>12345,   # number
+      "d"=>
+       [true,
+        [false,
+         [-123456789, nil],
+         0.39676E1,
+         ["Something else.", false],
+         nil]], # mix it up array
+      "e"=>{"zero"=>nil, "one"=>1, "two"=>2, "three"=>[3], "four"=>[0, 1, 2, 3, 4]}, # hash
+      "żółć"=>nil,# nil
+      "h"=>{"a"=>{"b"=>{"c"=>{"d"=>{"e"=>{"f"=>{"g"=>nil}}}}}}},# deep hash, not that deep
+      "i"=>[[[[[[[nil]]]]]]] # deep array, again, not that deep
+    }
+    json = JrJackson::Json.dump(expected)
+    actual = JrJackson::Ruby.compat_parse(json, {})
     assert_equal expected, actual
   end
 
@@ -384,7 +415,7 @@ class JrJacksonTest < Test::Unit::TestCase
   def test_stringio
     expected = {"foo" => 5, "utf8" => "żółć"}
     json = ::StringIO.new('{"foo":5, "utf8":"żółć"}')
-    actual = JrJackson::Json.load(json)
+    actual = JrJackson::Json.load_ruby(json)
     assert_equal expected, actual
   end
 
@@ -421,11 +452,12 @@ class JrJacksonTest < Test::Unit::TestCase
     actual = JrJackson::Json.parse(json, :use_bigdecimal => true, :symbolize_keys => true)[:foo]
     assert_bigdecimal_equal expected, actual
 
+    actual = JrJackson::Java.parse(json, {})['foo']
+    assert_bigdecimal_similar expected, actual
+
     actual = JrJackson::Json.parse(json, :use_bigdecimal => true, :raw => true)['foo']
     assert_bigdecimal_similar expected, actual
 
-    actual = JrJackson::Raw.parse_raw_bd(json)['foo']
-    assert_bigdecimal_similar expected, actual
   end
 
   def test_cannot_serialize_object
@@ -438,6 +470,13 @@ class JrJacksonTest < Test::Unit::TestCase
     assert_match /Cannot find Serializer for class: org.jruby.RubyBasicObject/, err.message
   end
 
+  def test_supports_pretty_printing
+    object = {"foo" => 5, "utf8" => "żółć"}
+    
+    actual = JrJackson::Json.dump(object, :pretty => true)
+    assert_equal "{\n  \"foo\" : 5,\n  \"utf8\" : \"żółć\"\n}", actual
+  end
+
   # -----------------------------
 
   def assert_bigdecimal_equal(expected, actual)
@@ -447,7 +486,7 @@ class JrJacksonTest < Test::Unit::TestCase
   end
 
   def assert_bigdecimal_similar(expected, actual)
-    assert_equal BigDecimal.new(expected.to_s), BigDecimal.new(actual.to_s)
+    assert_equal BigDecimal.new(expected.to_s).round(11), BigDecimal.new(actual.to_s).round(11)
     assert_equal Java::JavaMath::BigDecimal, actual.class
   end
 

@@ -29,7 +29,11 @@ public class JrJacksonRuby extends JrJacksonBase {
     public static Object parse_sym(ThreadContext context, IRubyObject self, IRubyObject arg, IRubyObject opts)
             throws JsonProcessingException, IOException, RaiseException {
 
-        return _parse(context, arg, new RubySymbolNameConverter());
+        return __parse(context, arg,
+                new RubySymbolNameConverter(),
+                new RubyBigIntValueConverter(),
+                new RubyBigDecimalValueConverter()
+        );
     }
 
     @JRubyMethod(module = true, name = {"parse", "load"}, required = 2)
@@ -37,24 +41,65 @@ public class JrJacksonRuby extends JrJacksonBase {
             throws JsonProcessingException, IOException, RaiseException {
 
         RubyNameConverter konv = new RubyStringNameConverter();
+        RubyConverter ikonv = new RubyBigIntValueConverter();
+        RubyConverter dkonv = new RubyBigDecimalValueConverter();
+        if (opts != context.nil) {
+            RubyHash options = opts.convertToHash();
+            if (options.size() > 0) {
+                if (flagged(options,
+                        RubyUtils.rubySymbol(context.runtime, "symbolize_keys"))) {
+                    konv = new RubySymbolNameConverter();
+                }
+                if (!flagged(options,
+                        RubyUtils.rubySymbol(context.runtime, "use_bigdecimal"), true)) {
+                    dkonv = new RubyFloatValueConverter();
+                }
+                if (flagged(options,
+                        RubyUtils.rubySymbol(context.runtime, "use_smallint"))) {
+                    ikonv = new RubyIntValueConverter();
+                }
+            }
+        }
+        return __parse(context, arg, konv, ikonv, dkonv);
+    }
+
+    @JRubyMethod(module = true, name = {"compat_parse", "compat_load"}, required = 2)
+    public static Object compat_parse(ThreadContext context, IRubyObject self, IRubyObject arg, IRubyObject opts)
+            throws JsonProcessingException, IOException, RaiseException {
+        RubyKeyConverter konv = new RubyStringKeyConverter();
+        RubyConverter dkonv = new RubyBigDecimalValueConverter();
+        RubyConverter ikonv = new RubyBigIntValueConverter();
 
         if (opts != context.nil) {
             RubyHash options = opts.convertToHash();
-            if (options.size() > 0 && flagged(options,
-                    RubyUtils.rubySymbol(context.runtime, "symbolize_keys"))) {
-                konv = new RubySymbolNameConverter();
+            if (options.size() > 0) {
+                if (flagged(options,
+                        RubyUtils.rubySymbol(context.runtime, "symbolize_keys"))) {
+                    konv = new RubySymbolKeyConverter();
+                }
+                if (!flagged(options,
+                        RubyUtils.rubySymbol(context.runtime, "use_bigdecimal"), true)) {
+                    dkonv = new RubyFloatValueConverter();
+                }
+                if (flagged(options,
+                        RubyUtils.rubySymbol(context.runtime, "use_smallint"))) {
+                    ikonv = new RubyIntValueConverter();
+                }
             }
         }
-        return _parse(context, arg, konv);
+        ObjectMapper om = RubyJacksonModule.mapperWith(context.runtime, konv, ikonv, dkonv);
+
+        return _parse(context, arg, om);
     }
 
-    private static Object _parse(ThreadContext context, IRubyObject arg, RubyNameConverter konv)
+    private static Object __parse(ThreadContext context, IRubyObject arg,
+                RubyNameConverter keykonv, RubyConverter intconv, RubyConverter decimalconv)
             throws JsonProcessingException, IOException, RaiseException {
 
         RubyHandler handler = new RubyHandler(context,
-                konv,
-                new RubyBigIntValueConverter(),
-                new RubyBigDecimalValueConverter());
+                keykonv,
+                intconv,
+                decimalconv);
         JrParse parse = new JrParse(handler);
         ObjectMapper mapper = RubyJacksonModule.rawBigNumberMapper();
         JsonFactory jf = mapper.getFactory();

@@ -1,6 +1,7 @@
 require 'bigdecimal'
 require 'benchmark/ips'
 require 'gson'
+require 'json/ext'
 require 'time'
 
 require File.expand_path('lib/jrjackson')
@@ -30,10 +31,11 @@ gson = ::Gson::Encoder.new({})
 # puts '-------------------------------------'
 
 Benchmark.ips do |x|
-  x.config(:time => 5, :warmup => 5)
+  x.config(:time => 20, :warmup => 20)
 
   x.report("jrjackson") { JrJackson::Base.generate(obj) }
   x.report("gson")      { gson.encode(obj) }
-  x.report("jrjackson") { JrJackson::Base.generate(obj) }
-  x.report("gson")      { gson.encode(obj) }
+  x.report("JSON")      { JSON.dump(obj) }
+
+  x.compare!
 end

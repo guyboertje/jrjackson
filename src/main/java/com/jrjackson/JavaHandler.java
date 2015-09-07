@@ -22,9 +22,20 @@ import java.util.HashMap;
  */
 
 public class JavaHandler implements IParseHandler<Object, ArrayList<Object>, HashMap<String, Object>> {
-    
+
     private Object _result;
-    
+    private final JavaConverter _intConv;
+    private final JavaConverter _floatConv;
+
+    public JavaHandler(
+            JavaConverter intConverter,
+            JavaConverter floatConverter) {
+
+        _intConv = intConverter;
+        _floatConv = floatConverter;
+
+    }
+
     @Override
     public void addValue(Object value) {
         _result = value;
@@ -37,7 +48,7 @@ public class JavaHandler implements IParseHandler<Object, ArrayList<Object>, Has
 
     @Override
     public void hashEnd() {
-        
+
     }
 
     @Override
@@ -57,50 +68,44 @@ public class JavaHandler implements IParseHandler<Object, ArrayList<Object>, Has
 
     @Override
     public void arrayEnd() {
-        
+
     }
 
     @Override
     public void arrayAppend(ArrayList<Object> array, Object value) {
         array.add(value);
     }
-    
+
     @Override
     public Object treatNull() {
         return null;
     }
-    
+
     @Override
     public Object treatInt(JsonParser jp) throws IOException {
-        if (jp.getNumberType() == JsonParser.NumberType.BIG_INTEGER) {
-            return jp.getBigIntegerValue();
-        }
-        return jp.getLongValue();
+        return _intConv.convert(jp);
     }
-    
+
     @Override
     public Object treatFloat(JsonParser jp) throws IOException {
-        if (jp.getNumberType() == JsonParser.NumberType.BIG_DECIMAL  ){
-            return jp.getDecimalValue();
-        }
-        return jp.getDoubleValue();
+        return _floatConv.convert(jp);
     }
-    
+
     @Override
     public Object treatString(JsonParser jp) throws IOException {
         return jp.getText();
     }
-    
+
     @Override
     public Object trueValue() {
         return true;
     }
-    
+
     @Override
     public Object falseValue() {
         return false;
     }
-    
+
     @Override
     public Object getResult() {
         return _result;
@@ -109,5 +114,5 @@ public class JavaHandler implements IParseHandler<Object, ArrayList<Object>, Has
     @Override
     public void raiseError(String e) {
 
-    }   
+    }
 }

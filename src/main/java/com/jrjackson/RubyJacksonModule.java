@@ -1,10 +1,10 @@
 package com.jrjackson;
 
 import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.core.util.VersionUtil;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 //import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.fasterxml.jackson.databind.ser.DefaultSerializerProvider;
@@ -25,7 +25,7 @@ public class RubyJacksonModule extends SimpleModule {
     }
 
     private RubyJacksonModule() {
-        super("JrJacksonStrModule", VersionUtil.versionFor(RubyJacksonModule.class));
+        super("JrJacksonStrModule", new Version(1, 2, 16, "0", "com.jrjackson.jruby", "jrjackson"));
     }
 
     public static ObjectMapper mapperWith(Ruby ruby, RubyKeyConverter nameConverter,
@@ -48,21 +48,28 @@ public class RubyJacksonModule extends SimpleModule {
 //    }
 
     public static ObjectMapper rawMapper() {
-        return static_mapper;
+        ObjectMapper om = static_mapper.copy();
+
+        om.disable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
+        om.disable(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS);
+        return om;
     }
 
     public static DefaultSerializerProvider createProvider(SimpleDateFormat sdf) {
-        static_mapper.setDateFormat(sdf);
-        return ((DefaultSerializerProvider)static_mapper.getSerializerProvider()).createInstance(
-            static_mapper.getSerializationConfig(),
-            static_mapper.getSerializerFactory()
+        ObjectMapper om = static_mapper.copy();
+        om.setDateFormat(sdf);
+        return ((DefaultSerializerProvider)om.getSerializerProvider()).createInstance(
+            om.getSerializationConfig(),
+            om.getSerializerFactory()
         );
     }
 
     public static ObjectMapper rawBigNumberMapper() {
-        static_mapper.enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
-        static_mapper.enable(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS);
-        return static_mapper;
+        ObjectMapper om = static_mapper.copy();
+
+        om.enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
+        om.enable(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS);
+        return om;
     }
 
 

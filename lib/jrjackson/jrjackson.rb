@@ -35,18 +35,20 @@ module JrJackson
         end
 
         if options && !options.empty?
-          # if options.size == 1 && !!options[:raw]
-          #   return JrJackson::Raw.parse_raw(json_source)
-          # end
-          # if options.size == 1 && !!options[:symbolize_keys]
-          #   return JrJackson::Raw.parse_sym(json_source)
-          # end
-          # if options.size == 2 && !!options[:raw] && !!options[:use_bigdecimal]
-          #   return JrJackson::Raw.parse_raw_bd(json_source)
-          # end
-          JrJackson::Raw.parse(json_source, options)
+          if options.size == 1 && !!options[:raw]
+            return JrJackson::Java.parse_raw(json_source, options)
+          end
+          if options.size == 1 && !!options[:symbolize_keys]
+            return JrJackson::Ruby.parse_sym(json_source, options)
+          end
+          if options.size == 2 && !!options[:raw] && !!options[:use_bigdecimal]
+            return JrJackson::Java.parse(json_source, options)
+          end
+          # JrJackson::Raw.parse(json_source, options)
+          JrJackson::Ruby.parse(json_source, options)
         else
-          JrJackson::Raw.parse_str(json_source)
+          # JrJackson::Raw.parse_str(json_source)
+          JrJackson::Ruby.parse(json_source, nil)
         end
       end
 

@@ -13,6 +13,7 @@ import java.io.IOException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.jruby.RubyHash;
 import org.jruby.exceptions.RaiseException;
 
 
@@ -27,19 +28,56 @@ public class JrJacksonJava extends JrJacksonBase {
     @JRubyMethod(module = true, name = {"parse", "load"}, required = 2)
     public static IRubyObject parse(ThreadContext context, IRubyObject self, IRubyObject arg, IRubyObject opts)
             throws JsonProcessingException, IOException, RaiseException {
-        
-        JavaHandler handler = new JavaHandler();
+
+        JavaConverter ikonv = new JavaBigIntValueConverter();
+        JavaConverter dkonv = new JavaBigDecimalValueConverter();
+        if (opts != context.nil) {
+            RubyHash options = opts.convertToHash();
+            if (options.size() > 0) {
+                if (!flagged(options,
+                        RubyUtils.rubySymbol(context.runtime, "use_bigdecimal"), true)) {
+                    dkonv = new JavaFloatValueConverter();
+                }
+                if (flagged(options,
+                        RubyUtils.rubySymbol(context.runtime, "use_smallint"))) {
+                    ikonv = new JavaLongValueConverter();
+                }
+            }
+        }
+
+        JavaHandler handler = new JavaHandler(ikonv, dkonv);
         JjParse parse = new JjParse(handler);
-        ObjectMapper mapper = RubyJacksonModule.rawBigNumberMapper();
-        JsonFactory jf = mapper.getFactory();
         JsonParser jp;
         try {
-            jp = buildParser(context, jf, arg);
+            jp = buildParser(context, RubyJacksonModule.factory, arg);
         } catch (IOException e) {
             throw context.runtime.newIOError(e.getLocalizedMessage());
         }
-        
+
         parse.deserialize(jp);
+        jp.close();
+        return RubyUtils.rubyObject(context.runtime, handler.getResult());
+    }
+
+    // deserialize
+    @JRubyMethod(module = true, name = {"parse_raw", "load_raw"}, required = 2)
+    public static IRubyObject parse_raw(ThreadContext context, IRubyObject self, IRubyObject arg, IRubyObject opts)
+            throws JsonProcessingException, IOException, RaiseException {
+
+        JavaConverter ikonv = new JavaBigIntValueConverter();
+        JavaConverter dkonv = new JavaBigDecimalValueConverter();
+
+        JavaHandler handler = new JavaHandler(ikonv, dkonv);
+        JjParse parse = new JjParse(handler);
+        JsonParser jp;
+        try {
+            jp = buildParser(context, RubyJacksonModule.factory, arg);
+        } catch (IOException e) {
+            throw context.runtime.newIOError(e.getLocalizedMessage());
+        }
+
+        parse.deserialize(jp);
+        jp.close();
         return RubyUtils.rubyObject(context.runtime, handler.getResult());
     }
 }
