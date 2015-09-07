@@ -6,3 +6,4 @@ Rakefile.old
 *.iml
 
 linked
+/libyjpagent.so

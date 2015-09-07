@@ -1,6 +1,5 @@
 package com.jrjackson;
 
-import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import org.jruby.Ruby;
 import org.jruby.RubyClass;
@@ -11,7 +10,6 @@ import org.jruby.runtime.builtin.IRubyObject;
 
 import java.io.IOException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.jruby.RubyHash;
 import org.jruby.exceptions.RaiseException;

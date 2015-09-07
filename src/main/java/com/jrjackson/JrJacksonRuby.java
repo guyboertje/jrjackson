@@ -111,6 +111,7 @@ public class JrJacksonRuby extends JrJacksonBase {
         }
 
         parse.deserialize(jp);
+        jp.close();
         return handler.getResult();
     }
 }
