@@ -1,3 +1,7 @@
+v0.3.3
+  fix bigdecimal bug
+    add require bigdecimal
+
 v0.3.2
   update changelog
 
