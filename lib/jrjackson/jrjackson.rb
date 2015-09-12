@@ -7,6 +7,7 @@ require_relative "jars/jrjackson-1.2.16.jar"
 # require_relative "linked/jrjackson-1.2.16.jar"
 
 require 'com/jrjackson/jr_jackson'
+require 'bigdecimal'
 
 module JrJackson
   module Json
