@@ -208,9 +208,12 @@ public class RubyAnySerializer {
 
     private void serializeKey(IRubyObject key, JsonGenerator jgen, SerializerProvider provider)
             throws IOException, JsonGenerationException {
-
-        jgen.writeFieldName(key.asJavaString());
-
+        if(key instanceof RubyString) {
+            jgen.writeFieldName(((RubyString)key).decodeString());
+        } else {
+            // includes RubySymbol and non RubyString objects
+            jgen.writeFieldName(key.toString());
+        }
     }
 
     /**

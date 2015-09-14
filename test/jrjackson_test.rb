@@ -477,6 +477,12 @@ class JrJacksonTest < Test::Unit::TestCase
     assert_equal "{\n  \"foo\" : 5,\n  \"utf8\" : \"żółć\"\n}", actual
   end
 
+  def test_can_serialise_non_string_keys
+    object = {5 => "foo"}
+    actual = JrJackson::Json.dump(object)
+    assert_equal "{\"5\":\"foo\"}", actual
+  end
+
   # -----------------------------
 
   def assert_bigdecimal_equal(expected, actual)

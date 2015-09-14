@@ -7,7 +7,14 @@ require File.expand_path('benchmarking/fixtures/bench_options')
 filename = File.expand_path(BenchOptions.source)
 
 opts = {use_bigdecimal: true, raw: true}
+optj = {use_bigdecimal: true, symbolize_keys: true}
 dumped_string = File.read(filename)
+
+Benchmark.bmbm(BenchOptions.output_width) do |x| 
+  x.report("jackson parse java: #{BenchOptions.iterations}") do
+    BenchOptions.iterations.times { JrJackson::Java.parse(dumped_string, opts) }
+  end
+end
 
 Benchmark.bmbm(BenchOptions.output_width) do |x| 
   x.report("jackson parse raw + bigdecimal direct: #{BenchOptions.iterations}") do
@@ -16,7 +23,7 @@ Benchmark.bmbm(BenchOptions.output_width) do |x|
 end
 
 Benchmark.bmbm(BenchOptions.output_width) do |x| 
-  x.report("jackson parse j raw: #{BenchOptions.iterations}") do
-    BenchOptions.iterations.times { JrJackson::Java.parse(dumped_string, nil) }
+  x.report("jackson parse java sym bd: #{BenchOptions.iterations}") do
+    BenchOptions.iterations.times { JrJackson::Java.parse(dumped_string, optj) }
   end
 end

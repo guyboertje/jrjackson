@@ -1,3 +1,7 @@
+v0.3.4
+  fix multi_json bug
+    not serializing non-string keys
+
 v0.3.3
   fix bigdecimal bug
     add require bigdecimal

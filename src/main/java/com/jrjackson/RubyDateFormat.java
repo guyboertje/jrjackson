@@ -6,9 +6,7 @@
 package com.jrjackson;
 
 import java.text.DateFormatSymbols;
-import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
 
 /**

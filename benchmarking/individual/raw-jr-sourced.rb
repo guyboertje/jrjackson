@@ -22,7 +22,7 @@ Benchmark.bmbm(BenchOptions.output_width) do |x|
 end
 
 Benchmark.bmbm(BenchOptions.output_width) do |x| 
-  x.report("jackson parse raw old: #{BenchOptions.iterations}") do
-    BenchOptions.iterations.times { JrJackson::Json.load(dumped_string, opts) }
+  x.report("jackson parse ruby compat: #{BenchOptions.iterations}") do
+    BenchOptions.iterations.times { JrJackson::Ruby.compat_parse(dumped_string, {}) }
   end
 end
