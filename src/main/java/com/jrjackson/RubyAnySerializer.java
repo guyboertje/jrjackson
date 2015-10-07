@@ -43,8 +43,19 @@ public class RubyAnySerializer {
     private void serializeUnknownRubyObject(ThreadContext ctx, IRubyObject rubyObject, JsonGenerator jgen, SerializerProvider provider)
             throws IOException, JsonGenerationException {
         RubyClass meta = rubyObject.getMetaClass();
-
-        DynamicMethod method = meta.searchMethod("to_time");
+        
+        DynamicMethod method = meta.searchMethod("to_json_data");
+        if (!method.isUndefined()) {
+            RubyObject obj = (RubyObject) method.call(ctx, rubyObject, meta, "to_json_data");
+            if (obj instanceof RubyString) {
+                RubyUtils.writeBytes(obj, jgen);
+            } else {
+                serialize(obj, jgen, provider);
+            }
+            return;
+        }
+        
+        method = meta.searchMethod("to_time");
         if (!method.isUndefined()) {
             RubyTime dt = (RubyTime) method.call(ctx, rubyObject, meta, "to_time");
             serializeTime(dt, jgen, provider);
@@ -69,17 +80,6 @@ public class RubyAnySerializer {
         if (!method.isUndefined()) {
             RubyObject obj = (RubyObject) method.call(ctx, rubyObject, meta, "to_a");
             serializeArray(obj, jgen, provider);
-            return;
-        }
-
-        method = meta.searchMethod("to_json_data");
-        if (!method.isUndefined()) {
-            RubyObject obj = (RubyObject) method.call(ctx, rubyObject, meta, "to_json_data");
-            if (obj instanceof RubyString) {
-                RubyUtils.writeBytes(obj, jgen);
-            } else {
-                serialize(obj, jgen, provider);
-            }
             return;
         }
 

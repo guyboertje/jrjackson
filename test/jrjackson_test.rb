@@ -22,6 +22,19 @@ class JrJacksonTest < Test::Unit::TestCase
 #   end
 # end
 
+  class ToJsonData
+    attr_reader :one, :two, :six
+    def initialize(a,b,c)
+      @one, @two, @six = a,b,c
+    end
+    def to_h
+      {'one' => one, 'two' => two, 'six' => six}
+    end
+    def to_json_data
+      [one, two, six]
+    end
+  end
+
   class CustomToH
     attr_accessor :one, :two, :six
     def initialize(a,b,c)
@@ -205,6 +218,13 @@ class JrJacksonTest < Test::Unit::TestCase
       ],
       handler.calls
     )
+  end
+
+  def test_to_json_data
+    object = ToJsonData.new("uno", :two, 6.0)
+    expected = "[1,[\"uno\",\"two\",6.0]]"
+    actual = JrJackson::Json.dump([1, object])
+    assert_equal expected, actual
   end
 
   def test_datetime
@@ -472,7 +492,7 @@ class JrJacksonTest < Test::Unit::TestCase
 
   def test_supports_pretty_printing
     object = {"foo" => 5, "utf8" => "żółć"}
-    
+
     actual = JrJackson::Json.dump(object, :pretty => true)
     assert_equal "{\n  \"foo\" : 5,\n  \"utf8\" : \"żółć\"\n}", actual
   end

@@ -20,6 +20,9 @@ This release is compatible with JRuby 9.0.0.0 and higher.
 
 #### NEWS
 
+07 October 2015 - during serialisation, check and execute `to_json_data` method
+first.
+
 13th September 2015 - added support for a `to_json_data` method lookup.
 Use this if you want to provide a JSON native data structure that best
 represents your custom object.
@@ -29,7 +32,7 @@ represents your custom object.
 26th October 2013 - Added support to serialize arbitary (non JSON datatypes)
 ruby objects.  Normally the toJava internal method is called, but additionally
 to_h, to_hash, to_a and finally to_json are tried.  Be aware that the to_json
-method might invoke a new selialization session (i.e. it may use the JSON gem) 
+method might invoke a new selialization session (i.e. it may use the JSON gem)
 and impact performance.
 
 ***
@@ -61,7 +64,7 @@ The options hash respects three symbol keys
 + :use_smallint
 
   Will return Integers objects instead of BigInteger
-  
+
 ```
 JrJackson::Json.dump(obj) -> json string
       aliased as generate

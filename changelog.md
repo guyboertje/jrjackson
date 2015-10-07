@@ -1,3 +1,6 @@
+v0.3.5
+  give highest precedence to the to_json_data method
+
 v0.3.4
   fix multi_json bug
     not serializing non-string keys
@@ -90,7 +93,7 @@ v0.2.0
   extract all Java -> Ruby generation to reusable RubyUtils static class
   support BigDecimal
   remove JSON Api
-  fixes issues 5, 6, 8, 
+  fixes issues 5, 6, 8,
 
   jruby 1.7.3
   jackson 2.2.2
