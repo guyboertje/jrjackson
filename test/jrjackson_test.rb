@@ -503,6 +503,14 @@ class JrJacksonTest < Test::Unit::TestCase
     assert_equal "{\"5\":\"foo\"}", actual
   end
 
+  def test_can_serialise_regex_match_data
+    re = %r|(foo)(bar)(baz)|
+    m = re.match('foobarbaz')
+    object = {'matched' => m[2]}
+    actual = JrJackson::Json.dump(object)
+    assert_equal "{\"matched\":\"bar\"}", actual
+  end
+
   # -----------------------------
 
   def assert_bigdecimal_equal(expected, actual)

@@ -1,3 +1,7 @@
+v0.3.6
+  fix for issue 45
+    use bytelist.begin instead of 0 generating from RubyString
+
 v0.3.5
   give highest precedence to the to_json_data method
 

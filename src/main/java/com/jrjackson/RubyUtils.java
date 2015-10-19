@@ -136,7 +136,7 @@ public class RubyUtils {
 //        return result;
     }
 
-    
+
     public static void writeBytes(IRubyObject value, JsonGenerator jgen)
         throws IOException {
 //            jgen.writeString(value.toString());
@@ -145,6 +145,6 @@ public class RubyUtils {
 //            jgen.writeUTF8String(s.getBytes(), 0, s.size());
             RubyString s = (RubyString)value;
             ByteList b = s.getByteList();
-            jgen.writeUTF8String(b.unsafeBytes(), 0, b.length());
+            jgen.writeUTF8String(b.unsafeBytes(), b.begin(), b.length());
     }
 }
