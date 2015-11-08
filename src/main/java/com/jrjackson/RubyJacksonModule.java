@@ -11,6 +11,7 @@ import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
 import java.text.SimpleDateFormat;
 
 import org.jruby.Ruby;
+import org.jruby.runtime.builtin.IRubyObject;
 
 public class RubyJacksonModule extends SimpleModule {
 
@@ -23,7 +24,7 @@ public class RubyJacksonModule extends SimpleModule {
     }
 
     private RubyJacksonModule() {
-        super("JrJacksonStrModule", new Version(1, 2, 16, "0", "com.jrjackson.jruby", "jrjackson"));
+        super("JrJacksonStrModule", new Version(1, 2, 17, "0", "com.jrjackson.jruby", "jrjackson"));
     }
 
     public static ObjectMapper mapperWith(Ruby ruby, RubyKeyConverter nameConverter,
@@ -50,7 +51,12 @@ public class RubyJacksonModule extends SimpleModule {
     }
 
     public static DefaultSerializerProvider createProvider(SimpleDateFormat sdf) {
-        static_mapper.setDateFormat(sdf);
+        static_mapper.setDateFormat(sdf)
+            .registerModule(
+                new RubyJacksonModule().addSerializer(
+                    IRubyObject.class, RubyAnySerializer.instance
+                )
+            );
         return ((DefaultSerializerProvider)static_mapper.getSerializerProvider()).createInstance(
             static_mapper.getSerializationConfig(),
             static_mapper.getSerializerFactory()
@@ -62,6 +68,5 @@ public class RubyJacksonModule extends SimpleModule {
         static_mapper.enable(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS);
         return static_mapper;
     }
-
 
 }

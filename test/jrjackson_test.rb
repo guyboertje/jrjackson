@@ -511,6 +511,17 @@ class JrJacksonTest < Test::Unit::TestCase
     assert_equal "{\"matched\":\"bar\"}", actual
   end
 
+  def test_can_mix_java_and_ruby_objects
+    json = '{"utf8":"żółć", "moo": "bar", "arr": [2,3,4], "flo": 3.33}'
+
+    expected = '{"mixed":{"arr":[2,3,4],"utf8":"żółć","flo":3.33,"zzz":{"one":1.0,"two":2,"six":6.0},"moo":"bar"}}'
+    object = JrJackson::Json.parse_java(json)
+    object["zzz"] = CustomToJson.new(1.0, 2, 6.0)
+    mixed = {"mixed" => object}
+    actual = JrJackson::Json.dump(mixed)
+    assert_equal expected, actual
+  end
+
   # -----------------------------
 
   def assert_bigdecimal_equal(expected, actual)

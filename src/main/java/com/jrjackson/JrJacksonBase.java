@@ -47,10 +47,6 @@ public class JrJacksonBase extends RubyObject {
         RubyHash options = (args.length <= 1) ? RubyHash.newHash(_ruby) : args[1].convertToHash();
         String format = (String) options.get(RubyUtils.rubySymbol(_ruby, "date_format"));
 
-//        StringWriter out = new StringWriter();
-//        JsonGenerator jgen = RubyJacksonModule.factory.createGenerator(out);
-
-
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         JsonGenerator jgen = RubyJacksonModule.factory.createGenerator(
                 baos, JsonEncoding.UTF8);
@@ -78,7 +74,6 @@ public class JrJacksonBase extends RubyObject {
             ByteList bl = new ByteList(baos.toByteArray(),
                     UTF8Encoding.INSTANCE);
             return RubyString.newString(_ruby, bl);
-//            return RubyUtils.rubyString(_ruby, out.toString());
         } catch (JsonProcessingException e) {
             throw ParseError.newParseError(_ruby, e.getLocalizedMessage());
         }
