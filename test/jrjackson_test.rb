@@ -21,6 +21,8 @@ class JrJacksonTest < Test::Unit::TestCase
 #     assert_equal %Q{{"current_time":"#{time_string}"}}, serialized_output
 #   end
 # end
+  class Test::Unit::CustomObj
+  end
 
   class ToJsonData
     attr_reader :one, :two, :six
@@ -482,12 +484,17 @@ class JrJacksonTest < Test::Unit::TestCase
 
   def test_cannot_serialize_object
     err = assert_raises(JrJackson::ParseError) { JrJackson::Json.dump({"foo" => Object.new}) }
-    assert_match /Cannot find Serializer for class: org.jruby.RubyObject/, err.message
+    assert_match /Cannot serialize instance of: Object/, err.message
   end
 
   def test_cannot_serialize_basic_object
     err = assert_raises(JrJackson::ParseError) { JrJackson::Json.dump({"foo" => BasicObject.new}) }
-    assert_match /Cannot find Serializer for class: org.jruby.RubyBasicObject/, err.message
+    assert_match /Cannot serialize instance of: BasicObject/, err.message
+  end
+
+  def test_cannot_serialize_custom_object
+    err = assert_raises(JrJackson::ParseError) { JrJackson::Json.dump({"foo" => Test::Unit::CustomObj.new}) }
+    assert_match /Cannot serialize instance of: Test::Unit::CustomObj/, err.message
   end
 
   def test_supports_pretty_printing
@@ -513,11 +520,12 @@ class JrJacksonTest < Test::Unit::TestCase
 
   def test_can_mix_java_and_ruby_objects
     json = '{"utf8":"żółć", "moo": "bar", "arr": [2,3,4], "flo": 3.33}'
-
-    expected = '{"mixed":{"arr":[2,3,4],"utf8":"żółć","flo":3.33,"zzz":{"one":1.0,"two":2,"six":6.0},"moo":"bar"}}'
+    timeobj = Time.new(2015,11,11,11,11,11).utc
+    expected = '{"mixed":{"arr":[2,3,4],"utf8":"żółć","flo":3.33,"zzz":{"one":1.0,"two":2,"six":6.0},"moo":"bar"},"time":"2015-11-11 11:11:11 +0000"}'
     object = JrJackson::Json.parse_java(json)
     object["zzz"] = CustomToJson.new(1.0, 2, 6.0)
     mixed = {"mixed" => object}
+    mixed['time'] = timeobj
     actual = JrJackson::Json.dump(mixed)
     assert_equal expected, actual
   end
