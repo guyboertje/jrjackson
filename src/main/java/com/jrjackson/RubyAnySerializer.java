@@ -95,7 +95,7 @@ public class RubyAnySerializer extends JsonSerializer<IRubyObject> {
             }
             return;
         }
-        throw new JsonGenerationException("Cannot find Serializer for class: " + rubyObject.getClass().getName());
+        throw new JsonGenerationException("Cannot serialize instance of: " + meta.getRealClass().getName());
     }
 
     @Override
