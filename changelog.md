@@ -1,6 +1,14 @@
+v0.3.9
+  Thanks to mkristian, now uses jar_dependencies
+    Upgrade to Jackson v2.7.1
+  fix for issue 51
+    dont create "new RubyJacksonModule()" when creating a Provider
+  fix for reports of symbol table overflow in Jackson when using JrJackson in very long running daemons (Logstash)
+    disable the FAIL_ON_SYMBOL_HASH_OVERFLOW setting
+
 v0.3.8
   fix for issue 47
-    Update Jackson to v 0.6.3
+    Update Jackson to v 2.6.3
   Change error message to better report failure in issue 46
 
 v0.3.7
