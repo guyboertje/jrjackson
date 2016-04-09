@@ -4,6 +4,7 @@ unless RUBY_PLATFORM =~ /java/
 end
 
 require_relative "jars/jrjackson-1.2.17.jar"
+require_relative '../jrjackson_jars'
 # require_relative "linked/jrjackson-1.2.17.jar"
 
 require 'com/jrjackson/jr_jackson'
