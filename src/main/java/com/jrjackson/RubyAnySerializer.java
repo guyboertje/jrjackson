@@ -17,19 +17,32 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import org.jruby.RubyArray;
 import org.jruby.RubyBignum;
-import org.jruby.RubyBoolean;
 import org.jruby.RubyClass;
-import org.jruby.RubyFixnum;
-import org.jruby.RubyFloat;
 import org.jruby.RubyHash;
 import org.jruby.RubyNumeric;
 import org.jruby.RubyObject;
 import org.jruby.RubyString;
-import org.jruby.RubyStruct;
-import org.jruby.RubySymbol;
 import org.jruby.RubyTime;
 
+
 public class RubyAnySerializer extends JsonSerializer<IRubyObject> {
+
+    enum RUBYCLASS {
+
+        String,
+        Float,
+        BigDecimal,
+        Time,
+        Array,
+        Hash,
+        Fixnum,
+        Bignum,
+        Date,
+        Symbol,
+        Struct,
+        TrueClass,
+        FalseClass;
+    }
 
     /**
      * Singleton instance to use.""
@@ -88,14 +101,13 @@ public class RubyAnySerializer extends JsonSerializer<IRubyObject> {
         if (!method.isUndefined()) {
             RubyObject obj = (RubyObject) method.call(ctx, rubyObject, meta, "to_json");
             if (obj instanceof RubyString) {
-
                 jgen.writeRawValue(obj.toString());
             } else {
                 serialize(obj, jgen, provider);
             }
             return;
         }
-        throw new JsonGenerationException("Cannot serialize instance of: " + meta.getRealClass().getName());
+        throw new JsonGenerationException("Cannot serialize instance of: " + meta.getRealClass().getName(), jgen);
     }
 
     @Override
@@ -110,56 +122,61 @@ public class RubyAnySerializer extends JsonSerializer<IRubyObject> {
 
             provider.defaultSerializeValue(((JavaProxy) value).getObject(), jgen);
 
-        } else if (value instanceof RubyString) {
-
-            RubyUtils.writeBytes(value, jgen);
-
-        } else if (value instanceof RubySymbol) {
-//            jgen.writeString(value.toString());
-            RubyString s = ((RubySymbol) value).asString();
-            jgen.writeUTF8String(s.getBytes(), 0, s.size());
-
-        } else if (value instanceof RubyBoolean) {
-
-            jgen.writeBoolean(value.isTrue());
-
-        } else if (value instanceof RubyFloat) {
-
-            jgen.writeNumber(RubyNumeric.num2dbl(value));
-
-        } else if (value instanceof RubyFixnum) {
-
-            jgen.writeNumber(RubyNumeric.num2long(value));
-
-        } else if (value instanceof RubyBignum) {
-
-            jgen.writeNumber(((RubyBignum) value).getBigIntegerValue());
-
-        } else if (value instanceof RubyBigDecimal) {
-
-            jgen.writeNumber(((RubyBigDecimal) value).getBigDecimalValue());
-
-        } else if (value instanceof RubyHash) {
-
-            serializeHash(value, jgen, provider);
-
-        } else if (value instanceof RubyArray) {
-
-            serializeArray(value, jgen, provider);
-
-        } else if (value instanceof RubyStruct) {
-
-            IRubyObject obj = value.callMethod(value.getRuntime().getCurrentContext(), "to_a");
-            serializeArray(obj, jgen, provider);
-
-        } else if (value instanceof RubyTime) {
-//            System.err.println("------->>>> RubyTime");
-            serializeTime((RubyTime) value, jgen, provider);
-
         } else {
 
-            serializeUnknownRubyObject(value.getRuntime().getCurrentContext(), value, jgen, provider);
+            String rubyClassName = value.getMetaClass().getRealClass().getName();
+            RUBYCLASS clazz;
 
+            try {
+                clazz = RUBYCLASS.valueOf(rubyClassName);
+            } catch (IllegalArgumentException e) {
+                serializeUnknownRubyObject(value.getRuntime().getCurrentContext(), value, jgen, provider);
+                return;
+            }
+
+            switch (clazz) {
+                case Hash:
+                    serializeHash(value, jgen, provider);
+                    break;
+                case Array:
+                    serializeArray(value, jgen, provider);
+                    break;
+                case String:
+                    RubyUtils.writeBytes(value, jgen);
+                    break;
+                case Symbol:
+                case Date:
+                    // Date to_s -> yyyy-mm-dd
+                    RubyString s = value.asString();
+                    jgen.writeUTF8String(s.getBytes(), 0, s.size());
+                    break;
+                case TrueClass:
+                case FalseClass:
+                    jgen.writeBoolean(value.isTrue());
+                    break;
+                case Float:
+                    jgen.writeNumber(RubyNumeric.num2dbl(value));
+                    break;
+                case Fixnum:
+                    jgen.writeNumber(RubyNumeric.num2long(value));
+                    break;
+                case Bignum:
+                    jgen.writeNumber(((RubyBignum) value).getBigIntegerValue());
+                    break;
+                case BigDecimal:
+                    jgen.writeNumber(((RubyBigDecimal) value).getBigDecimalValue());
+                    break;
+                case Struct:
+                    IRubyObject obj = value.callMethod(value.getRuntime().getCurrentContext(), "to_a");
+                    serializeArray(obj, jgen, provider);
+                    break;
+                case Time:
+                    serializeTime((RubyTime) value, jgen, provider);
+                    break;
+                default:
+                    serializeUnknownRubyObject(value.getRuntime().getCurrentContext(), value, jgen, provider);
+                    break;
+            }
         }
     }
 
@@ -209,8 +226,8 @@ public class RubyAnySerializer extends JsonSerializer<IRubyObject> {
 
     private void serializeKey(IRubyObject key, JsonGenerator jgen, SerializerProvider provider)
             throws IOException, JsonGenerationException {
-        if(key instanceof RubyString) {
-            jgen.writeFieldName(((RubyString)key).decodeString());
+        if (key instanceof RubyString) {
+            jgen.writeFieldName(((RubyString) key).decodeString());
         } else {
             // includes RubySymbol and non RubyString objects
             jgen.writeFieldName(key.toString());

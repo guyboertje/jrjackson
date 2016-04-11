@@ -20,9 +20,3 @@ Benchmark.bmbm(BenchOptions.output_width) do |x|
     BenchOptions.iterations.times { JrJackson::Java.parse(dumped_string, opts) }
   end
 end
-
-Benchmark.bmbm(BenchOptions.output_width) do |x| 
-  x.report("jackson parse ruby compat: #{BenchOptions.iterations}") do
-    BenchOptions.iterations.times { JrJackson::Ruby.compat_parse(dumped_string, {}) }
-  end
-end

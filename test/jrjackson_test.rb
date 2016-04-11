@@ -4,12 +4,15 @@ $LOAD_PATH << File.expand_path('../../lib', __FILE__)
 
 require "java"
 
+require 'securerandom'
+
 require 'test/unit'
 require 'thread'
 require 'bigdecimal'
 require 'jrjackson'
 require 'stringio'
 require 'time'
+require 'date'
 
 class JrJacksonTest < Test::Unit::TestCase
 #   def test_serialize_date
@@ -236,6 +239,13 @@ class JrJacksonTest < Test::Unit::TestCase
     assert_equal expected, actual
   end
 
+  def test_dump_date_in_array
+    expected = "[\"2016-04-10\"]"
+    td = Date.new(2016, 4, 10)
+    actual = JrJackson::Json.generate([td])
+    assert_equal(actual, expected)
+  end
+
   def test_threading
     q1, q2, q3 = Queue.new, Queue.new, Queue.new
 
@@ -389,28 +399,6 @@ class JrJacksonTest < Test::Unit::TestCase
     assert_equal expected, actual
   end
 
-  def test_can_compat_parse_returning_ruby_objects_string_keys
-    expected = {
-      "a"=>"żółć", # string
-      "b"=>true,    # boolean
-      "c"=>12345,   # number
-      "d"=>
-       [true,
-        [false,
-         [-123456789, nil],
-         0.39676E1,
-         ["Something else.", false],
-         nil]], # mix it up array
-      "e"=>{"zero"=>nil, "one"=>1, "two"=>2, "three"=>[3], "four"=>[0, 1, 2, 3, 4]}, # hash
-      "żółć"=>nil,# nil
-      "h"=>{"a"=>{"b"=>{"c"=>{"d"=>{"e"=>{"f"=>{"g"=>nil}}}}}}},# deep hash, not that deep
-      "i"=>[[[[[[[nil]]]]]]] # deep array, again, not that deep
-    }
-    json = JrJackson::Json.dump(expected)
-    actual = JrJackson::Ruby.compat_parse(json, {})
-    assert_equal expected, actual
-  end
-
   def test_can_parse_returning_ruby_objects_symbol_keys
     expected = {:a=>"Alpha",
      :b=>true,
@@ -542,5 +530,4 @@ class JrJacksonTest < Test::Unit::TestCase
     assert_equal BigDecimal.new(expected.to_s).round(11), BigDecimal.new(actual.to_s).round(11)
     assert_equal Java::JavaMath::BigDecimal, actual.class
   end
-
 end

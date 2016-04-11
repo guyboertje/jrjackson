@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import java.io.ByteArrayOutputStream;
 import org.jruby.RubyHash;
 import org.jruby.RubyIO;
@@ -37,8 +38,6 @@ import org.jruby.util.ByteList;
  */
 public class JrJacksonBase extends RubyObject {
 
-    private static final SimpleDateFormat RDF = new RubyDateFormat("yyyy-MM-dd HH:mm:ss Z");
-
     // serialize
     @JRubyMethod(module = true, name = {"generate", "dump"}, required = 1, optional = 1)
     public static IRubyObject generate(ThreadContext context, IRubyObject self, IRubyObject[] args)
@@ -55,21 +54,20 @@ public class JrJacksonBase extends RubyObject {
             jgen.useDefaultPrettyPrinter();
         }
 
-        SimpleDateFormat simpleFormat;
+        SerializerProvider provider;
         if (format != null) {
-            simpleFormat = new SimpleDateFormat(format);
+            SimpleDateFormat simpleFormat = new SimpleDateFormat(format);
             String timezone = (String) options.get(RubyUtils.rubySymbol(_ruby, "timezone"));
             if (timezone != null) {
                 simpleFormat.setTimeZone(TimeZone.getTimeZone(timezone));
             }
+            provider = RubyJacksonModule.createProvider(simpleFormat);
         } else {
-            // using a 'marker' class instance, will not use later but default to #to_s
-            simpleFormat = RDF;
+            provider = RubyJacksonModule.createProvider();
         }
 
         try {
-            RubyAnySerializer.instance.serialize(args[0], jgen,
-                    RubyJacksonModule.createProvider(simpleFormat));
+            RubyAnySerializer.instance.serialize(args[0], jgen, provider);
             jgen.close();
             ByteList bl = new ByteList(baos.toByteArray(),
                     UTF8Encoding.INSTANCE);
@@ -89,7 +87,7 @@ public class JrJacksonBase extends RubyObject {
     }
 
     protected static boolean flagged(RubyHash opts, RubySymbol key, boolean returnVal) {
-        if(!opts.containsKey(key)) {
+        if (!opts.containsKey(key)) {
             return returnVal;
         }
         Object val = opts.get(key);

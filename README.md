@@ -57,7 +57,7 @@ The options hash respects three symbol keys
 
 + :use_bigdecimal
 
-  Will return BigDecimal objects instead of Float
+  Will return BigDecimal objects instead of Float.
   If used with the :raw option you will get Java::JavaMath::BigDecimal objects
   otherwise they are Ruby BigDecimal
 

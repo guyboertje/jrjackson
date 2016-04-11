@@ -3,9 +3,9 @@ unless RUBY_PLATFORM =~ /java/
   exit 255
 end
 
-require_relative "jars/jrjackson-1.2.17.jar"
-require_relative '../jrjackson_jars'
-# require_relative "linked/jrjackson-1.2.17.jar"
+require "jrjackson_jars"
+
+require_relative "jars/jrjackson-1.2.18.jar"
 
 require 'com/jrjackson/jr_jackson'
 require 'bigdecimal'
@@ -63,7 +63,9 @@ module JrJackson
         when nil
           'null'
         else
-          if object.respond_to?(:to_json)
+          if object.respond_to?(:to_json_data)
+            JrJackson::Base.generate(object, options)
+          elsif object.respond_to?(:to_json)
             object.to_json
           elsif object.respond_to?(:to_s)
             object.to_s

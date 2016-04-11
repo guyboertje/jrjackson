@@ -1,6 +1,6 @@
 #-*- mode: ruby -*-
 
-VERSION='1.2.17'
+VERSION='1.2.18'
 gemspec :jar => "jrjackson/jars/jrjackson-#{VERSION}.jar"
 
 # overwrite groupId:artifacgtId:version from gem
