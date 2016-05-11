@@ -5,7 +5,7 @@ end
 
 require "jrjackson_jars"
 
-require_relative "jars/jrjackson-1.2.18.jar"
+require_relative "jars/jrjackson-1.2.19.jar"
 
 require 'com/jrjackson/jr_jackson'
 require 'bigdecimal'

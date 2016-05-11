@@ -1,6 +1,6 @@
 #-*- mode: ruby -*-
 
-VERSION='1.2.18'
+VERSION='1.2.19'
 gemspec :jar => "jrjackson/jars/jrjackson-#{VERSION}.jar"
 
 # overwrite groupId:artifacgtId:version from gem
@@ -18,7 +18,7 @@ jar 'junit:junit', '4.11', :scope => :test
 jar 'org.jruby:jruby', '9.0.5.0', :scope => :provided
 
 plugin :compiler, '3.1', :source => '1.7', :target => '1.7',
-       :showDeprecateion => false,
+       :showDeprecation => false,
        :showWarnings => false,
        :executable => '${JAVA_HOME}/bin/javac',
        :fork => true

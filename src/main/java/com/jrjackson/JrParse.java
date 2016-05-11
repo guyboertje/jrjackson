@@ -1,13 +1,13 @@
 package com.jrjackson;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonStreamContext;
-import java.io.IOException;
-import java.util.HashMap;
 import org.jruby.RubyArray;
 import org.jruby.RubyHash;
 import org.jruby.runtime.builtin.IRubyObject;
+
+import java.io.IOException;
+import java.util.HashMap;
 
 
 /**
@@ -16,29 +16,25 @@ import org.jruby.runtime.builtin.IRubyObject;
  */
 public class JrParse {
     private final RubyHandler _handler;
-    protected final HashMap<JsonStreamContext, IRubyObject> _objectMap = new HashMap<JsonStreamContext, IRubyObject>();
-    protected JsonStreamContext _deepestContext;
+    private final HashMap<JsonStreamContext, IRubyObject> _objectMap = new HashMap<JsonStreamContext, IRubyObject>();
+    private JsonStreamContext _deepestContext;
     
     public JrParse(RubyHandler handler) {
         _handler = handler;
-        
     }
-    
-    public void deserialize(JsonParser jp) throws JsonProcessingException, IOException {
+
+    public void deserialize(JsonParser jp) throws IOException {
         try {
-            
+
             while (jp.nextValue() != null) {
-                handleCurrentToken(jp);
+                handleRubyToken(jp);
             }
-            
-        } catch (JsonProcessingException e) {
-            _handler.raiseError(e.getLocalizedMessage());
         } catch (IOException e) {
             _handler.raiseError(e.getLocalizedMessage());
         }
     }
-    
-    private void callAddValue(JsonStreamContext x) {
+
+    private void addRubyValue(JsonStreamContext x) {
         JsonStreamContext px = x.getParent();
         IRubyObject dtarget = _objectMap.get(_deepestContext);
         
@@ -54,28 +50,28 @@ public class JrParse {
                     (RubyArray)value, dtarget);
         } else if (x.inObject()) {
             _handler.hashSet(
-                    (RubyHash)value, callHashKey(x), dtarget);
+                    (RubyHash)value, getRubyHashKey(x), dtarget);
 
         } else {
             _handler.addValue(value);
         }
     }
     
-    private void callAddValue(JsonStreamContext x, IRubyObject val) {
+    private void addRubyValue(JsonStreamContext x, IRubyObject val) {
         
         if (x.inArray()) {
             RubyArray a = (RubyArray)_objectMap.get(x);
             _handler.arrayAppend(a, val);
         } else if (x.inObject()) {
             RubyHash h = (RubyHash)_objectMap.get(x);
-            _handler.hashSet(h, callHashKey(x), val);
+            _handler.hashSet(h, getRubyHashKey(x), val);
             
         } else {
             _handler.addValue(val);
         }
     }
     
-    private IRubyObject callHashKey(JsonStreamContext x) {
+    private IRubyObject getRubyHashKey(JsonStreamContext x) {
         String k = x.getCurrentName();
         if (k == null) {
             return _handler.treatNull();
@@ -83,8 +79,8 @@ public class JrParse {
         return _handler.hashKey(k);
     }
     
-    private void handleCurrentToken(JsonParser jp)
-            throws IOException, JsonProcessingException {
+    protected void handleRubyToken(JsonParser jp)
+            throws IOException {
         
         JsonStreamContext cx = jp.getParsingContext();
         
@@ -107,41 +103,38 @@ public class JrParse {
                 break;
                 
             case VALUE_STRING:
-                callAddValue(cx, 
-                        _handler.treatString(jp));
+                addRubyValue(cx, _handler.treatString(jp));
                 break;
             
             case VALUE_NUMBER_INT:
-                callAddValue(cx,
-                        _handler.treatInt(jp));
+                addRubyValue(cx, _handler.treatInt(jp));
                 break;
                 
             case VALUE_NUMBER_FLOAT:
-                callAddValue(cx,
-                        _handler.treatFloat(jp));
+                addRubyValue(cx, _handler.treatFloat(jp));
                 break;
                 
             case VALUE_TRUE:
-                callAddValue(cx, _handler.trueValue());
+                addRubyValue(cx, _handler.trueValue());
                 break;
 
             case VALUE_FALSE:
-                callAddValue(cx, _handler.falseValue());
+                addRubyValue(cx, _handler.falseValue());
                 break;
 
             case VALUE_NULL: // should not get this but...
-                callAddValue(cx, _handler.treatNull());
+                addRubyValue(cx, _handler.treatNull());
                 break;
 
             case END_ARRAY:
                 _handler.arrayEnd();
-                callAddValue(cx);
+                addRubyValue(cx);
                 _deepestContext = cx;
                 break;
 
             case END_OBJECT:
                 _handler.hashEnd();
-                callAddValue(cx);
+                addRubyValue(cx);
                 _deepestContext = cx;
                 break;
         }

@@ -192,7 +192,7 @@ public class SchParse  extends StreamParse {
     }
     
 }
-//        System.out.println("--- callAddValue final ---");
+//        System.out.println("--- addRubyValue final ---");
 //        if (px != null) {
 //            System.out.println("-------- parent --------");
 //            System.out.println(px.getTypeDesc());

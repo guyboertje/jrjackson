@@ -15,16 +15,11 @@ require 'time'
 require 'date'
 
 class JrJacksonTest < Test::Unit::TestCase
-#   def test_serialize_date
-#     # default date format
-#     time_string = "2014-12-18 18:18:18 +0000"
-#     source_time = Time.parse(time_string)
-#     # source_time = Date.today
-#     serialized_output = JrJackson::Json.dump({current_time: source_time})
-#     assert_equal %Q{{"current_time":"#{time_string}"}}, serialized_output
-#   end
-# end
   class Test::Unit::CustomObj
+  end
+
+  class Test::Unit::NullObj < BasicObject
+    def nil?() true; end
   end
 
   class ToJsonData
@@ -470,24 +465,32 @@ class JrJacksonTest < Test::Unit::TestCase
 
   end
 
-  def test_cannot_serialize_object
-    err = assert_raises(JrJackson::ParseError) { JrJackson::Json.dump({"foo" => Object.new}) }
-    assert_match /Cannot serialize instance of: Object/, err.message
+  def test_can_serialize_object
+    obj = Object.new
+    actual = JrJackson::Json.dump({"foo" => obj})
+    assert_equal "{\"foo\":\"#{obj}\"}", actual
   end
 
-  def test_cannot_serialize_basic_object
-    err = assert_raises(JrJackson::ParseError) { JrJackson::Json.dump({"foo" => BasicObject.new}) }
-    assert_match /Cannot serialize instance of: BasicObject/, err.message
+  def test_can_serialize_basic_object
+    obj = BasicObject.new
+    actual = JrJackson::Json.dump({"foo" => obj})
+    assert_equal "{\"foo\":\"#<BasicObject>\"}", actual
   end
 
-  def test_cannot_serialize_custom_object
-    err = assert_raises(JrJackson::ParseError) { JrJackson::Json.dump({"foo" => Test::Unit::CustomObj.new}) }
-    assert_match /Cannot serialize instance of: Test::Unit::CustomObj/, err.message
+  def test_can_serialize_basic_object_subclass
+    obj = Test::Unit::NullObj.new
+    actual = JrJackson::Json.dump({"foo" => obj})
+    assert_equal "{\"foo\":\"#<Test::Unit::NullObj>\"}", actual
+  end
+
+  def test_can_serialize_custom_object
+    obj = Test::Unit::CustomObj.new
+    actual = JrJackson::Json.dump({"foo" => obj})
+    assert_equal "{\"foo\":\"#{obj}\"}", actual
   end
 
   def test_supports_pretty_printing
     object = {"foo" => 5, "utf8" => "żółć"}
-
     actual = JrJackson::Json.dump(object, :pretty => true)
     assert_equal "{\n  \"foo\" : 5,\n  \"utf8\" : \"żółć\"\n}", actual
   end
@@ -516,6 +519,20 @@ class JrJacksonTest < Test::Unit::TestCase
     mixed['time'] = timeobj
     actual = JrJackson::Json.dump(mixed)
     assert_equal expected, actual
+  end
+
+  def test_can_serialize_exceptions
+    e = StandardError.new("Something immensely bad happened")
+    object = {'error' => e}
+
+    actual = JrJackson::Json.dump(object)
+    assert_equal "{\"error\":\"#{e.inspect}\"}", actual
+  end
+
+  def test_can_serialize_class
+    object = {"foo" => BasicObject}
+    actual = JrJackson::Json.dump(object)
+    assert_equal "{\"foo\":\"#{BasicObject.inspect}\"}", actual
   end
 
   # -----------------------------

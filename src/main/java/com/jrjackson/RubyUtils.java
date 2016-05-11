@@ -1,32 +1,23 @@
 package com.jrjackson;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import java.io.IOException;
-import java.util.*;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.jruby.Ruby;
-import org.jruby.RubyArray;
-import org.jruby.RubyBignum;
-import org.jruby.RubyBoolean;
-import org.jruby.RubyFixnum;
-import org.jruby.RubyFloat;
-import org.jruby.RubyHash;
-import org.jruby.RubyObject;
-import org.jruby.RubyString;
-import org.jruby.RubySymbol;
-
-import org.jruby.javasupport.JavaUtil;
+import org.jruby.*;
 import org.jruby.ext.bigdecimal.RubyBigDecimal;
+import org.jruby.javasupport.JavaUtil;
 import org.jruby.runtime.builtin.IRubyObject;
 import org.jruby.util.ByteList;
 import org.jruby.util.SafeDoubleParser;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public class RubyUtils {
 
@@ -105,6 +96,14 @@ public class RubyUtils {
         RubyHash hash = rubyHash(ruby, key1, value1);
         hash.fastASet(key2, value2);
         return hash;
+    }
+
+    public static boolean isBasicObjectOrSubclass(IRubyObject object) {
+        List<IRubyObject> list = object.getMetaClass().getAncestorList();
+        for (IRubyObject entry : list) {
+            if("Kernel".equalsIgnoreCase(entry.toString())) return false;
+        }
+        return true;
     }
 
     public static String jodaTimeString(DateTime dt) {

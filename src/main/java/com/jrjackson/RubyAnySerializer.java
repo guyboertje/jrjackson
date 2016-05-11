@@ -5,8 +5,8 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
+import org.jruby.*;
 import org.jruby.ext.bigdecimal.RubyBigDecimal;
-
 import org.jruby.internal.runtime.methods.DynamicMethod;
 import org.jruby.java.proxies.JavaProxy;
 import org.jruby.runtime.ThreadContext;
@@ -15,39 +15,17 @@ import org.jruby.runtime.builtin.IRubyObject;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import org.jruby.RubyArray;
-import org.jruby.RubyBignum;
-import org.jruby.RubyClass;
-import org.jruby.RubyHash;
-import org.jruby.RubyNumeric;
-import org.jruby.RubyObject;
-import org.jruby.RubyString;
-import org.jruby.RubyTime;
 
 
 public class RubyAnySerializer extends JsonSerializer<IRubyObject> {
-
-    enum RUBYCLASS {
-
-        String,
-        Float,
-        BigDecimal,
-        Time,
-        Array,
-        Hash,
-        Fixnum,
-        Bignum,
-        Date,
-        Symbol,
-        Struct,
-        TrueClass,
-        FalseClass;
-    }
 
     /**
      * Singleton instance to use.""
      */
     public static final RubyAnySerializer instance = new RubyAnySerializer();
+    private static final String HLT = "#<";
+    private static final String CSP = ": ";
+    private static final String GT = ">";
 
     public RubyAnySerializer() {
 //        super(IRubyObject.class);
@@ -107,12 +85,23 @@ public class RubyAnySerializer extends JsonSerializer<IRubyObject> {
             }
             return;
         }
-        throw new JsonGenerationException("Cannot serialize instance of: " + meta.getRealClass().getName(), jgen);
+
+        if (!RubyUtils.isBasicObjectOrSubclass(rubyObject) && rubyObject.respondsTo("to_s")) {
+            String result = rubyObject.toString();
+            jgen.writeString(result);
+        } else {
+            String name = meta.getRealClass().getName();
+            StringBuilder sb = new StringBuilder(2 + name.length());
+            sb.append(HLT).append(name).append(GT);
+            jgen.writeString(sb.toString());
+        }
     }
 
     @Override
     public void serialize(IRubyObject value, JsonGenerator jgen, SerializerProvider provider)
             throws IOException, JsonGenerationException {
+
+        String rubyClassName = value.getType().getName();
 
         if (value.isNil()) {
 
@@ -122,9 +111,19 @@ public class RubyAnySerializer extends JsonSerializer<IRubyObject> {
 
             provider.defaultSerializeValue(((JavaProxy) value).getObject(), jgen);
 
+        } else if (value instanceof RubyException) {
+            RubyException re = (RubyException) value;
+            String msg = re.message(value.getRuntime().getCurrentContext()).toString();
+            StringBuilder sb = new StringBuilder(5 + rubyClassName.length() + msg.length());
+            sb.append(HLT).append(rubyClassName).append(CSP).append(msg).append(GT);
+            jgen.writeString(sb.toString());
+
+        } else if (value.isClass() || value.isModule()) {
+
+            jgen.writeString(value.inspect().toString());
+
         } else {
 
-            String rubyClassName = value.getMetaClass().getRealClass().getName();
             RUBYCLASS clazz;
 
             try {
@@ -250,5 +249,21 @@ public class RubyAnySerializer extends JsonSerializer<IRubyObject> {
         typeSer.writeTypePrefixForScalar(value, jgen);
         serialize(value, jgen, provider);
         typeSer.writeTypeSuffixForScalar(value, jgen);
+    }
+
+    enum RUBYCLASS {
+        String,
+        Float,
+        BigDecimal,
+        Time,
+        Array,
+        Hash,
+        Fixnum,
+        Bignum,
+        Date,
+        Symbol,
+        Struct,
+        TrueClass,
+        FalseClass
     }
 }

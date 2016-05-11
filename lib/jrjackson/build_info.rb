@@ -1,11 +1,11 @@
 module JrJackson
   module BuildInfo
     def self.version
-      '0.3.9'
+      '0.4.0'
     end
 
     def self.release_date
-      '2016-04-09'
+      '2016-05-11'
     end
 
     def self.files
