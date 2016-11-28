@@ -27,6 +27,8 @@ public class RubyAnySerializer extends JsonSerializer<IRubyObject> {
     private static final String CSP = ": ";
     private static final String GT = ">";
 
+    private static final RUBYCLASS[] CLASS_NAMES = RUBYCLASS.values();
+
     public RubyAnySerializer() {
 //        super(IRubyObject.class);
 
@@ -104,78 +106,87 @@ public class RubyAnySerializer extends JsonSerializer<IRubyObject> {
         String rubyClassName = value.getType().getName();
 
         if (value.isNil()) {
-
             jgen.writeNull(); // for RubyNil and NullObjects
+            return;
+        }
 
-        } else if (value instanceof JavaProxy) {
-
+        if (value instanceof JavaProxy) {
             provider.defaultSerializeValue(((JavaProxy) value).getObject(), jgen);
+            return;
+        }
 
-        } else if (value instanceof RubyException) {
+        if (value instanceof RubyStruct) {
+            IRubyObject obj = value.callMethod(value.getRuntime().getCurrentContext(), "to_a");
+            serializeArray(obj, jgen, provider);
+            return;
+        }
+
+        if (value instanceof RubyException) {
             RubyException re = (RubyException) value;
             String msg = re.message(value.getRuntime().getCurrentContext()).toString();
             StringBuilder sb = new StringBuilder(5 + rubyClassName.length() + msg.length());
             sb.append(HLT).append(rubyClassName).append(CSP).append(msg).append(GT);
             jgen.writeString(sb.toString());
+            return;
+        }
 
-        } else if (value.isClass() || value.isModule()) {
-
+        if (value.isClass() || value.isModule()) {
             jgen.writeString(value.inspect().toString());
+            return;
+        }
 
-        } else {
+        RUBYCLASS clazz = null;
 
-            RUBYCLASS clazz;
+        for(RUBYCLASS v : CLASS_NAMES) {
+            if(rubyClassName.equals(v.name())) {
+                clazz = v;
+                break;
+            }
+        }
 
-            try {
-                clazz = RUBYCLASS.valueOf(rubyClassName);
-            } catch (IllegalArgumentException e) {
+        if (clazz == null) {
+            serializeUnknownRubyObject(value.getRuntime().getCurrentContext(), value, jgen, provider);
+            return;
+        }
+
+        switch (clazz) {
+            case Hash:
+                serializeHash(value, jgen, provider);
+                break;
+            case Array:
+                serializeArray(value, jgen, provider);
+                break;
+            case String:
+                RubyUtils.writeBytes(value, jgen);
+                break;
+            case Symbol:
+            case Date:
+                // Date to_s -> yyyy-mm-dd
+                RubyString s = value.asString();
+                jgen.writeUTF8String(s.getBytes(), 0, s.size());
+                break;
+            case TrueClass:
+            case FalseClass:
+                jgen.writeBoolean(value.isTrue());
+                break;
+            case Float:
+                jgen.writeNumber(RubyNumeric.num2dbl(value));
+                break;
+            case Fixnum:
+                jgen.writeNumber(RubyNumeric.num2long(value));
+                break;
+            case Bignum:
+                jgen.writeNumber(((RubyBignum) value).getBigIntegerValue());
+                break;
+            case BigDecimal:
+                jgen.writeNumber(((RubyBigDecimal) value).getBigDecimalValue());
+                break;
+            case Time:
+                serializeTime((RubyTime) value, jgen, provider);
+                break;
+            default:
                 serializeUnknownRubyObject(value.getRuntime().getCurrentContext(), value, jgen, provider);
-                return;
-            }
-
-            switch (clazz) {
-                case Hash:
-                    serializeHash(value, jgen, provider);
-                    break;
-                case Array:
-                    serializeArray(value, jgen, provider);
-                    break;
-                case String:
-                    RubyUtils.writeBytes(value, jgen);
-                    break;
-                case Symbol:
-                case Date:
-                    // Date to_s -> yyyy-mm-dd
-                    RubyString s = value.asString();
-                    jgen.writeUTF8String(s.getBytes(), 0, s.size());
-                    break;
-                case TrueClass:
-                case FalseClass:
-                    jgen.writeBoolean(value.isTrue());
-                    break;
-                case Float:
-                    jgen.writeNumber(RubyNumeric.num2dbl(value));
-                    break;
-                case Fixnum:
-                    jgen.writeNumber(RubyNumeric.num2long(value));
-                    break;
-                case Bignum:
-                    jgen.writeNumber(((RubyBignum) value).getBigIntegerValue());
-                    break;
-                case BigDecimal:
-                    jgen.writeNumber(((RubyBigDecimal) value).getBigDecimalValue());
-                    break;
-                case Struct:
-                    IRubyObject obj = value.callMethod(value.getRuntime().getCurrentContext(), "to_a");
-                    serializeArray(obj, jgen, provider);
-                    break;
-                case Time:
-                    serializeTime((RubyTime) value, jgen, provider);
-                    break;
-                default:
-                    serializeUnknownRubyObject(value.getRuntime().getCurrentContext(), value, jgen, provider);
-                    break;
-            }
+                break;
         }
     }
 
@@ -253,16 +264,15 @@ public class RubyAnySerializer extends JsonSerializer<IRubyObject> {
 
     enum RUBYCLASS {
         String,
+        Fixnum,
+        Hash,
+        Array,
         Float,
         BigDecimal,
         Time,
-        Array,
-        Hash,
-        Fixnum,
         Bignum,
         Date,
         Symbol,
-        Struct,
         TrueClass,
         FalseClass
     }
