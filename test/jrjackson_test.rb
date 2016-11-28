@@ -76,6 +76,9 @@ class JrJacksonTest < Test::Unit::TestCase
 
   CustomStruct = Struct.new(:one, :two, :six)
 
+  class StrangeError < RuntimeError
+
+  end
 
   class ScHandler
     attr_accessor :calls
@@ -522,9 +525,8 @@ class JrJacksonTest < Test::Unit::TestCase
   end
 
   def test_can_serialize_exceptions
-    e = StandardError.new("Something immensely bad happened")
+    e = StrangeError.new("Something immensely bad happened")
     object = {'error' => e}
-
     actual = JrJackson::Json.dump(object)
     assert_equal "{\"error\":\"#{e.inspect}\"}", actual
   end

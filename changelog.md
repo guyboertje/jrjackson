@@ -1,3 +1,10 @@
+v0.4.1
+  fix for issue 55
+    Refactor AnySerializer acceptable class detection that does not use an exception
+
+v0.4.0
+  Implement `to_s` and Exception serialization
+
 v0.3.9
   Thanks to mkristian, now uses jar_dependencies
     Upgrade to Jackson v2.7.1
