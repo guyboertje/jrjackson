@@ -1,6 +1,6 @@
 #-*- mode: ruby -*-
 
-VERSION='1.2.19'
+VERSION='1.2.20'
 gemspec :jar => "jrjackson/jars/jrjackson-#{VERSION}.jar"
 
 # overwrite groupId:artifacgtId:version from gem
@@ -15,7 +15,7 @@ properties 'project.build.sourceEncoding' => 'UTF-8',
 
 jar 'junit:junit', '4.11', :scope => :test
 
-jar 'org.jruby:jruby', '9.0.5.0', :scope => :provided
+jar 'org.jruby:jruby', '9.1.5.0', :scope => :provided
 
 plugin :compiler, '3.1', :source => '1.7', :target => '1.7',
        :showDeprecation => false,
