@@ -2,15 +2,15 @@
 begin
   require 'jar_dependencies'
 rescue LoadError
-  require 'com/fasterxml/jackson/core/jackson-databind/2.7.3/jackson-databind-2.7.3.jar'
-  require 'com/fasterxml/jackson/core/jackson-annotations/2.7.3/jackson-annotations-2.7.3.jar'
-  require 'com/fasterxml/jackson/module/jackson-module-afterburner/2.7.3/jackson-module-afterburner-2.7.3.jar'
-  require 'com/fasterxml/jackson/core/jackson-core/2.7.3/jackson-core-2.7.3.jar'
+  require 'com/fasterxml/jackson/core/jackson-databind/2.9.1/jackson-databind-2.9.1.jar'
+  require 'com/fasterxml/jackson/core/jackson-annotations/2.9.1/jackson-annotations-2.9.1.jar'
+  require 'com/fasterxml/jackson/module/jackson-module-afterburner/2.9.1/jackson-module-afterburner-2.9.1.jar'
+  require 'com/fasterxml/jackson/core/jackson-core/2.9.1/jackson-core-2.9.1.jar'
 end
 
 if defined? Jars
-  require_jar( 'com.fasterxml.jackson.core', 'jackson-databind', '2.7.3' )
-  require_jar( 'com.fasterxml.jackson.core', 'jackson-annotations', '2.7.3' )
-  require_jar( 'com.fasterxml.jackson.module', 'jackson-module-afterburner', '2.7.3' )
-  require_jar( 'com.fasterxml.jackson.core', 'jackson-core', '2.7.3' )
+  require_jar( 'com.fasterxml.jackson.core', 'jackson-databind', '2.9.1' )
+  require_jar( 'com.fasterxml.jackson.core', 'jackson-annotations', '2.9.1' )
+  require_jar( 'com.fasterxml.jackson.module', 'jackson-module-afterburner', '2.9.1' )
+  require_jar( 'com.fasterxml.jackson.core', 'jackson-core', '2.9.1' )
 end
