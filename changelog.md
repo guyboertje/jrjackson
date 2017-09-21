@@ -1,4 +1,4 @@
-v0.4.2
+v0.4.3
   bump Jackson to v2.9.1
   make static_mapper public
   
