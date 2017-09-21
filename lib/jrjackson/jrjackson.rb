@@ -4,8 +4,9 @@ unless RUBY_PLATFORM =~ /java/
 end
 
 require "jrjackson_jars"
+require_relative "build_info"
 
-require_relative "jars/jrjackson-1.2.20.jar"
+require_relative "jars/jrjackson-#{JrJackson::BuildInfo.jar_version}.jar"
 
 require 'com/jrjackson/jr_jackson'
 require 'bigdecimal'

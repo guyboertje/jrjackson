@@ -1,3 +1,7 @@
+v0.4.2
+  bump Jackson to v2.9.1
+  make static_mapper public
+  
 v0.4.1
   fix for issue 55
     Refactor AnySerializer acceptable class detection that does not use an exception

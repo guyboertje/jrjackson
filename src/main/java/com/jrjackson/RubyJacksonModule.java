@@ -2,22 +2,22 @@ package com.jrjackson;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.Version;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.DefaultSerializerProvider;
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
-import java.text.SimpleDateFormat;
-
 import org.jruby.Ruby;
 import org.jruby.runtime.builtin.IRubyObject;
+
+import java.text.SimpleDateFormat;
 
 public class RubyJacksonModule extends SimpleModule {
 
     private static final SimpleDateFormat RDF = new RubyDateFormat("yyyy-MM-dd HH:mm:ss Z");
 
-    private static final ObjectMapper static_mapper = new ObjectMapper();
+    public static final ObjectMapper static_mapper = new ObjectMapper();
     public static final JsonFactory factory = new JsonFactory(static_mapper).disable(JsonFactory.Feature.FAIL_ON_SYMBOL_HASH_OVERFLOW);
 
     static {

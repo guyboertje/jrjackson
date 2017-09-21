@@ -11,7 +11,7 @@ DO NOT MODIFIY - GENERATED CODE
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.jrjackson.jruby</groupId>
   <artifactId>jrjackson</artifactId>
-  <version>1.2.20</version>
+  <version>1.2.21</version>
   <name>A JRuby wrapper for the java jackson json processor jar</name>
   <description>A mostly native JRuby wrapper for the java jackson json processor jar</description>
   <url>http://github.com/guyboertje/jrjackson</url>
@@ -31,10 +31,9 @@ DO NOT MODIFIY - GENERATED CODE
     <url>http://github.com/guyboertje/jrjackson</url>
   </scm>
   <properties>
-    <netbeans.hint.jdkPlatform>JDK_1.8</netbeans.hint.jdkPlatform>
     <polyglot.dump.pom>pom.xml</polyglot.dump.pom>
     <mavengem.wagon.version>0.2.0</mavengem.wagon.version>
-    <jruby.plugins.version>1.1.4</jruby.plugins.version>
+    <jruby.plugins.version>1.1.5</jruby.plugins.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <dependencies>
@@ -53,31 +52,24 @@ DO NOT MODIFIY - GENERATED CODE
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>rubygems</groupId>
-      <artifactId>ruby-maven</artifactId>
-      <version>[3.3.10,3.3.99999]</version>
-      <type>gem</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>2.7.3</version>
+      <version>2.9.1</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
-      <version>2.7.3</version>
+      <version>2.9.1</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.7.3</version>
+      <version>2.9.1</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.module</groupId>
       <artifactId>jackson-module-afterburner</artifactId>
-      <version>2.7.3</version>
+      <version>2.9.1</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -88,7 +80,7 @@ DO NOT MODIFIY - GENERATED CODE
     <dependency>
       <groupId>org.jruby</groupId>
       <artifactId>jruby</artifactId>
-      <version>9.1.5.0</version>
+      <version>9.1.13.0</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
@@ -126,7 +118,7 @@ DO NOT MODIFIY - GENERATED CODE
         </executions>
         <configuration>
           <outputDirectory>lib/jrjackson/jars</outputDirectory>
-          <finalName>jrjackson-1.2.20</finalName>
+          <finalName>jrjackson-1.2.21</finalName>
         </configuration>
       </plugin>
       <plugin>
@@ -137,7 +129,7 @@ DO NOT MODIFIY - GENERATED CODE
             <fileset>
               <directory>lib/jrjackson/jars</directory>
               <includes>
-                <include>jrjackson-1.2.20.jar</include>
+                <include>jrjackson-1.2.21.jar</include>
                 <include>*/**/*.jar</include>
               </includes>
             </fileset>
@@ -156,8 +148,8 @@ DO NOT MODIFIY - GENERATED CODE
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.1</version>
         <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
+          <source>1.8</source>
+          <target>1.8</target>
           <showDeprecation>false</showDeprecation>
           <showWarnings>false</showWarnings>
           <executable>${JAVA_HOME}/bin/javac</executable>

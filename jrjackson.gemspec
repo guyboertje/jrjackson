@@ -19,13 +19,12 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency 'bundler', '~> 1.10'
   s.add_development_dependency 'jar-dependencies', '< 2.0', '>= 0.3.2'
-  s.add_development_dependency 'ruby-maven', '~>3.3.10'
 
-  JACKSON_VERSION = '2.7.3'
-  s.requirements << "jar com.fasterxml.jackson.core:jackson-core, #{JACKSON_VERSION}"
-  s.requirements << "jar com.fasterxml.jackson.core:jackson-annotations, #{JACKSON_VERSION}"
-  s.requirements << "jar com.fasterxml.jackson.core:jackson-databind, #{JACKSON_VERSION}"
-  s.requirements << "jar com.fasterxml.jackson.module:jackson-module-afterburner, #{JACKSON_VERSION}"
+  jackson_version = JrJackson::BuildInfo.jackson_version
+  s.requirements << "jar com.fasterxml.jackson.core:jackson-core, #{jackson_version}"
+  s.requirements << "jar com.fasterxml.jackson.core:jackson-annotations, #{jackson_version}"
+  s.requirements << "jar com.fasterxml.jackson.core:jackson-databind, #{jackson_version}"
+  s.requirements << "jar com.fasterxml.jackson.module:jackson-module-afterburner, #{jackson_version}"
 
   s.files = JrJackson::BuildInfo.files
 
