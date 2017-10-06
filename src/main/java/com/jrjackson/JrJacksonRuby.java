@@ -26,7 +26,7 @@ public class JrJacksonRuby extends JrJacksonBase {
 
     // deserialize
     @JRubyMethod(module = true, name = {"parse_sym", "load_sym"}, required = 2)
-    public static Object parse_sym(ThreadContext context, IRubyObject self, IRubyObject arg, IRubyObject opts)
+    public static IRubyObject parse_sym(ThreadContext context, IRubyObject self, IRubyObject arg, IRubyObject opts)
             throws JsonProcessingException, IOException, RaiseException {
 
         return __parse(context, arg,
@@ -37,7 +37,7 @@ public class JrJacksonRuby extends JrJacksonBase {
     }
 
     @JRubyMethod(module = true, name = {"parse", "load"}, required = 2)
-    public static Object parse(ThreadContext context, IRubyObject self, IRubyObject arg, IRubyObject opts)
+    public static IRubyObject parse(ThreadContext context, IRubyObject self, IRubyObject arg, IRubyObject opts)
             throws JsonProcessingException, IOException, RaiseException {
 
         RubyNameConverter konv = new RubyStringNameConverter();
@@ -63,7 +63,7 @@ public class JrJacksonRuby extends JrJacksonBase {
         return __parse(context, arg, konv, ikonv, dkonv);
     }
 
-    private static Object __parse(ThreadContext context, IRubyObject arg,
+    private static IRubyObject __parse(ThreadContext context, IRubyObject arg,
                 RubyNameConverter keykonv, RubyConverter intconv, RubyConverter decimalconv)
             throws JsonProcessingException, IOException, RaiseException {
 
