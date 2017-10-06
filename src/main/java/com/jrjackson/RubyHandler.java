@@ -108,7 +108,7 @@ public class RubyHandler implements IParseHandler<IRubyObject, RubyArray, RubyHa
 
     @Override
     public IRubyObject getResult() {
-        return _result;
+        return _result == null ? _ctx.nil : _result;
     }
 
     @Override
