@@ -1,3 +1,7 @@
+v0.4.4
+  fix for issue 64
+    Ruby parse() null/nil handling
+
 v0.4.3
   bump Jackson to v2.9.1
   make static_mapper public
