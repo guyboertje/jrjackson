@@ -1,3 +1,5 @@
+v0.4.5
+  bump Jackson to v2.9.4
 v0.4.4
   fix for issue 64
     Ruby parse() null/nil handling

@@ -13,7 +13,7 @@ module JrJackson
     end
 
     def self.jackson_version
-      '2.9.1'
+      '2.9.4'
     end
 
     def self.jar_version
