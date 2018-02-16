@@ -8,3 +8,7 @@ Rakefile.old
 linked
 /libyjpagent.so
 /.project
+
+lib/jrjackson_jars.rb
+lib/com/fasterxml/jackson/
+pom.xml
