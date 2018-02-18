@@ -9,7 +9,7 @@ module JrJackson
     end
 
     def self.files
-      generated_files.concat(git_files)
+      git_files.concat(generated_jar_files).concat(generated_files)
     end
 
     def self.jackson_version
@@ -23,11 +23,21 @@ module JrJackson
     private
 
     def self.generated_files
-      Dir.glob( %w(pom.xml lib/jrjackson_jars.rb lib/com/fasterxml/jackson/**/*.jar lib/jrjackson/jars/jrjackson-*.jar) )
+      Dir.glob( %w(pom.xml lib/jrjackson_jars.rb) )
     end
 
     def self.git_files
       `git ls-files`.split($/).reject{|s| s.start_with?("benchmarking")}
+    end
+
+    def self.generated_jar_files
+      [
+        "lib/com/fasterxml/jackson/core/jackson-annotations/#{jackson_version}/jackson-annotations-#{jackson_version}.jar",
+        "lib/com/fasterxml/jackson/core/jackson-core/#{jackson_version}/jackson-core-#{jackson_version}.jar",
+        "lib/com/fasterxml/jackson/core/jackson-databind/#{jackson_version}/jackson-databind-#{jackson_version}.jar",
+        "lib/com/fasterxml/jackson/module/jackson-module-afterburner/#{jackson_version}/jackson-module-afterburner-#{jackson_version}.jar",
+        "lib/jrjackson/jars/jrjackson-#{jar_version}.jar"
+      ]
     end
   end
 end
