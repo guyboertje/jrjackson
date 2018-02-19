@@ -27,5 +27,4 @@ Gem::Specification.new do |s|
   s.requirements << "jar com.fasterxml.jackson.module:jackson-module-afterburner, #{jackson_version}"
 
   s.files = JrJackson::BuildInfo.files
-
 end
