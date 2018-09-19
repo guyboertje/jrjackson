@@ -70,7 +70,7 @@ class JrJacksonTest < Test::Unit::TestCase
       @now = tm
     end
     def to_time
-      @now.to_time
+      @now.to_time.utc
     end
   end
 
@@ -281,7 +281,7 @@ class JrJacksonTest < Test::Unit::TestCase
   end
 
   def test_serialize_non_json_datatypes_as_values
-    dt = Time.now
+    dt = Time.now.utc
     today = Date.today
     co1 = CustomToH.new("uno", :two, 6.0)
     co2 = CustomToHash.new("uno", :two, 6.0)
@@ -292,12 +292,12 @@ class JrJacksonTest < Test::Unit::TestCase
     json_string = JrJackson::Json.dump(source)
     expected = {
       :sym => "a_symbol",
-      :dt => dt.to_s,
+      :dt => dt.strftime('%F %T %z'),
       :co1 => {:one => "uno", :two => "two", :six => 6.0 },
       :co2 => {:one => "uno", :two => "two", :six => 6.0 },
       :co3 => {:one => 1.0, :two => 2.0, :six => 6.0 },
       :co4 => [1, 2, 6],
-      :co5 => today.to_time.to_s
+      :co5 => today.to_time.utc.strftime('%F %T %z')
     }
     actual = JrJackson::Json.load(json_string, :symbolize_keys => true)
     assert_equal expected, actual
@@ -514,7 +514,7 @@ class JrJacksonTest < Test::Unit::TestCase
 
   def test_can_mix_java_and_ruby_objects
     json = '{"utf8":"żółć", "moo": "bar", "arr": [2,3,4], "flo": 3.33}'
-    timeobj = Time.new(2015,11,11,11,11,11).utc
+    timeobj = Time.new(2015,11,11,11,11,11,0).utc
     expected = '{"mixed":{"arr":[2,3,4],"utf8":"żółć","flo":3.33,"zzz":{"one":1.0,"two":2,"six":6.0},"moo":"bar"},"time":"2015-11-11 11:11:11 +0000"}'
     object = JrJackson::Json.parse_java(json)
     object["zzz"] = CustomToJson.new(1.0, 2, 6.0)

@@ -12,11 +12,9 @@ import org.jruby.Ruby;
 import org.jruby.runtime.builtin.IRubyObject;
 
 import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 
 public class RubyJacksonModule extends SimpleModule {
-
-    private static final SimpleDateFormat RDF = new RubyDateFormat("yyyy-MM-dd HH:mm:ss Z");
-
     public static final ObjectMapper static_mapper = new ObjectMapper();
     public static final JsonFactory factory = new JsonFactory(static_mapper).disable(JsonFactory.Feature.FAIL_ON_SYMBOL_HASH_OVERFLOW);
 
@@ -56,11 +54,9 @@ public class RubyJacksonModule extends SimpleModule {
     }
 
     public static DefaultSerializerProvider createProvider() {
-        static_mapper.setDateFormat(RDF);
-        return ((DefaultSerializerProvider) static_mapper.getSerializerProvider()).createInstance(
-                static_mapper.getSerializationConfig(),
-                static_mapper.getSerializerFactory()
-        );
+        SimpleDateFormat rdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+        rdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return createProvider(rdf);
     }
 
     public static ObjectMapper rawBigNumberMapper() {
