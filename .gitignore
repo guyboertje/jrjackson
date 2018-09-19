@@ -4,6 +4,7 @@ target
 Rakefile.old
 .idea
 *.iml
+.ruby-version
 
 linked
 /libyjpagent.so
