@@ -70,7 +70,7 @@ class JrJacksonTest < Test::Unit::TestCase
       @now = tm
     end
     def to_time
-      @now.to_time
+      @now.to_time.utc
     end
   end
 
@@ -281,7 +281,7 @@ class JrJacksonTest < Test::Unit::TestCase
   end
 
   def test_serialize_non_json_datatypes_as_values
-    dt = Time.now
+    dt = Time.now.utc
     today = Date.today
     co1 = CustomToH.new("uno", :two, 6.0)
     co2 = CustomToHash.new("uno", :two, 6.0)
@@ -292,12 +292,12 @@ class JrJacksonTest < Test::Unit::TestCase
     json_string = JrJackson::Json.dump(source)
     expected = {
       :sym => "a_symbol",
-      :dt => dt.to_s,
+      :dt => dt.strftime('%F %T %z'),
       :co1 => {:one => "uno", :two => "two", :six => 6.0 },
       :co2 => {:one => "uno", :two => "two", :six => 6.0 },
       :co3 => {:one => 1.0, :two => 2.0, :six => 6.0 },
       :co4 => [1, 2, 6],
-      :co5 => today.to_time.to_s
+      :co5 => today.to_time.utc.strftime('%F %T %z')
     }
     actual = JrJackson::Json.load(json_string, :symbolize_keys => true)
     assert_equal expected, actual
@@ -340,7 +340,7 @@ class JrJacksonTest < Test::Unit::TestCase
     time = Time.new(2014,6,10,18,18,40, "-04:00")
     # using date_format option
     assert_equal "{\"time\":\"2014-06-10\"}", JrJackson::Json.dump({"time" => time}, :date_format => "yyyy-MM-dd")
-    assert_match /\{"time"\:"\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}[+-]\d{4}"\}/, JrJackson::Json.dump({"time" => time}, :date_format => "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+    assert_match(/\{"time"\:"\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}[+-]\d{4}"\}/, JrJackson::Json.dump({"time" => time}, :date_format => "yyyy-MM-dd'T'HH:mm:ss.SSSZ"))
   end
 
   def test_serialize_date_date_format_timezone
@@ -370,7 +370,7 @@ class JrJacksonTest < Test::Unit::TestCase
     assert_equal "żółć", actual["utf8"]
     assert_equal Java::JavaUtil::HashMap, actual["zzz"].class
     assert_equal Bignum, actual["zzz"]["bar"].class
-    assert_equal -9, actual["zzz"]["bar"]
+    assert_equal(-9, actual["zzz"]["bar"])
   end
 
   def test_can_parse_returning_ruby_objects_string_keys
@@ -451,7 +451,7 @@ class JrJacksonTest < Test::Unit::TestCase
   end
 
   def test_can_parse_big_decimals
-    expected = BigDecimal.new '0.12345678901234567890123456789'
+    expected = BigDecimal('0.12345678901234567890123456789')
     json = '{"foo":0.12345678901234567890123456789}'
 
     actual = JrJackson::Json.parse(json, :use_bigdecimal => true)['foo']
@@ -514,7 +514,7 @@ class JrJacksonTest < Test::Unit::TestCase
 
   def test_can_mix_java_and_ruby_objects
     json = '{"utf8":"żółć", "moo": "bar", "arr": [2,3,4], "flo": 3.33}'
-    timeobj = Time.new(2015,11,11,11,11,11).utc
+    timeobj = Time.new(2015,11,11,11,11,11,0).utc
     expected = '{"mixed":{"arr":[2,3,4],"utf8":"żółć","flo":3.33,"zzz":{"one":1.0,"two":2,"six":6.0},"moo":"bar"},"time":"2015-11-11 11:11:11 +0000"}'
     object = JrJackson::Json.parse_java(json)
     object["zzz"] = CustomToJson.new(1.0, 2, 6.0)
@@ -546,7 +546,7 @@ class JrJacksonTest < Test::Unit::TestCase
   end
 
   def assert_bigdecimal_similar(expected, actual)
-    assert_equal BigDecimal.new(expected.to_s).round(11), BigDecimal.new(actual.to_s).round(11)
+    assert_equal BigDecimal(expected.to_s).round(11), BigDecimal(actual.to_s).round(11)
     assert_equal Java::JavaMath::BigDecimal, actual.class
   end
 end

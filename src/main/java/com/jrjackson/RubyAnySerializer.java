@@ -173,6 +173,7 @@ public class RubyAnySerializer extends JsonSerializer<IRubyObject> {
                 jgen.writeNumber(RubyNumeric.num2dbl(value));
                 break;
             case Fixnum:
+            case Integer:
                 jgen.writeNumber(RubyNumeric.num2long(value));
                 break;
             case Bignum:
@@ -265,6 +266,7 @@ public class RubyAnySerializer extends JsonSerializer<IRubyObject> {
     enum RUBYCLASS {
         String,
         Fixnum,
+        Integer,
         Hash,
         Array,
         Float,
