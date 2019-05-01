@@ -5,7 +5,15 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
-import org.jruby.*;
+import org.jruby.RubyArray;
+import org.jruby.RubyClass;
+import org.jruby.RubyException;
+import org.jruby.RubyHash;
+import org.jruby.RubyNumeric;
+import org.jruby.RubyObject;
+import org.jruby.RubyString;
+import org.jruby.RubyStruct;
+import org.jruby.RubyTime;
 import org.jruby.ext.bigdecimal.RubyBigDecimal;
 import org.jruby.internal.runtime.methods.DynamicMethod;
 import org.jruby.java.proxies.JavaProxy;
@@ -172,12 +180,14 @@ public class RubyAnySerializer extends JsonSerializer<IRubyObject> {
             case Float:
                 jgen.writeNumber(RubyNumeric.num2dbl(value));
                 break;
+            case Bignum:
             case Fixnum:
             case Integer:
-                jgen.writeNumber(RubyNumeric.num2long(value));
-                break;
-            case Bignum:
-                jgen.writeNumber(((RubyBignum) value).getBigIntegerValue());
+                if (value.getJavaClass() == long.class) {
+                    jgen.writeNumber(((RubyNumeric) value).getLongValue());
+                } else {
+                    jgen.writeNumber(((RubyNumeric) value).getBigIntegerValue());
+                }
                 break;
             case BigDecimal:
                 jgen.writeNumber(((RubyBigDecimal) value).getBigDecimalValue());

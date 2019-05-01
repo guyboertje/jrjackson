@@ -369,7 +369,12 @@ class JrJacksonTest < Test::Unit::TestCase
     assert_equal "bar", actual["moo"]
     assert_equal "żółć", actual["utf8"]
     assert_equal Java::JavaUtil::HashMap, actual["zzz"].class
-    assert_equal Bignum, actual["zzz"]["bar"].class
+    if 1.class == Integer
+      # avoid deprecation warning as Ruby 2.4 unifies Fixnum and Bignum into Integer
+      assert_equal Integer, actual["zzz"]["bar"].class
+    else
+      assert_equal Bignum, actual["zzz"]["bar"].class
+    end
     assert_equal(-9, actual["zzz"]["bar"])
   end
 
@@ -535,6 +540,12 @@ class JrJacksonTest < Test::Unit::TestCase
     object = {"foo" => BasicObject}
     actual = JrJackson::Json.dump(object)
     assert_equal "{\"foo\":\"#{BasicObject.inspect}\"}", actual
+  end
+
+  def test_can_handle_big_numbers
+    object = {"foo" => 2**63, "bar" => 65536}
+    actual = JrJackson::Json.dump(object)
+    assert_equal "{\"foo\":9223372036854775808,\"bar\":65536}", actual
   end
 
   # -----------------------------

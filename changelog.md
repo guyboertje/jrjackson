@@ -1,3 +1,6 @@
+v0.4.8
+  fix serialisation of big numbers as Ruby 2.4 unifies Fixnum and Bignum into Integer 
+
 v0.4.4
   fix for issue 64
     Ruby parse() null/nil handling
