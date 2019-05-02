@@ -16,6 +16,7 @@ Gem::Specification.new do |s|
   s.summary     = %q{A JRuby wrapper for the java jackson json processor jar}
   s.description = %q{A mostly native JRuby wrapper for the java jackson json processor jar}
   s.license     = 'Apache License 2.0'
+  s.require_paths = ["lib"]
 
   s.add_development_dependency 'bundler', '~> 1.10'
   s.add_development_dependency 'jar-dependencies', '< 2.0', '>= 0.3.2'

@@ -1,11 +1,13 @@
+#!/usr/bin/env ruby
+
 require 'bigdecimal'
 require 'benchmark/ips'
-require 'gson'
+# require 'gson'
 require 'json/ext'
 require 'time'
 
-require File.expand_path('lib/jrjackson')
-
+$LOAD_PATH.unshift File.expand_path('../../../lib', __FILE__)
+require 'jrjackson'
 
 obj = {
   'a' => 'Alpha', # string
@@ -20,7 +22,7 @@ obj = {
   'j' => Java::JavaUtil::ArrayList.new(["foo", 1])
 }
 
-gson = ::Gson::Encoder.new({})
+# gson = ::Gson::Encoder.new({})
 
 # puts '-------------------------------------'
 # puts gson.encode(obj)
@@ -31,11 +33,11 @@ gson = ::Gson::Encoder.new({})
 # puts '-------------------------------------'
 
 Benchmark.ips do |x|
-  x.config(:time => 20, :warmup => 20)
+  x.config(:time => 120, :warmup => 180)
 
   x.report("jrjackson") { JrJackson::Base.generate(obj) }
-  x.report("gson")      { gson.encode(obj) }
   x.report("JSON")      { JSON.dump(obj) }
+  # x.report("gson")      { gson.encode(obj) }
 
   x.compare!
 end
