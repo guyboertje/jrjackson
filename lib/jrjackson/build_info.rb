@@ -1,11 +1,11 @@
 module JrJackson
   module BuildInfo
     def self.version
-      '0.4.8'
+      '0.4.9'
     end
 
     def self.release_date
-      '2019-05-01'
+      '2019-08-09'
     end
 
     def self.files
@@ -13,11 +13,15 @@ module JrJackson
     end
 
     def self.jackson_version
-      '2.9.7'
+      '2.9.9'
+    end
+
+    def self.jackson_databind_version
+      '2.9.9.3'
     end
 
     def self.jar_version
-      '1.2.26'
+      '1.2.27'
     end
 
     private
@@ -34,7 +38,7 @@ module JrJackson
       [
         "lib/com/fasterxml/jackson/core/jackson-annotations/#{jackson_version}/jackson-annotations-#{jackson_version}.jar",
         "lib/com/fasterxml/jackson/core/jackson-core/#{jackson_version}/jackson-core-#{jackson_version}.jar",
-        "lib/com/fasterxml/jackson/core/jackson-databind/#{jackson_version}/jackson-databind-#{jackson_version}.jar",
+        "lib/com/fasterxml/jackson/core/jackson-databind/#{jackson_databind_version}/jackson-databind-#{jackson_databind_version}.jar",
         "lib/com/fasterxml/jackson/module/jackson-module-afterburner/#{jackson_version}/jackson-module-afterburner-#{jackson_version}.jar",
         "lib/jrjackson/jars/jrjackson-#{jar_version}.jar"
       ]
