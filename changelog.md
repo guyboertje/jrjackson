@@ -1,3 +1,6 @@
+v0.4.9
+  bump Jackson to v2.9.9, and jackson-databind to v2.9.9.3
+
 v0.4.8
   fix serialisation of big numbers as Ruby 2.4 unifies Fixnum and Bignum into Integer 
 

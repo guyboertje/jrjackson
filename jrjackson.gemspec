@@ -22,9 +22,10 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'jar-dependencies', '< 2.0', '>= 0.3.2'
 
   jackson_version = JrJackson::BuildInfo.jackson_version
+  jackson_databind_version = JrJackson::BuildInfo.jackson_databind_version
   s.requirements << "jar com.fasterxml.jackson.core:jackson-core, #{jackson_version}"
   s.requirements << "jar com.fasterxml.jackson.core:jackson-annotations, #{jackson_version}"
-  s.requirements << "jar com.fasterxml.jackson.core:jackson-databind, #{jackson_version}"
+  s.requirements << "jar com.fasterxml.jackson.core:jackson-databind, #{jackson_databind_version}"
   s.requirements << "jar com.fasterxml.jackson.module:jackson-module-afterburner, #{jackson_version}"
 
   s.files = JrJackson::BuildInfo.files
