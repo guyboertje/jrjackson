@@ -17,6 +17,7 @@ import java.util.TimeZone;
 public class RubyJacksonModule extends SimpleModule {
     public static final ObjectMapper static_mapper = new ObjectMapper();
     public static final JsonFactory factory = new JsonFactory(static_mapper).disable(JsonFactory.Feature.FAIL_ON_SYMBOL_HASH_OVERFLOW);
+    private static final TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
 
     static {
         static_mapper.registerModule(new RubyJacksonModule().addSerializer(
@@ -55,7 +56,7 @@ public class RubyJacksonModule extends SimpleModule {
 
     public static DefaultSerializerProvider createProvider() {
         SimpleDateFormat rdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
-        rdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        rdf.setTimeZone(utcTimeZone);
         return createProvider(rdf);
     }
 

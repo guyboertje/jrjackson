@@ -237,11 +237,11 @@ public class RubyAnySerializer extends JsonSerializer<IRubyObject> {
         } else if (df instanceof RubyDateFormat) {
             // why another branch? I thought there was an easy win on to_s
             // maybe with jruby 9000
-            RubyDateFormat rdf = (RubyDateFormat) df.clone();
-            jgen.writeString(rdf.format(dt.getJavaDate()));
+            RubyDateFormat clonedRubyDatFormat = (RubyDateFormat) df.clone();
+            jgen.writeString(clonedRubyDatFormat.format(dt.getJavaDate()));
         } else {
-            SimpleDateFormat sdf = (SimpleDateFormat) df.clone();
-            jgen.writeString(df.format(dt.getJavaDate()));
+            SimpleDateFormat clonedSimpleDateFormat = (SimpleDateFormat) df.clone();
+            jgen.writeString(clonedSimpleDateFormat.format(dt.getJavaDate()));
         }
     }
 

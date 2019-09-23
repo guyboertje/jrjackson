@@ -1,3 +1,7 @@
+v0.4.10
+  fix concurrency issue when serializing dates. Also cache the value of "UTC" TimeZone locally to 
+  avoid contention to synchronized `getTimeZone` method.
+
 v0.4.9
   bump Jackson to v2.9.9, and jackson-databind to v2.9.9.3
 

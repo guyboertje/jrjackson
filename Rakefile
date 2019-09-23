@@ -10,7 +10,7 @@ end
 
 desc "Run benchmarks"
 task :benchmark do
-  load 'benchmarking/benchmark.rb'
+  load 'benchmarking/benchmark_threaded.rb'
 end
 
 desc "Pack jar after compiling classes, use this to rebuild the pom.xml"

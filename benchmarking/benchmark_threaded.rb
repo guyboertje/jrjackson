@@ -8,6 +8,7 @@ require 'digest'
 require 'json/ext'
 require 'gson'
 
+require File.expand_path('lib/jrjackson_jars')
 require File.expand_path('lib/jrjackson')
 
 HASH = {:one => nil, :two => nil, :three => nil, :four => {:a => nil, :b => nil, :c =>nil},
@@ -24,6 +25,10 @@ def random_number
   rand 999_999_999
 end
 
+def random_date
+  Time.at(rand * Time.now.to_i)
+end
+
 def random_float
   random_number + rand
 end
@@ -36,14 +41,14 @@ def fill_array
   value
 end
 
-def randomize_entries hsh
+def randomize_entries hsh, include_dates
   new_hsh = {}
   hsh.each_pair do |key, value|
     case value
     when NilClass
-      new_hsh[key] = send METHODS[rand(3)]
+      new_hsh[key] = send METHODS[rand(include_dates ? 4 : 3)]
     when Hash
-      new_hsh[key] = randomize_entries value
+      new_hsh[key] = randomize_entries value, include_dates
     when Array
       new_hsh[key] = fill_array
     end
@@ -51,24 +56,57 @@ def randomize_entries hsh
   new_hsh
 end
 
-METHODS = [:random_string, :random_number, :random_float]
+METHODS = [:random_string, :random_number, :random_float, :random_date]
 
 org_array = []
+no_dates_array = []
 one = []
 
 0.upto(5000) do |i|
   hsh = HASH.dup
-  org_array << randomize_entries(hsh)
+  org_array << randomize_entries(hsh, true)
 end
+
+0.upto(5000) do |i|
+  hsh = HASH.dup
+  no_dates_array << randomize_entries(hsh, false)
+end
+
 
 generated_array = []
 generated_smile = []
 
 org_array.each do |hsh|
-  generated_array << JrJackson::Raw.generate(hsh)
+  generated_array << JrJackson::Base.generate(hsh)
 end
 
 q = Queue.new
+
+
+Benchmark.bmbm("Jackson generate with no dates".size) do |x|
+  x.report("Jackson generate with dates") do
+    threads = 100.times.map do
+      Thread.new do
+        org_array.each do |hsh|
+          JrJackson::Base.generate(hsh)
+        end
+      end
+    end
+    threads.each(&:join)
+  end
+
+  x.report("Jackson generate with no dates") do
+
+    threads = 100.times.map do
+      Thread.new do
+        no_dates_array.each do |hsh|
+          JrJackson::Base.generate(hsh)
+        end
+      end
+    end
+    threads.each(&:join)
+  end
+end
 
 Benchmark.bmbm("jackson parse symbol keys:  ".size) do |x|
 
