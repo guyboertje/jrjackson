@@ -548,6 +548,21 @@ class JrJacksonTest < Test::Unit::TestCase
     assert_equal "{\"foo\":9223372036854775808,\"bar\":65536}", actual
   end
 
+
+  # This test failed more often than not before fixing the underlying code
+  # and would fail every time if `100_000.times` was changed to `loop`
+  def test_concurrent_dump
+    now = Time.now
+    num_threads = 100
+
+    threads = num_threads.times.map do |i|
+      Thread.new do
+        100_000.times { JrJackson::Json.dump("a" => now) }
+      end
+    end
+    threads.each(&:join)
+  end
+
   # -----------------------------
 
   def assert_bigdecimal_equal(expected, actual)

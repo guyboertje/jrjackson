@@ -1,3 +1,11 @@
+v0.4.10
+  fix concurrency issue when serializing dates. 
+  Cache UTC TimeZone class to avoid unnecessary calls to synchronized method
+  Use a ThreadLocal to hold per-thread instances of SimpleDateFormat to avoid
+   unnecessary expensive clonings of that object
+  Replace unsafe call to setDateFormat on static ObjectMapper class by creating
+   an amended SerializationConfig
+
 v0.4.9
   bump Jackson to v2.9.9, and jackson-databind to v2.9.9.3
 

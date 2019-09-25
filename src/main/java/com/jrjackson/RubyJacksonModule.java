@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.DefaultSerializerProvider;
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
@@ -17,6 +18,16 @@ import java.util.TimeZone;
 public class RubyJacksonModule extends SimpleModule {
     public static final ObjectMapper static_mapper = new ObjectMapper();
     public static final JsonFactory factory = new JsonFactory(static_mapper).disable(JsonFactory.Feature.FAIL_ON_SYMBOL_HASH_OVERFLOW);
+    private static final TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
+
+    private static final ThreadLocal<SimpleDateFormat>  dateFormat = new ThreadLocal<SimpleDateFormat> ()  {
+        @Override
+        protected SimpleDateFormat initialValue() {
+            SimpleDateFormat rdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+            rdf.setTimeZone(utcTimeZone);
+            return rdf;
+        }
+    };
 
     static {
         static_mapper.registerModule(new RubyJacksonModule().addSerializer(
@@ -27,7 +38,7 @@ public class RubyJacksonModule extends SimpleModule {
     }
 
     private RubyJacksonModule() {
-        super("JrJacksonStrModule", new Version(1, 2, 18, "0", "com.jrjackson.jruby", "jrjackson"));
+        super("JrJacksonStrModule", new Version(1, 2, 28, "0", "com.jrjackson.jruby", "jrjackson"));
     }
 
     public static ObjectMapper mapperWith(Ruby ruby, RubyKeyConverter nameConverter,
@@ -46,17 +57,18 @@ public class RubyJacksonModule extends SimpleModule {
     }
 
     public static DefaultSerializerProvider createProvider(SimpleDateFormat sdf) {
-        static_mapper.setDateFormat(sdf);
+        // Use a copy of the SerializationConfig to avoid calling setDateFormat on the static ObjectMapper
+        // object, removing its thread safety properties. In future, we might want to think about doing
+        // a refactor to use ObjectWriters instead of modifying serialization configs.
+        SerializationConfig config = static_mapper.getSerializationConfig().with(sdf);
         return ((DefaultSerializerProvider) static_mapper.getSerializerProvider()).createInstance(
-                static_mapper.getSerializationConfig(),
+                config,
                 static_mapper.getSerializerFactory()
         );
     }
 
     public static DefaultSerializerProvider createProvider() {
-        SimpleDateFormat rdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
-        rdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return createProvider(rdf);
+        return createProvider(dateFormat.get());
     }
 
     public static ObjectMapper rawBigNumberMapper() {
