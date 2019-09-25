@@ -234,14 +234,14 @@ public class RubyAnySerializer extends JsonSerializer<IRubyObject> {
         if (df == null) {
             // DateFormat should always be set
             provider.defaultSerializeDateValue(dt.getJavaDate(), jgen);
-        } else if (df instanceof RubyDateFormat) {
+        } // RWB Note: I believe this is no longer used
+        else if (df instanceof RubyDateFormat) {
             // why another branch? I thought there was an easy win on to_s
             // maybe with jruby 9000
             RubyDateFormat clonedRubyDatFormat = (RubyDateFormat) df.clone();
             jgen.writeString(clonedRubyDatFormat.format(dt.getJavaDate()));
         } else {
-            SimpleDateFormat clonedSimpleDateFormat = (SimpleDateFormat) df.clone();
-            jgen.writeString(clonedSimpleDateFormat.format(dt.getJavaDate()));
+            jgen.writeString(df.format(dt.getJavaDate()));
         }
     }
 

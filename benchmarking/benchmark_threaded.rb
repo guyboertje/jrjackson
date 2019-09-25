@@ -87,8 +87,10 @@ Benchmark.bmbm("Jackson generate with no dates".size) do |x|
   x.report("Jackson generate with dates") do
     threads = 100.times.map do
       Thread.new do
-        org_array.each do |hsh|
-          JrJackson::Base.generate(hsh)
+        10.times.each do
+          org_array.each do |hsh|
+            JrJackson::Base.generate(hsh)
+          end
         end
       end
     end
@@ -99,8 +101,10 @@ Benchmark.bmbm("Jackson generate with no dates".size) do |x|
 
     threads = 100.times.map do
       Thread.new do
-        no_dates_array.each do |hsh|
-          JrJackson::Base.generate(hsh)
+        10.times.each do
+          no_dates_array.each do |hsh|
+            JrJackson::Base.generate(hsh)
+          end
         end
       end
     end
