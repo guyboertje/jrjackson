@@ -565,6 +565,16 @@ class JrJacksonTest < Test::Unit::TestCase
 
   # -----------------------------
 
+  def test_can_serialize_bigdecimal_as_string
+    object = {"foo" => BigDecimal.new('0.12345678901234567890123456789')}
+
+    actual = JrJackson::Json.dump(object)
+    assert_equal "{\"foo\":0.12345678901234567890123456789}", actual
+
+    actual = JrJackson::Json.dump(object, :stringify_bigdecimal => true)
+    assert_equal "{\"foo\":\"0.12345678901234567890123456789\"}", actual
+  end
+
   def assert_bigdecimal_equal(expected, actual)
     assert_equal expected, actual
     assert_equal expected.class, actual.class
