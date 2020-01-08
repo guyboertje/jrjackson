@@ -1,3 +1,6 @@
+v0.4.11
+  Bump Jackson to v2.9.10, and jackson-databind to v2.9.10.1
+
 v0.4.10
   fix concurrency issue when serializing dates. 
   Cache UTC TimeZone class to avoid unnecessary calls to synchronized method
