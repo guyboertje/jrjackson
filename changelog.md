@@ -1,3 +1,6 @@
+v0.4.13
+  Bump jackson-databind to v2.9.10.6
+
 v0.4.12
   Bump jackson-databind to v2.9.10.4
 
