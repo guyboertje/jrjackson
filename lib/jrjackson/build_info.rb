@@ -5,7 +5,7 @@ module JrJackson
     end
 
     def self.release_date
-      '2020-09-01'
+      '2020-10-26'
     end
 
     def self.files
