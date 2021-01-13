@@ -14,7 +14,7 @@ properties 'project.build.sourceEncoding' => 'UTF-8',
 
 jar 'junit:junit', '4.11', :scope => :test
 
-jar 'org.jruby:jruby', '9.2.4.0', :scope => :provided
+jar 'org.jruby:jruby', '9.2.13.0', :scope => :provided
 
 plugin :compiler, '3.1', :source => '1.8', :target => '1.8',
        :showDeprecation => false,
@@ -23,9 +23,3 @@ plugin :compiler, '3.1', :source => '1.8', :target => '1.8',
        :fork => true
 
 plugin :surefire, '2.17', :skipTests => true
-
-# since bundle install does not vendor our jars we need to it manually
-plugin 'org.torquebox.mojo:jruby9-exec-maven-plugin', '0.3.1' do
-  execute_goal :exec, :id => 'vendor-jars', :phase => 'prepare-package',
-               :script => "require 'jars/installer';Jars::Installer.vendor_jars!"
-end
