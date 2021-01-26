@@ -1,3 +1,6 @@
+v0.4.14
+  Bump jackson-databind to v2.9.10.8
+
 v0.4.13
   Bump jackson-databind to v2.9.10.6
 
@@ -8,7 +11,7 @@ v0.4.11
   Bump Jackson to v2.9.10, and jackson-databind to v2.9.10.1
 
 v0.4.10
-  fix concurrency issue when serializing dates. 
+  fix concurrency issue when serializing dates.
   Cache UTC TimeZone class to avoid unnecessary calls to synchronized method
   Use a ThreadLocal to hold per-thread instances of SimpleDateFormat to avoid
    unnecessary expensive clonings of that object
@@ -19,7 +22,7 @@ v0.4.9
   bump Jackson to v2.9.9, and jackson-databind to v2.9.9.3
 
 v0.4.8
-  fix serialisation of big numbers as Ruby 2.4 unifies Fixnum and Bignum into Integer 
+  fix serialisation of big numbers as Ruby 2.4 unifies Fixnum and Bignum into Integer
 
 v0.4.4
   fix for issue 64
@@ -28,7 +31,7 @@ v0.4.4
 v0.4.3
   bump Jackson to v2.9.1
   make static_mapper public
-  
+
 v0.4.1
   fix for issue 55
     Refactor AnySerializer acceptable class detection that does not use an exception
