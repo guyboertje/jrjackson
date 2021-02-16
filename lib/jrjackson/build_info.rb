@@ -1,7 +1,7 @@
 module JrJackson
   module BuildInfo
     def self.version
-      '0.4.14'
+      '0.4.15'
     end
 
     def self.release_date
@@ -13,11 +13,11 @@ module JrJackson
     end
 
     def self.jackson_version
-      '2.9.10'
+      '2.12.1'
     end
 
     def self.jackson_databind_version
-      '2.9.10.8'
+      '2.12.1'
     end
 
     def self.jar_version
