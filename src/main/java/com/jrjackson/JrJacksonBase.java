@@ -54,6 +54,7 @@ public class JrJacksonBase extends RubyObject {
             jgen.useDefaultPrettyPrinter();
         }
 
+        Boolean stringifyBigDecimal = flagged(options, RubyUtils.rubySymbol(_ruby, "stringify_bigdecimal"));
         SerializerProvider provider;
         if (format != null) {
             SimpleDateFormat simpleFormat = new SimpleDateFormat(format);
@@ -67,7 +68,7 @@ public class JrJacksonBase extends RubyObject {
         }
 
         try {
-            RubyAnySerializer.instance.serialize(args[0], jgen, provider);
+            new RubyAnySerializer(stringifyBigDecimal).serialize(args[0], jgen, provider);
             jgen.close();
             ByteList bl = new ByteList(baos.toByteArray(),
                     UTF8Encoding.INSTANCE);

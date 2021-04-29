@@ -37,9 +37,14 @@ public class RubyAnySerializer extends JsonSerializer<IRubyObject> {
 
     private static final RUBYCLASS[] CLASS_NAMES = RUBYCLASS.values();
 
-    public RubyAnySerializer() {
-//        super(IRubyObject.class);
+    private final Boolean stringifyBigDecimal;
 
+    public RubyAnySerializer() {
+        this(false);
+    }
+
+    public RubyAnySerializer(Boolean stringifyBigDecimal) {
+        this.stringifyBigDecimal = stringifyBigDecimal;
     }
 
     private void serializeUnknownRubyObject(ThreadContext ctx, IRubyObject rubyObject, JsonGenerator jgen, SerializerProvider provider)
@@ -190,7 +195,11 @@ public class RubyAnySerializer extends JsonSerializer<IRubyObject> {
                 }
                 break;
             case BigDecimal:
-                jgen.writeNumber(((RubyBigDecimal) value).getBigDecimalValue());
+                if (this.stringifyBigDecimal) {
+                  jgen.writeString(value.callMethod(value.getRuntime().getCurrentContext(), "to_s", value.getRuntime().newString("F")).toString());
+                } else {
+                  jgen.writeNumber(((RubyBigDecimal) value).getBigDecimalValue());
+                }
                 break;
             case Time:
                 serializeTime((RubyTime) value, jgen, provider);
