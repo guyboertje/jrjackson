@@ -16,6 +16,13 @@ end
 desc "Pack jar after compiling classes, use this to rebuild the pom.xml"
 task :compile do
   RubyMaven.exec('prepare-package')
+  # after packaging the jrjackson-x.y.z.jar vendor jar dependencies
+  Rake::Task['vendor_jars'].invoke
+end
+
+task :vendor_jars do
+  require 'jars/installer'
+  Jars::Installer.vendor_jars!
 end
 
 desc "Clean build"
@@ -30,4 +37,3 @@ Gem::PackageTask.new( eval File.read( 'jrjackson.gemspec' ) ) do
   desc 'Pack gem'
   task :package => [:compile]
 end
-
