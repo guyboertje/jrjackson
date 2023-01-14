@@ -13,11 +13,11 @@ module JrJackson
     end
 
     def self.jackson_version
-      '2.14.0'
+      '2.13.4.2'
     end
 
     def self.jackson_databind_version
-      '2.14.0'
+      '2.13.4.2'
     end
 
     def self.jar_version
