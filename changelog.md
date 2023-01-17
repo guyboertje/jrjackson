@@ -1,3 +1,6 @@
+v0.4.17
+  Bump jackson and jackson-databind to v2.14.1
+
 v0.4.16
   Publish v0.4.15 again without world writable files
 

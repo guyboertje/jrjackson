@@ -29,10 +29,10 @@ represents your custom object.
 
 11th May 2014 - Added to_time method call for Ruby object serialization
 
-26th October 2013 - Added support to serialize arbitrary (non JSON datatypes)
+26th October 2013 - Added support to serialize arbitrary (non JSON data types)
 ruby objects.  Normally the toJava internal method is called, but additionally
 to_h, to_hash, to_a and finally to_json are tried.  Be aware that the to_json
-method might invoke a new selialization session (i.e. it may use the JSON gem)
+method might invoke a new serialization session (i.e. it may use the JSON gem)
 and impact performance.
 
 ***
@@ -43,7 +43,7 @@ and impact performance.
 JrJackson::Json.load(string, options) -> hash like object
       aliased as parse
 ```
-By default the load method will return Ruby objects (Hashes have string keys).
+By default, the load method will return Ruby objects (Hashes have string keys).
 The options hash respects three symbol keys
 
 + :symbolize_keys
@@ -89,6 +89,16 @@ There are four Ruby sub modules of the JrJackson module
 ```JrJackson::Java```, this is used by the external facade, you should use this directly. It returns Java objects e.g. ArrayList, HashMap, BigDecimal, BigInteger, Long, Float and String, JRuby wraps (mostly) them in a JavaProxy Ruby object.
 
 ***
+
+#### How to build the `jrjackson`?
+
+The library requires maven and [ruby-maven]((https://github.com/jruby/ruby-maven)) libraries.
+Make sure to install the maven depending on your system (ex.: `brew install maven` on macOS) and also install ruby-maven with `gem install ruby-maven`.
+Note that, recent builds showed old maven versions failed and succeeded with `3.8.7` version.
+
+Run `rake && rake test` to build and test the `jrjackson`.
+
+To build the local gem to test against your platform, use `gem build jrjackson.gemspec` command.
 
 #### Benchmarks
 

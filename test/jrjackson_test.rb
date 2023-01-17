@@ -339,7 +339,7 @@ class JrJacksonTest < Test::Unit::TestCase
 
     time = Time.new(2014,6,10,18,18,40, "-04:00")
     # using date_format option
-    assert_equal "{\"time\":\"2014-06-10\"}", JrJackson::Json.dump({"time" => time}, :date_format => "yyyy-MM-dd")
+    assert_equal "{\"time\":\"2014-06-10\"}", JrJackson::Json.dump({"time" => time}, :date_format => "yyyy-MM-dd", :timezone => "UTC")
     assert_match(/\{"time"\:"\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}[+-]\d{4}"\}/, JrJackson::Json.dump({"time" => time}, :date_format => "yyyy-MM-dd'T'HH:mm:ss.SSSZ"))
   end
 
