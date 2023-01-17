@@ -5,7 +5,7 @@ module JrJackson
     end
 
     def self.release_date
-      '2023-01-14'
+      '2023-01-17'
     end
 
     def self.files
@@ -13,11 +13,11 @@ module JrJackson
     end
 
     def self.jackson_version
-      '2.13.4.2'
+      '2.14.1'
     end
 
     def self.jackson_databind_version
-      '2.13.4.2'
+      '2.14.1'
     end
 
     def self.jar_version
