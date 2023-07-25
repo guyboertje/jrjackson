@@ -473,6 +473,24 @@ class JrJacksonTest < Test::Unit::TestCase
 
   end
 
+  def test_can_parse_utf_16
+    expected = { "key" => "value👍" }
+    json_utf_16 = '{"key": "value👍"}'.encode('UTF-16')
+
+    actual = JrJackson::Json.load(json_utf_16)
+
+    assert_equal(expected, actual)
+  end
+
+  def test_can_parse_utf_32
+    expected = { "key" => "value👍" }
+    json_utf_32 = '{"key": "value👍"}'.encode('UTF-32')
+
+    actual = JrJackson::Json.load(json_utf_32)
+
+    assert_equal(expected, actual)
+  end
+
   def test_can_serialize_object
     obj = Object.new
     actual = JrJackson::Json.dump({"foo" => obj})
