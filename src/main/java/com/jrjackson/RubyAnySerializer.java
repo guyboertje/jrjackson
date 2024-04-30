@@ -50,7 +50,7 @@ public class RubyAnySerializer extends JsonSerializer<IRubyObject> {
         if (!method.isUndefined()) {
             RubyObject obj = (RubyObject) method.call(ctx, rubyObject, meta, "to_json_data");
             if (obj instanceof RubyString) {
-                RubyUtils.writeBytes(obj, jgen);
+                jgen.writeString(((RubyString) value).toJavaString());
             } else {
                 serialize(obj, jgen, provider);
             }
@@ -165,7 +165,7 @@ public class RubyAnySerializer extends JsonSerializer<IRubyObject> {
                 serializeArray(value, jgen, provider);
                 break;
             case String:
-                RubyUtils.writeBytes(value, jgen);
+                jgen.writeString(((RubyString) value).toJavaString());
                 break;
             case Symbol:
             case Date:
