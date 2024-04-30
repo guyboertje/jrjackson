@@ -7,6 +7,7 @@ group :development do
   gem 'benchmark-ips'
   gem 'rake'
   gem 'ruby-maven'
+  gem 'test-unit'
 end
 
 gemspec
