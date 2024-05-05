@@ -52,8 +52,8 @@ public class RubyObjectDeserializer
     @Override
     public RubyObject deserialize(JsonParser jp, DeserializationContext ctxt)
             throws IOException, JsonProcessingException {
-        
-        switch (jp.getCurrentToken()) {
+        JsonToken jt = jp.getCurrentToken();
+        switch (jt) {
             case START_OBJECT:
                 return mapObject(jp, ctxt);
 
@@ -90,7 +90,7 @@ public class RubyObjectDeserializer
             case END_ARRAY: // invalid
             case END_OBJECT: // invalid
             default:
-                throw ctxt.mappingException(Object.class);
+                throw ctxt.wrongTokenException(jp, Object.class, jt, null);
         }
     }
 
