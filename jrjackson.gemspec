@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.license     = 'Apache License 2.0'
   s.require_paths = ["lib"]
 
-  s.add_development_dependency 'bundler'
+  s.add_development_dependency 'test-unit'
   s.add_development_dependency 'jar-dependencies', '< 2.0', '>= 0.3.2'
 
   jackson_version = JrJackson::BuildInfo.jackson_version
