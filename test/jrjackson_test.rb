@@ -352,6 +352,37 @@ class JrJacksonTest < Test::Unit::TestCase
     assert_equal "{\"time\":\"2014-06-10T22:18:40.000Z\"}", JrJackson::Json.dump({"time" => time}, :date_format => "yyyy-MM-dd'T'HH:mm:ss.SSSX", :timezone => "UTC")
   end
 
+  def test_serialize_string_valid_utf8
+    input = "valid \u{A7}\u{a9c5}\u{18a5}\u{1f984} unicode".encode('UTF-8').freeze
+    expected = ('"' + input + '"').freeze
+    actual = JrJackson::Json.dump(input)
+
+    assert_equal(Encoding::UTF_8, actual.encoding)
+    assert_true(actual.valid_encoding?)
+    assert_equal(expected, actual)
+  end
+
+  def test_serialize_string_invalid_utf8
+    # keep valid utf-8 sequences, but replace invalid ones with the replacement character
+    input = "Thïs is a not-quite-v\xCEalid uni\xF0\x9D\x84code string \xF0\x9F\x92\x96ok".b.force_encoding(Encoding::UTF_8).freeze
+    expected = "\x22Thïs is a not-quite-v\u{FFFD}alid uni\u{FFFD}code string \u{1F496}ok\x22".encode('UTF-8').freeze
+    actual = JrJackson::Json.dump(input)
+
+    assert_equal(Encoding::UTF_8, actual.encoding)
+    assert_true(actual.valid_encoding?)
+    assert_equal(expected, actual)
+  end
+
+  def test_serialize_string_valid_windows1252
+    input = "Th\xEFs \xCCs W\xCFnd\xD8w\x8A".b.force_encoding(Encoding::WINDOWS_1252).freeze
+    expected = "\u{22}Th\u{EF}s \u{CC}s W\u{CF}nd\u{D8}w\u{160}\u{22}".encode('UTF-8').freeze
+    actual = JrJackson::Json.dump(input)
+
+    assert_equal(Encoding::UTF_8, actual.encoding)
+    assert_true(actual.valid_encoding?)
+    assert_equal(expected, actual)
+  end
+
   def test_can_parse_returning_java_objects
     expected = {"arr"=>[2, 3, 4],
       "flo"=>0.333E1,
