@@ -14,7 +14,7 @@ properties 'project.build.sourceEncoding' => 'UTF-8',
 
 jar 'junit:junit', '4.13.2', :scope => :test
 
-jar 'org.jruby:jruby', '9.4.7.0', :scope => :provided
+jar 'org.jruby:jruby', '9.3.14.0', :scope => :provided
 
 plugin :compiler, '3.1', :source => '1.8', :target => '1.8',
        :showDeprecation => false,
