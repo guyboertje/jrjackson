@@ -1,27 +1,27 @@
 module JrJackson
   module BuildInfo
     def self.version
-      '0.4.18'
+      '0.4.19'
     end
 
     def self.release_date
-      '2023-06-28'
+      '2024-05-08'
     end
 
     def self.files
-      git_files.concat(generated_jar_files).concat(generated_files)
+      repo_files.concat(generated_jar_files).concat(generated_files)
     end
 
     def self.jackson_version
-      '2.15.2'
+      '2.15.4'
     end
 
     def self.jackson_databind_version
-      '2.15.2'
+      '2.15.4'
     end
 
     def self.jar_version
-      '1.2.35'
+      '1.2.36'
     end
 
     private
@@ -30,8 +30,8 @@ module JrJackson
       Dir.glob( %w(pom.xml lib/jrjackson_jars.rb) )
     end
 
-    def self.git_files
-      `git ls-files`.split($/).reject{|s| s.start_with?("benchmarking")}
+    def self.repo_files
+      Dir["lib/**/*"].select{ |f| File.file? f } + ["README.md", "jrjackson.gemspec", ]
     end
 
     def self.generated_jar_files

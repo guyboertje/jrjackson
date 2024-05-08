@@ -15,8 +15,10 @@ Gem::Specification.new do |s|
   s.homepage    = "http://github.com/guyboertje/jrjackson"
   s.summary     = %q{A JRuby wrapper for the java jackson json processor jar}
   s.description = %q{A mostly native JRuby wrapper for the java jackson json processor jar}
-  s.license     = 'Apache License 2.0'
+  s.license     = 'Apache-2.0'
   s.require_paths = ["lib"]
+
+  s.add_development_dependency 'jar-dependencies', '< 2.0', '>= 0.3.2'
 
   jackson_version = JrJackson::BuildInfo.jackson_version
   jackson_databind_version = JrJackson::BuildInfo.jackson_databind_version

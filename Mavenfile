@@ -12,7 +12,7 @@ properties 'project.build.sourceEncoding' => 'UTF-8',
            # create a pom.xml from this here
            'polyglot.dump.pom' => 'pom.xml'
 
-jar 'junit:junit', '4.11', :scope => :test
+jar 'junit:junit', '4.13.2', :scope => :test
 
 jar 'org.jruby:jruby', '9.3.14.0', :scope => :provided
 
