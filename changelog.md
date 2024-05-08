@@ -1,3 +1,13 @@
+v0.4.19
+  Upgrade jackson and jackson-databind to v2.15.4
+  Build using JRuby 9.4.7.0 and Junit 4.13.2
+  Update development gems such as json 2.x
+  Remove dependency on git ls-files in gemspec
+  Remove unnecessary content from gem such as .java files and tests
+
+v0.4.18
+  Upgrade jackson and jackson-databind to v2.15.2
+
 v0.4.17
   Bump jackson and jackson-databind to v2.14.1
 
