@@ -9,12 +9,12 @@ import org.jruby.*;
 import org.jruby.ext.bigdecimal.RubyBigDecimal;
 import org.jruby.javasupport.JavaUtil;
 import org.jruby.runtime.builtin.IRubyObject;
-import org.jruby.util.ByteList;
 import org.jruby.util.SafeDoubleParser;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -135,15 +135,11 @@ public class RubyUtils {
 //        return result;
     }
 
-
-    public static void writeBytes(IRubyObject value, JsonGenerator jgen)
-        throws IOException {
-//            jgen.writeString(value.toString());
-//            byte[] b = s.getBytes();
-//            jgen.writeUTF8String(b, 0, b.length);
-//            jgen.writeUTF8String(s.getBytes(), 0, s.size());
-            RubyString s = (RubyString)value;
-            ByteList b = s.getByteList();
-            jgen.writeUTF8String(b.unsafeBytes(), b.begin(), b.length());
+    public static void writeRubyString(final RubyString value, final JsonGenerator jgen) throws IOException {
+        // NOTE: RubyString#asJavaString produces a string whose internal representation is valid utf8, after transcoding
+        // from the source encoding and/or replacing invalid sequences with the appropriate replacement character.
+        // We avoid using JsonGenerator#writeString because it does a char-wise mapping, splitting and mangling surrogate pairs
+        final byte[] utf8Bytes = value.asJavaString().getBytes(StandardCharsets.UTF_8);
+        jgen.writeUTF8String(utf8Bytes, 0, utf8Bytes.length);
     }
 }
