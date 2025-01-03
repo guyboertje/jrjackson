@@ -1,3 +1,7 @@
+v0.4.21
+  Upgrade jackson and jackson-databind to v2.16.2
+  Upgrade JRuby to 9.4.8.0
+
 v0.4.20
   fix: don't assume ruby strings are valid utf-8
 
