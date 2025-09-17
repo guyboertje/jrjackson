@@ -38,7 +38,7 @@ public class RubyJacksonModule extends SimpleModule {
     }
 
     private RubyJacksonModule() {
-        super("JrJacksonStrModule", new Version(1, 2, 28, "0", "com.jrjackson.jruby", "jrjackson"));
+        super("JrJacksonStrModule", new Version(1, 3, 0, "0", "com.jrjackson.jruby", "jrjackson"));
     }
 
     public static ObjectMapper mapperWith(Ruby ruby, RubyKeyConverter nameConverter,

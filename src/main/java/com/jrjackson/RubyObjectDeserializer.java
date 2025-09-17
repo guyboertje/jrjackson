@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.fasterxml.jackson.core.*;
 
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.util.ObjectBuffer;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
@@ -90,7 +91,13 @@ public class RubyObjectDeserializer
             case END_ARRAY: // invalid
             case END_OBJECT: // invalid
             default:
-                throw ctxt.mappingException(Object.class);
+                throw JsonMappingException.from(
+                        jp,
+                        String.format(
+                                "Unexpected token (%s) when deserializing Ruby object",
+                                jp.currentToken()
+                        )
+                );
         }
     }
 
