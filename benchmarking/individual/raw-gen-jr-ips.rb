@@ -2,7 +2,6 @@
 
 require 'bigdecimal'
 require 'benchmark/ips'
-# require 'gson'
 require 'json/ext'
 require 'time'
 
@@ -22,22 +21,11 @@ obj = {
   'j' => Java::JavaUtil::ArrayList.new(["foo", 1])
 }
 
-# gson = ::Gson::Encoder.new({})
-
-# puts '-------------------------------------'
-# puts gson.encode(obj)
-# puts '-------------------------------------'
-
-# puts '-------------------------------------'
-# puts JrJackson::Base.generate(obj)
-# puts '-------------------------------------'
-
 Benchmark.ips do |x|
   x.config(:time => 120, :warmup => 180)
 
   x.report("jrjackson") { JrJackson::Base.generate(obj) }
   x.report("JSON")      { JSON.dump(obj) }
-  # x.report("gson")      { gson.encode(obj) }
 
   x.compare!
 end

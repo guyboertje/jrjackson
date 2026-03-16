@@ -6,7 +6,6 @@ require 'benchmark'
 require 'thread'
 require 'digest'
 require 'json/ext'
-require 'gson'
 
 require File.expand_path('lib/jrjackson_jars')
 require File.expand_path('lib/jrjackson')
@@ -121,19 +120,6 @@ Benchmark.bmbm("jackson parse symbol keys:  ".size) do |x|
     end
     th2 = Thread.new(generated_array) do |arry|
       50.times {arry.each {|string| ::JSON.parse(string).first }}
-      q << true
-    end
-    q.pop
-    q.pop
-  end
-
-  x.report("gson parse:") do
-    th1 = Thread.new(generated_array) do |arry|
-      50.times {arry.each {|string| ::Gson::Decoder.new.decode(string) }}
-      q << true
-    end
-    th2 = Thread.new(generated_array) do |arry|
-      50.times {arry.each {|string| ::Gson::Decoder.new.decode(string) }}
       q << true
     end
     q.pop

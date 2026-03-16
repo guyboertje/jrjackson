@@ -1,0 +1,48 @@
+name: Tests
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  test:
+    name: JRuby ${{ matrix.jruby-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        jruby-version:
+          - 'jruby-9.3'
+          - 'jruby-9.4'
+          - 'jruby-10.0'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Cache Maven repository
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('Mavenfile', 'pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Set up JRuby ${{ matrix.jruby-version }}
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.jruby-version }}
+          bundler-cache: true
+
+      - name: Compile Java sources
+        run: bundle exec rake compile
+
+      - name: Run tests
+        run: bundle exec rake test

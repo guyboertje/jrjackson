@@ -106,8 +106,7 @@ Credit to Chuck Remes for the benchmark and initial
 investigation when the jruby, json gem and the jackson
 libraries were young.
 
-I compared Json (java) 1.8.3, Gson 0.6.1 and jackson 2.6.1 on jruby 1.7.22 and Oracle Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27 +jit [linux-amd64]
-All the benchmarks were run separately. A 727.9KB string of random json data is read from a file and handled 250 times, thereby attempting to balance invocation and parsing benchmarking.
+Benchmarks are run separately. A 727.9KB string of random json data is read from a file and handled 250 times, thereby attempting to balance invocation and parsing benchmarking.
 
 ```
 generation/serialize
@@ -116,7 +115,6 @@ generation/serialize
 
 
 json java generate: 250                        6.780      0.620      7.400    (  6.599)
-gson generate: 250                             4.480      0.530      5.010    (  4.688)
 jackson generate: 250                          2.200      0.010      2.210    (  2.128)
 
 json mri parse: 250                            9.620      0.000      9.620    (  9.631)
@@ -147,7 +145,6 @@ I have done IPS style benchmarks too.
 Generation
 ```
 jrjackson:   74539.4 i/s
-    gson:    58288.3 i/s - 1.28x slower
     JSON:    54597.2 i/s - 1.37x slower
 ```
 

@@ -5,9 +5,9 @@
 # require 'benchmark'
 # require 'thread'
 require 'digest'
-require 'gson'
 
-# require File.expand_path('lib/jrjackson')
+$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+require 'jrjackson'
 
 HASH = {:one => nil, :two => nil, :three => nil, :four => {:a => nil, :b => nil, :c =>nil},
 :five => {:d => nil, :e => nil},
@@ -59,7 +59,7 @@ filename = File.expand_path('benchmarking/fixtures/source4.json')
 array = Array.new(array_size)
 
 File.open(filename, 'w') do |f|
-  f.write( ::Gson::Encoder.new({}).encode(
+  f.write( JrJackson::Json.dump(
       array.map{|e| randomize_entries(HASH.dup)}
     )
   )
