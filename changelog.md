@@ -1,3 +1,7 @@
+v0.4.21
+  Add bigdecimal as a runtime dependency for JRuby 10 / Ruby 3.4+ compatibility
+  Add GitHub Actions CI workflow
+
 v0.4.20
   fix: don't assume ruby strings are valid utf-8
 
