@@ -7,6 +7,7 @@ group :development do
   gem 'rake'
   gem 'ruby-maven'
   gem 'test-unit'
+  gem 'bigdecimal'
 end
 
 gemspec

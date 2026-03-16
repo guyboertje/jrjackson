@@ -39,6 +39,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.jruby-version }}
+          bundler: latest
           bundler-cache: true
 
       - name: Compile Java sources
