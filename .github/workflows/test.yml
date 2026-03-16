@@ -14,7 +14,6 @@ jobs:
       fail-fast: false
       matrix:
         jruby-version:
-          - 'jruby-9.3'
           - 'jruby-9.4'
           - 'jruby-10.0'
 
@@ -39,7 +38,6 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.jruby-version }}
-          bundler: latest
           bundler-cache: true
 
       - name: Compile Java sources
