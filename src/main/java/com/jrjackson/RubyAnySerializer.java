@@ -261,6 +261,7 @@ public class RubyAnySerializer extends JsonSerializer<IRubyObject> {
     // 1. JrJacksonBase.generate() calls serialize() directly, bypassing ObjectMapper.writeValue()
     // 2. No default typing or @JsonTypeInfo is configured on the ObjectMapper
     // Kept for now in case external consumers use the ObjectMapper with polymorphic typing.
+    @Deprecated(since = "0.5.0", forRemoval = true)
     @Override
     public void serializeWithType(IRubyObject value, JsonGenerator jgen, SerializerProvider provider, TypeSerializer typeSer)
             throws IOException, JsonGenerationException {
