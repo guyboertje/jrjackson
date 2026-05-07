@@ -1,6 +1,6 @@
 v0.5.0
   Upgrade jackson and jackson-databind to v2.21.2
-  Require JRuby 9.4.14.0 and Java 17 toolchain for builds
+  Require JRuby 9.4.14.0 and Java 11 toolchain for builds
   Drop legacy Gson benchmarks and dependency
   Add bigdecimal as a runtime dependency for JRuby 10 / Ruby 3.4+ compatibility
   Add GitHub Actions CI workflow

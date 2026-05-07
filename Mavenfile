@@ -11,13 +11,13 @@ packaging :jar
 properties 'project.build.sourceEncoding' => 'UTF-8',
            # create a pom.xml from this here
            'polyglot.dump.pom' => 'pom.xml',
-           'maven.compiler.release' => '17'
+           'maven.compiler.release' => '11'
 
 jar 'junit:junit', '4.13.2', :scope => :test
 
 jar 'org.jruby:jruby', '9.4.14.0', :scope => :provided
 
-plugin :compiler, '3.11.0', :release => '17',
+plugin :compiler, '3.11.0', :release => '11',
        :showDeprecation => false,
        :showWarnings => false
 
