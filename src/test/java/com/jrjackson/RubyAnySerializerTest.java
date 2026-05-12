@@ -4,10 +4,8 @@ import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import org.jcodings.specific.UTF8Encoding;
-import org.jruby.CompatVersion;
 import org.jruby.Ruby;
 import org.jruby.RubyHash;
-import org.jruby.RubyInstanceConfig;
 import org.jruby.ext.bigdecimal.RubyBigDecimal;
 import org.jruby.util.ByteList;
 import org.junit.Before;
@@ -27,14 +25,10 @@ public class RubyAnySerializerTest {
     public void setUp() throws Exception {
         if (setupDone) return;
 
-        RubyInstanceConfig config_19 = new RubyInstanceConfig();
-        config_19.setCompatVersion(CompatVersion.RUBY1_9);
-        ruby = Ruby.newInstance(config_19);
+        ruby = Ruby.newInstance();
         RubyBigDecimal.createBigDecimal(ruby); // we need to do 'require "bigdecimal"'
-//        JrubyTimestampExtLibrary.createTimestamp(ruby);
         setupDone = true;
     }
-
 
     @Test
     public void testSerialize() throws Exception {

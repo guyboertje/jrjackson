@@ -478,6 +478,33 @@ class JrJacksonTest < Test::Unit::TestCase
     end
   end
 
+  def test_deserializer_unexpected_token_error_path
+    require 'java'
+
+    runtime = org.jruby.Ruby.getGlobalRuntime
+    deserializer = Java::ComJrjackson::RubyObjectDeserializer.new
+    deserializer = deserializer.with(
+      runtime,
+      Java::ComJrjackson::RubyStringKeyConverter.new,
+      Java::ComJrjackson::RubyIntValueConverter.new,
+      Java::ComJrjackson::RubyFloatValueConverter.new
+    )
+
+    mapper = Java::ComFasterxmlJacksonDatabind::ObjectMapper.new
+    parser = mapper.factory.create_parser("[]")
+
+    parser.next_token # START_ARRAY
+    parser.next_token # END_ARRAY
+
+    context = mapper.deserialization_context
+
+    error = assert_raise(Java::ComFasterxmlJacksonDatabind::JsonMappingException) do
+      deserializer.deserialize(parser, context)
+    end
+
+    assert_match(/Unexpected token \(END_ARRAY\) when deserializing Ruby object/, error.message)
+  end
+
   def test_can_parse_bignum
     expected = 12345678901234567890123456789
     json = '{"foo":12345678901234567890123456789}'

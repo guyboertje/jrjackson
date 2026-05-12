@@ -15,4 +15,3 @@ jruby -J-Xmn1024m -J-Xms4096m -J-Xmx4096m -S ./benchmarking/individual/raw-jr-so
 jruby -J-Xmn1024m -J-Xms4096m -J-Xmx4096m -S ./benchmarking/individual/raw-bd-jr-sourced.rb
 
 jruby -J-Xmn1024m -J-Xms4096m -J-Xmx4096m -S ./benchmarking/individual/sj-jr-sourced.rb
-

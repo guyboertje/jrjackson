@@ -10,16 +10,15 @@ packaging :jar
 
 properties 'project.build.sourceEncoding' => 'UTF-8',
            # create a pom.xml from this here
-           'polyglot.dump.pom' => 'pom.xml'
+           'polyglot.dump.pom' => 'pom.xml',
+           'maven.compiler.release' => '11'
 
 jar 'junit:junit', '4.13.2', :scope => :test
 
-jar 'org.jruby:jruby', '9.3.14.0', :scope => :provided
+jar 'org.jruby:jruby', '9.4.14.0', :scope => :provided
 
-plugin :compiler, '3.1', :source => '1.8', :target => '1.8',
+plugin :compiler, '3.11.0', :release => '11',
        :showDeprecation => false,
-       :showWarnings => false,
-       :executable => '${JAVA_HOME}/bin/javac',
-       :fork => true
+       :showWarnings => false
 
-plugin :surefire, '2.17', :skipTests => true
+plugin :surefire, '2.17', :skipTests => false

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.type.WritableTypeId;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import org.jruby.RubyArray;
 import org.jruby.RubyClass;
@@ -255,22 +257,18 @@ public class RubyAnySerializer extends JsonSerializer<IRubyObject> {
         }
     }
 
-    /**
-     * Default implementation will write type prefix, call regular serialization method (since assumption is that value itself does not need JSON Array or Object start/end markers), and then write type suffix. This should work for most cases; some sub-classes may want to change this behavior.
-     *
-     * @param value
-     * @param jgen
-     * @param provider
-     * @param typeSer
-     * @throws java.io.IOException
-     * @throws com.fasterxml.jackson.core.JsonGenerationException
-     */
+    // TODO: Remove this method. It is dead code that is never triggered because:
+    // 1. JrJacksonBase.generate() calls serialize() directly, bypassing ObjectMapper.writeValue()
+    // 2. No default typing or @JsonTypeInfo is configured on the ObjectMapper
+    // Kept for now in case external consumers use the ObjectMapper with polymorphic typing.
+    @Deprecated(since = "0.5.0", forRemoval = true)
     @Override
     public void serializeWithType(IRubyObject value, JsonGenerator jgen, SerializerProvider provider, TypeSerializer typeSer)
             throws IOException, JsonGenerationException {
-        typeSer.writeTypePrefixForScalar(value, jgen);
+        WritableTypeId typeId = typeSer.typeId(value, JsonToken.VALUE_STRING);
+        typeSer.writeTypePrefix(jgen, typeId);
         serialize(value, jgen, provider);
-        typeSer.writeTypeSuffixForScalar(value, jgen);
+        typeSer.writeTypeSuffix(jgen, typeId);
     }
 
     enum RUBYCLASS {

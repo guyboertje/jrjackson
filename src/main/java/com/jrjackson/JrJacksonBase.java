@@ -22,7 +22,6 @@ import org.jruby.RubyString;
 import org.jruby.RubySymbol;
 import org.jruby.anno.JRubyMethod;
 import org.jruby.exceptions.RaiseException;
-import org.jruby.ext.stringio.StringIO;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 import org.jruby.util.ByteList;
@@ -109,16 +108,26 @@ public class JrJacksonBase extends RubyObject {
         return sp.deserialize(jp);
     }
 
-    protected static JsonParser buildParser(ThreadContext ctx, JsonFactory jf, IRubyObject arg) throws IOException {
+    private static boolean isStringIO(IRubyObject arg) {
+        return "StringIO".equals(arg.getMetaClass().getName());
+    }
+
+    protected static byte[] extractBytes(ThreadContext ctx, IRubyObject arg) {
         if (arg instanceof RubyString) {
-            return jf.createParser(((RubyString) arg).getByteList().bytes());
-        } else if (arg instanceof StringIO) {
-            RubyString content = (RubyString) ((StringIO) arg).string(ctx);
-            return jf.createParser(content.getByteList().bytes());
-        } else {
-            // must be an IO object then
-            return jf.createParser(((RubyIO) arg).getInStream());
+            return ((RubyString) arg).getByteList().bytes();
+        } else if (isStringIO(arg)) {
+            RubyString content = arg.callMethod(ctx, "string").convertToString();
+            return content.getByteList().bytes();
         }
+        return null;
+    }
+
+    protected static JsonParser buildParser(ThreadContext ctx, JsonFactory jf, IRubyObject arg) throws IOException {
+        byte[] bytes = extractBytes(ctx, arg);
+        if (bytes != null) {
+            return jf.createParser(bytes);
+        }
+        return jf.createParser(((RubyIO) arg).getInStream());
     }
 
     protected static IRubyObject _parse(ThreadContext context, IRubyObject arg, ObjectMapper mapper) throws IOException, RaiseException {
@@ -128,13 +137,10 @@ public class JrJacksonBase extends RubyObject {
         mapper.setDateFormat(simpleFormat);
         try {
             Object o;
-            if (arg instanceof RubyString) {
-                o = mapper.readValue(((RubyString) arg).getByteList().bytes(), Object.class);
-            } else if (arg instanceof StringIO) {
-                RubyString content = (RubyString) ((StringIO) arg).string(context);
-                o = mapper.readValue(content.getByteList().bytes(), Object.class);
+            byte[] bytes = extractBytes(context, arg);
+            if (bytes != null) {
+                o = mapper.readValue(bytes, Object.class);
             } else {
-                // must be an IO object then
                 o = mapper.readValue(((RubyIO) arg).getInStream(), Object.class);
             }
             return RubyUtils.rubyObject(ruby, o);
