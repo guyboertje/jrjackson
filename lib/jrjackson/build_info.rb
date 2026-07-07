@@ -1,11 +1,11 @@
 module JrJackson
   module BuildInfo
     def self.version
-      '0.5.1'
+      '0.5.2'
     end
 
     def self.release_date
-      '2026-06-26'
+      '2026-07-07'
     end
 
     def self.files
@@ -31,7 +31,14 @@ module JrJackson
     private
 
     def self.generated_files
-      Dir.glob( %w(pom.xml lib/jrjackson_jars.rb) )
+      files = %w(pom.xml lib/jrjackson_jars.rb)
+      missing = files.reject { |f| File.file?(f) }
+      unless missing.empty?
+        raise "jrjackson packaging error: generated file(s) missing at build time: " \
+              "#{missing.join(', ')}. Run `rake vendor_jars` (or `rake compile`) to " \
+              "regenerate them before building the gem."
+      end
+      files
     end
 
     def self.repo_files
