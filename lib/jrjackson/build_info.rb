@@ -37,8 +37,11 @@ module JrJackson
       %w(pom.xml lib/jrjackson_jars.rb)
     end
 
+    # Exclude jars from the glob. They are listed with their exact versions in
+    # generated_jar_files, so leftover jars from an older version are not
+    # packaged.
     def self.repo_files
-      Dir["lib/**/*"].select{ |f| File.file? f } + ["README.md", "jrjackson.gemspec", ]
+      Dir["lib/**/*"].select{ |f| File.file?(f) && !f.end_with?(".jar") } + ["README.md", "jrjackson.gemspec", ]
     end
 
     def self.generated_jar_files
