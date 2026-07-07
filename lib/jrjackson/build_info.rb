@@ -30,15 +30,11 @@ module JrJackson
 
     private
 
+    # Use an explicit list, not Dir.glob. The gemspec is evaluated at Rakefile
+    # load time, before rake compile regenerates these files, so a glob would
+    # drop them.
     def self.generated_files
-      files = %w(pom.xml lib/jrjackson_jars.rb)
-      missing = files.reject { |f| File.file?(f) }
-      unless missing.empty?
-        raise "jrjackson packaging error: generated file(s) missing at build time: " \
-              "#{missing.join(', ')}. Run `rake vendor_jars` (or `rake compile`) to " \
-              "regenerate them before building the gem."
-      end
-      files
+      %w(pom.xml lib/jrjackson_jars.rb)
     end
 
     def self.repo_files

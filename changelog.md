@@ -1,8 +1,7 @@
 v0.5.2
-  Fix packaging: the generated lib/jrjackson_jars.rb shim was omitted from the
-    v0.5.1 gem, making it fail to load with `LoadError: cannot load such file --
-    jrjackson_jars`. Guard generated_files so a missing generated file now fails
-    the build instead of shipping a broken gem.
+  Fix packaging so the generated lib/jrjackson_jars.rb is included in the gem
+  List generated files explicitly instead of using Dir.glob so they are packaged even when generated after the gemspec is evaluated
+  Add a build step that fails when a file listed in the gemspec is missing
 
 v0.5.1
   Upgrade jackson and jackson-databind to v2.21.4
