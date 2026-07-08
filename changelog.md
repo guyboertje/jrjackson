@@ -1,3 +1,11 @@
+v0.5.2
+  Fix packaging so the generated lib/jrjackson_jars.rb is included in the gem
+  List generated files explicitly instead of using Dir.glob so they are packaged even when generated after the gemspec is evaluated
+  Add a build step that fails when a file listed in the gemspec is missing
+
+v0.5.1
+  Upgrade jackson and jackson-databind to v2.21.4
+
 v0.5.0
   Upgrade jackson and jackson-databind to v2.21.2
   Require JRuby 9.4.14.0 and Java 11 toolchain for builds

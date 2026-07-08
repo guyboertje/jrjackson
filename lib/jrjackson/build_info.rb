@@ -1,11 +1,11 @@
 module JrJackson
   module BuildInfo
     def self.version
-      '0.5.1'
+      '0.5.2'
     end
 
     def self.release_date
-      '2026-06-26'
+      '2026-07-07'
     end
 
     def self.files
@@ -30,12 +30,18 @@ module JrJackson
 
     private
 
+    # Use an explicit list, not Dir.glob. The gemspec is evaluated at Rakefile
+    # load time, before rake compile regenerates these files, so a glob would
+    # drop them.
     def self.generated_files
-      Dir.glob( %w(pom.xml lib/jrjackson_jars.rb) )
+      %w(pom.xml lib/jrjackson_jars.rb)
     end
 
+    # Exclude jars from the glob. They are listed with their exact versions in
+    # generated_jar_files, so leftover jars from an older version are not
+    # packaged.
     def self.repo_files
-      Dir["lib/**/*"].select{ |f| File.file? f } + ["README.md", "jrjackson.gemspec", ]
+      Dir["lib/**/*"].select{ |f| File.file?(f) && !f.end_with?(".jar") } + ["README.md", "jrjackson.gemspec", ]
     end
 
     def self.generated_jar_files
