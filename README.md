@@ -1,4 +1,16 @@
+# Moved to elastic/jrjackson
 
+This repository is no longer maintained. Development and gem releases have moved
+to [elastic/jrjackson](https://github.com/elastic/jrjackson), which is now the
+source of truth for the `jrjackson` gem.
+
+- Open issues and pull requests there: https://github.com/elastic/jrjackson
+- The gem on RubyGems is published from that repository: https://rubygems.org/gems/jrjackson
+
+Existing releases here remain available, but no further changes will be made in
+this repository.
+
+---
 
 LICENSE applicable to this library:
 
